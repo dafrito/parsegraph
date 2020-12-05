@@ -1,0 +1,9 @@
+{
+  "source": "./src",
+  "destination": "./dist/docs",
+  "excludes": ["index.js"],
+  "plugins": [
+    {"name": "esdoc-standard-plugin"},
+    {"name": "esdoc-typescript-plugin", "option": {"enable": true}}
+  ]
+}

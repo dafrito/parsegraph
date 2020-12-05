@@ -1,0 +1,10 @@
+require:
+  - ts-node/register
+  - source-map-support/register
+recursive: true
+color: true
+exit: true
+extension:
+  - js
+  - ts
+  - test.ts
