@@ -1,0 +1,19 @@
+{
+  "name": "parsegraph-pagingbuffer",
+  "version": "1.4.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/parsegraph/pagingbuffer.git"
+  },
+  "author": "Rainback, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/parsegraph/pagingbuffer/issues"
+  },
+  "homepage": "https://github.com/parsegraph/pagingbuffer#readme"
+}
