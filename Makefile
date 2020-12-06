@@ -1,13 +1,15 @@
+DIST_NAME = testsuite
+
 SCRIPT_FILES = \
 	src/PagingBuffer.ts \
 	src/BufferPage.ts
 
 all: build lint test coverage esdoc
 
-build: dist/pagingbuffer.js
+build: dist/$(DIST_NAME).js
 .PHONY: build
 
-demo: dist/parsegraph.js
+demo: dist/$(DIST_NAME).js
 	npm run demo
 .PHONY: demo
 
@@ -37,7 +39,7 @@ esdoc:
 doc: esdoc
 .PHONY: doc
 
-dist/pagingbuffer.js: $(SCRIPT_FILES)
+dist/$(DIST_NAME).js: $(SCRIPT_FILES)
 	npm run build
 
 clean:
