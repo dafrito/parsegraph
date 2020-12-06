@@ -6,7 +6,7 @@ export default class BufferPage {
       renderFuncThisArg = this;
     }
     if (!renderFunc) {
-      renderFunc = function (gl, numIndices) {
+      renderFunc = function(gl, numIndices) {
         // console.log("Drawing " + numIndices + " indices");
         gl.drawArrays(gl.TRIANGLES, 0, numIndices);
       };
@@ -19,7 +19,7 @@ export default class BufferPage {
     this.renderFuncThisArg = renderFuncThisArg;
 
     // Add a buffer entry for each vertex attribute.
-    pagingBuffer._attribs.forEach(function () {
+    pagingBuffer._attribs.forEach(function() {
       this.buffers.push([]);
       this.glBuffers.push(null);
     }, this);
@@ -48,10 +48,10 @@ export default class BufferPage {
   appendData(attribIndex, ...args) {
     // Ensure attribIndex points to a valid attribute.
     if (attribIndex < 0 || attribIndex > this.buffers.length - 1) {
-      throw new Error("attribIndex is out of range. Given: " + attribIndex);
+      throw new Error('attribIndex is out of range. Given: ' + attribIndex);
     }
-    if (typeof attribIndex !== "number") {
-      throw new Error("attribIndex must be a number.");
+    if (typeof attribIndex !== 'number') {
+      throw new Error('attribIndex must be a number.');
     }
 
     /**
@@ -61,20 +61,20 @@ export default class BufferPage {
      */
     const appendValue = (value) => {
       let numAdded = 0;
-      if (typeof value.forEach == "function") {
-        value.forEach(function (x) {
+      if (typeof value.forEach == 'function') {
+        value.forEach(function(x) {
           numAdded += appendValue(x);
         }, this);
         return numAdded;
       }
-      if (typeof value.length == "number") {
+      if (typeof value.length == 'number') {
         for (let i = 0; i < value.length; ++i) {
           numAdded += appendValue(value[i]);
         }
         return numAdded;
       }
-      if (Number.isNaN(value) || typeof value != "number") {
-        throw new Error("Value is not a number: " + value);
+      if (Number.isNaN(value) || typeof value != 'number') {
+        throw new Error('Value is not a number: ' + value);
       }
       this.buffers[attribIndex].push(value);
       this.needsUpdate = true;
@@ -91,20 +91,20 @@ export default class BufferPage {
   }
 
   appendRGB(attribIndex, color) {
-    if (typeof color.r == "function") {
+    if (typeof color.r == 'function') {
       return this.appendData(attribIndex, color.r(), color.g(), color.b());
     }
     return this.appendData(attribIndex, color.r, color.g, color.b);
   }
 
   appendRGBA(attribIndex, color) {
-    if (typeof color.r == "function") {
+    if (typeof color.r == 'function') {
       return this.appendData(
-        attribIndex,
-        color.r(),
-        color.g(),
-        color.b(),
-        color.a()
+          attribIndex,
+          color.r(),
+          color.g(),
+          color.b(),
+          color.a(),
       );
     }
     return this.appendData(attribIndex, color.r, color.g, color.b, color.a);

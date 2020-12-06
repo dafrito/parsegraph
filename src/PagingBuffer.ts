@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 
-import BufferPage from "./BufferPage";
+import BufferPage from './BufferPage';
 
 /*
  * Manages the low-level paging of vertex attributes. For
@@ -9,10 +9,10 @@ import BufferPage from "./BufferPage";
 export default class PagingBuffer {
   constructor(gl, program) {
     if (!gl) {
-      throw new Error("gl must be provided");
+      throw new Error('gl must be provided');
     }
     if (!program) {
-      throw new Error("program must be provided");
+      throw new Error('program must be provided');
     }
     // Contains vertex attribute information used for drawing. Provide using
     // defineAttrib.
@@ -60,7 +60,7 @@ export default class PagingBuffer {
 
   getWorkingPage() {
     if (this._pages.length === 0) {
-      throw new Error("Refusing to create a new page; call addPage()");
+      throw new Error('Refusing to create a new page; call addPage()');
     }
     return this._pages[this._currentPage];
   }
@@ -78,7 +78,7 @@ export default class PagingBuffer {
       drawMode = this._gl.STATIC_DRAW;
     }
     // Add a new buffer entry for this new attribute.
-    this._pages.forEach(function (page) {
+    this._pages.forEach(function(page) {
       page.buffers.push([]);
       page.glBuffers.push(null);
     });
@@ -116,8 +116,8 @@ export default class PagingBuffer {
    */
   clear() {
     // Clear the buffers for all pages.
-    this._pages.forEach(function (page) {
-      this._attribs.forEach(function (attrib, attribIndex) {
+    this._pages.forEach(function(page) {
+      this._attribs.forEach(function(attrib, attribIndex) {
         // if(page.glBuffers[attribIndex] != null) {
         // this._gl.deleteBuffer(page.glBuffers[attribIndex]);
         // page.glBuffers[attribIndex] = null;
@@ -142,7 +142,7 @@ export default class PagingBuffer {
     let count = 0;
 
     // Enable used vertex attributes.
-    this._attribs.forEach(function (attrib) {
+    this._attribs.forEach(function(attrib) {
       if (attrib.location == -1) {
         return;
       }
@@ -150,7 +150,7 @@ export default class PagingBuffer {
     }, this);
 
     // Draw each page.
-    this._pages.forEach(function (page, index) {
+    this._pages.forEach(function(page, index) {
       if (index > this._currentPage) {
         return;
       }
@@ -158,7 +158,7 @@ export default class PagingBuffer {
       let numIndices;
 
       // Prepare each vertex attribute.
-      this._attribs.forEach(function (attrib, attribIndex) {
+      this._attribs.forEach(function(attrib, attribIndex) {
         if (attrib.location == -1) {
           return;
         }
@@ -173,31 +173,31 @@ export default class PagingBuffer {
         if (page.needsUpdate && bufferData.length > 0) {
           // console.log("Pushing bytes to GL");
           this._gl.bufferData(
-            this._gl.ARRAY_BUFFER,
-            new Float32Array(bufferData),
-            attrib.drawMode
+              this._gl.ARRAY_BUFFER,
+              new Float32Array(bufferData),
+              attrib.drawMode,
           );
         }
 
         // Set up the vertex attribute pointer.
         this._gl.vertexAttribPointer(
-          attrib.location,
-          attrib.numComponents,
-          this._gl.FLOAT,
-          false,
-          0,
-          0
+            attrib.location,
+            attrib.numComponents,
+            this._gl.FLOAT,
+            false,
+            0,
+            0,
         );
 
         const thisNumIndices = bufferData.length / attrib.numComponents;
         if (Math.round(thisNumIndices) != thisNumIndices) {
           throw new Error(
-            "Odd number of indices for attrib " +
+              'Odd number of indices for attrib ' +
               attrib.name +
-              ". Wanted " +
+              '. Wanted ' +
               Math.round(thisNumIndices) +
-              ", but got " +
-              thisNumIndices
+              ', but got ' +
+              thisNumIndices,
           );
         }
         if (numIndices == undefined) {
@@ -217,7 +217,7 @@ export default class PagingBuffer {
     }, this);
 
     // Disable used variables.
-    this._attribs.forEach(function (attrib) {
+    this._attribs.forEach(function(attrib) {
       if (attrib.location == -1) {
         return;
       }
