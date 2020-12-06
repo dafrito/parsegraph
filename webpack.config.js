@@ -1,12 +1,12 @@
 const path = require("path");
 
 module.exports = {
-  entry: path.resolve(__dirname, "src/PagingBuffer.ts"),
+  entry: path.resolve(__dirname, "src/index.ts"),
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "pagingbuffer.js",
+    filename: "testsuite.js",
     globalObject: "this",
-    library: "PagingBuffer",
+    library: "TestSuite",
     libraryTarget: "umd",
   },
   module: {

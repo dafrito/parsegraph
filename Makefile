@@ -1,7 +1,11 @@
 DIST_NAME = testsuite
 
 SCRIPT_FILES = \
-	src/TestSuite.js
+	src/index.ts \
+	src/Test.ts \
+	src/TestResult.ts \
+	src/TestSuite.ts \
+	src/TestSuiteResult.ts
 
 all: build lint test coverage esdoc
 
