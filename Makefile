@@ -1,8 +1,7 @@
 DIST_NAME = testsuite
 
 SCRIPT_FILES = \
-	src/PagingBuffer.ts \
-	src/BufferPage.ts
+	src/TestSuite.js
 
 all: build lint test coverage esdoc
 

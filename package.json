@@ -1,8 +1,8 @@
 {
-  "name": "parsegraph-pagingbuffer",
-  "version": "1.4.7",
-  "description": "Method to populate WebGL buffers during painting",
-  "main": "dist/pagingbuffer.js",
+  "name": "parsegraph-testsuite",
+  "version": "1.4.0",
+  "description": "Test class",
+  "main": "dist/testsuite.js",
   "scripts": {
     "coverage": "nyc npm run test",
     "test": "mocha -r @babel/register -r jsdom-global/register --recursive",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/parsegraph/pagingbuffer.git"
+    "url": "git+ssh://git@github.com/parsegraph/TestSuite.git"
   },
   "author": "Rainback, Inc.",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/parsegraph/pagingbuffer/issues"
+    "url": "https://github.com/parsegraph/TestSuite/issues"
   },
-  "homepage": "https://github.com/parsegraph/pagingbuffer#readme",
+  "homepage": "https://github.com/parsegraph/TestSuite#readme",
   "nyc": {
     "extends": "@istanbuljs/nyc-config-babel",
     "reporter": [
