@@ -2,9 +2,9 @@
 
 export default class BufferPage {
   constructor(
-    pagingBuffer,
-    renderFunc,
-    renderFuncThisArg
+      pagingBuffer,
+      renderFunc,
+      renderFuncThisArg,
   ) {
     if (!renderFuncThisArg) {
       renderFuncThisArg = this;
@@ -49,7 +49,7 @@ export default class BufferPage {
    * Adds each of the specified values to the working buffer. If the value is an
    * array, each of its internal values are added.
    */
-  appendData(attribIndex, /* , ... */) {
+  appendData(attribIndex /* , ... */) {
     // Ensure attribIndex points to a valid attribute.
     if (attribIndex < 0 || attribIndex > this.buffers.length - 1) {
       throw new Error('attribIndex is out of range. Given: ' + attribIndex);
@@ -60,19 +60,20 @@ export default class BufferPage {
 
     /**
      * Adds the specified value to the current vertex attribute buffer.
+     * @param {Function|Array|number} value either a function, Array, or number.
+     * @return {number} the number of added values
      */
-    const pagingBuffer = this;
-    const appendValue = function(value) {
+    const appendValue = (value)=>{
       let numAdded = 0;
       if (typeof value.forEach == 'function') {
         value.forEach(function(x) {
-          numAdded += appendValue.call(this, x);
+          numAdded += appendValue(x);
         }, this);
         return numAdded;
       }
       if (typeof value.length == 'number') {
         for (let i = 0; i < value.length; ++i) {
-          numAdded += appendValue.call(this, value[i]);
+          numAdded += appendValue(value[i]);
         }
         return numAdded;
       }
@@ -88,7 +89,7 @@ export default class BufferPage {
     // Add each argument individually.
     let cumulativeAdded = 0;
     for (let i = 1; i < args.length; ++i) {
-      cumulativeAdded += appendValue.call(this, args[i]);
+      cumulativeAdded += appendValue(args[i]);
     }
     return cumulativeAdded;
   };

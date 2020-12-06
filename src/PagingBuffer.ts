@@ -8,11 +8,11 @@ import BufferPage from './BufferPage';
  */
 export default class PagingBuffer {
   constructor(gl, program) {
-    if(!gl) {
-      throw new Error("gl must be provided");
+    if (!gl) {
+      throw new Error('gl must be provided');
     }
-    if(!program) {
-      throw new Error("program must be provided");
+    if (!program) {
+      throw new Error('program must be provided');
     }
     // Contains vertex attribute information used for drawing. Provide using
     // defineAttrib.
@@ -186,52 +186,52 @@ export default class PagingBuffer {
           );
         }
 
-      // Set up the vertex attribute pointer.
-      this._gl.vertexAttribPointer(
-          attrib.location,
-          attrib.numComponents,
-          this._gl.FLOAT,
-          false,
-          0,
-          0,
-      );
+        // Set up the vertex attribute pointer.
+        this._gl.vertexAttribPointer(
+            attrib.location,
+            attrib.numComponents,
+            this._gl.FLOAT,
+            false,
+            0,
+            0,
+        );
 
-      const thisNumIndices = bufferData.length / attrib.numComponents;
-      if (Math.round(thisNumIndices) != thisNumIndices) {
-        throw new Error(
-            'Odd number of indices for attrib ' +
+        const thisNumIndices = bufferData.length / attrib.numComponents;
+        if (Math.round(thisNumIndices) != thisNumIndices) {
+          throw new Error(
+              'Odd number of indices for attrib ' +
             attrib.name +
             '. Wanted ' +
             Math.round(thisNumIndices) +
             ', but got ' +
             thisNumIndices,
-        );
+          );
+        }
+        if (numIndices == undefined) {
+          numIndices = thisNumIndices;
+        } else {
+          numIndices = Math.min(numIndices, thisNumIndices);
+        }
+      }, this);
+
+      // Draw the page's triangles.
+      if (numIndices > 0) {
+        page.renderFunc.call(page.renderFuncThisArg, this._gl, numIndices);
+        count += numIndices / 3;
       }
-      if (numIndices == undefined) {
-        numIndices = thisNumIndices;
-      } else {
-        numIndices = Math.min(numIndices, thisNumIndices);
-      }
+
+      page.needsUpdate = false;
     }, this);
 
-    // Draw the page's triangles.
-    if (numIndices > 0) {
-      page.renderFunc.call(page.renderFuncThisArg, this._gl, numIndices);
-      count += numIndices / 3;
-    }
+    // Disable used variables.
+    this._attribs.forEach(function(attrib) {
+      if (attrib.location == -1) {
+        return;
+      }
+      this._gl.disableVertexAttribArray(attrib.location);
+    }, this);
 
-    page.needsUpdate = false;
-  }, this);
-
-  // Disable used variables.
-  this._attribs.forEach(function(attrib) {
-    if (attrib.location == -1) {
-      return;
-    }
-    this._gl.disableVertexAttribArray(attrib.location);
-  }, this);
-
-  return count;
+    return count;
   }
 }
 
