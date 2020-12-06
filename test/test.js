@@ -50,5 +50,17 @@ describe('PagingBuffer', function() {
         pb.appendData(a_position, 0, 1, 0);
         pb.appendData(a_position, 0, 0, 1);
     });
+    it('fails if given falsy attribute index', function() {
+        var canvas = new HTMLCanvasElement( 500, 500 );
+        var gl = canvas.getContext('webgl');
+        var pb = new PagingBuffer(gl, 1);
+        pb.addPage(()=>{}, null);
+        const a_position = pb.defineAttrib("a_position", 3);
+        pb.appendData(a_position, 1, 0, 0);
+        assert.throws(()=>{
+          pb.appendData(null, 0, 1, 0);
+        });
+        pb.appendData(a_position, 0, 0, 1);
+    });
   });
 });
