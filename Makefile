@@ -2,6 +2,8 @@ SCRIPT_FILES = \
 	src/PagingBuffer.ts \
 	src/BufferPage.ts
 
+all: build lint test coverage esdoc
+
 build: dist/pagingbuffer.js
 .PHONY: build
 
