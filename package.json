@@ -5,7 +5,7 @@
   "main": "dist/pagingbuffer.js",
   "scripts": {
     "coverage": "nyc npm run test",
-    "test": "mocha -r jsdom-global/register --recursive",
+    "test": "mocha -r @babel/register -r jsdom-global/register --recursive",
     "demo": "node demo/demo.js",
     "autobuild": "webpack --watch --config webpack.config.js",
     "build": "webpack --config webpack.config.js"
