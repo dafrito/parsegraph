@@ -79,7 +79,7 @@ export default class PagingBuffer {
   defineAttrib(
       name,
       numComponents,
-      drawMode?
+      drawMode?,
   ) {
     if (drawMode == undefined) {
       drawMode = this._gl.STATIC_DRAW;
