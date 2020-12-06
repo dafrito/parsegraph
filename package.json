@@ -22,8 +22,13 @@
   "homepage": "https://github.com/parsegraph/pagingbuffer#readme",
   "nyc": {
     "extends": "@istanbuljs/nyc-config-babel",
-    "reporter": ["html"],
-    "exclude": ["test/**.js", "dist/**.js"],
+    "reporter": [
+      "html"
+    ],
+    "exclude": [
+      "test/**.js",
+      "dist/**.js"
+    ],
     "reportDir": "dist/coverage"
   },
   "devDependencies": {
