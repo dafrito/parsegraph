@@ -22,7 +22,9 @@
   "homepage": "https://github.com/parsegraph/pagingbuffer#readme",
   "nyc": {
     "extends": "@istanbuljs/nyc-config-babel",
-    "reporter": ["html"]
+    "reporter": ["html"],
+    "sourceMap": true,
+    "produce-source-map": true
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
