@@ -1,6 +1,6 @@
 {
   "name": "parsegraph-pagingbuffer",
-  "version": "1.4.0",
+  "version": "1.4.3",
   "description": "Method to populate WebGL buffers during painting",
   "main": "dist/pagingbuffer.js",
   "scripts": {
