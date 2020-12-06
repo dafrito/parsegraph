@@ -11,5 +11,6 @@ parserOptions:
 plugins:
   - "@typescript-eslint"
 rules: {
-  "complexity": ["error", 20]
+  "complexity": ["error", 20],
+  "require-jsdoc": ["off"]
 }
