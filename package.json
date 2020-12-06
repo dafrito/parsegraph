@@ -2,7 +2,7 @@
   "name": "parsegraph-pagingbuffer",
   "version": "1.4.0",
   "description": "Method to populate WebGL buffers during painting",
-  "main": "src/PagingBuffer.ts",
+  "main": "dist/pagingbuffer.js",
   "scripts": {
     "coverage": "nyc npm run test",
     "test": "mocha -r jsdom-global/register --recursive",
