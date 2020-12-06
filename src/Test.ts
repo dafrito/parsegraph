@@ -1,3 +1,5 @@
+import TestSuiteResult from './TestSuiteResult';
+
 export default class Test {
   _name:string;
   _runner:object[];
@@ -25,7 +27,7 @@ export default class Test {
 
   run(listener, listenerThisArg, resultDom, suiteResult) {
     if (!suiteResult) {
-      suiteResult = new parsegraph_TestSuiteResult();
+      suiteResult = new TestSuiteResult();
     }
     if (this.isTestSuite()) {
       try {
@@ -76,7 +78,7 @@ export default class Test {
       testStatus = 'Crashed';
     }
 
-    return new parsegraph_TestResult(testStatus, testResult, this);
+    return new TestResult(testStatus, testResult, this);
   };
 
   test() {

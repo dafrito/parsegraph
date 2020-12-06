@@ -1,6 +1,13 @@
 import Test from './Test';
+import TestSuiteResult from './TestSuiteResult';
 
-let AllTests;
+let allTests = null;
+export function AllTests() {
+  if(!allTests) {
+    allTests = new TestSuite("parsegraph", true);
+  }
+  return allTests;
+}
 
 export default class TestSuite {
   _name:string;
@@ -15,8 +22,8 @@ export default class TestSuite {
 
     this._tests = [];
 
-    if (!dontAutoadd && AllTests) {
-      AllTests.addTest(this);
+    if (!dontAutoadd && AllTests()) {
+      AllTests().addTest(this);
     }
   }
 
@@ -41,7 +48,7 @@ export default class TestSuite {
           runner,
       );
     }
-    const test = new parsegraph_Test(testName, runner, runnerThisArg);
+    const test = new Test(testName, runner, runnerThisArg);
     this._tests.push(test);
     return test;
   };
@@ -54,7 +61,7 @@ export default class TestSuite {
     };
 
     if (!testResults) {
-      testResults = new parsegraph_TestSuiteResult();
+      testResults = new TestSuiteResult();
     }
 
     // Run the given listener for each test object.
@@ -138,6 +145,3 @@ export default class TestSuite {
     return testResults;
   };
 }
-
-AllTests = new TestSuite('parsegraph', true);
-export AllTests
