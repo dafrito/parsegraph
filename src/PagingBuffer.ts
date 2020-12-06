@@ -105,17 +105,17 @@ export default class PagingBuffer {
 
   appendRGB(...args) {
     const page = this.getWorkingPage();
-    return page.appendRGB.apply(page, ...args);
+    return page.appendRGB(...args);
   };
 
   appendRGBA(...args) {
     const page = this.getWorkingPage();
-    return page.appendRGBA.apply(page, ...args);
+    return page.appendRGBA(...args);
   };
 
   appendData(...args) {
     const page = this.getWorkingPage();
-    return page.appendData.apply(page, ...args);
+    return page.appendData(...args);
   };
 
   /*
