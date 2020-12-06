@@ -5,6 +5,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "pagingbuffer.js",
+    globalObject: "this",
     library: "PagingBuffer",
     libraryTarget: "umd",
   },
