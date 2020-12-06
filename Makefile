@@ -1,6 +1,6 @@
 SCRIPT_FILES = \
-	src/PagingBuffer.js \
-	src/BufferPage.js
+	src/PagingBuffer.ts \
+	src/BufferPage.ts
 
 build: dist/pagingbuffer.js
 .PHONY: build
