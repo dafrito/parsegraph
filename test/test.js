@@ -1,8 +1,5 @@
 var assert = require("assert");
-import PagingBuffer, { BufferPage } from "../dist/pagingbuffer";
-console.log(PagingBuffer);
-console.log(BufferPage);
-
+import PagingBuffer from "../dist/pagingbuffer";
 require("webgl-mock");
 
 describe("Array", function () {
