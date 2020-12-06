@@ -1,7 +1,7 @@
 {
-  "name": "parsegraph-testsuite",
-  "version": "1.4.1",
-  "description": "Test class",
+  "name": "parsegraph-extent",
+  "version": "1.4.0",
+  "description": "2D geometric container",
   "main": "dist/testsuite.js",
   "scripts": {
     "coverage": "nyc npm run test",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/parsegraph/TestSuite.git"
+    "url": "git+ssh://git@github.com/parsegraph/extent.git"
   },
   "author": "Rainback, Inc.",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/parsegraph/TestSuite/issues"
+    "url": "https://github.com/parsegraph/extent/issues"
   },
-  "homepage": "https://github.com/parsegraph/TestSuite#readme",
+  "homepage": "https://github.com/parsegraph/extent#readme",
   "nyc": {
     "extends": "@istanbuljs/nyc-config-babel",
     "reporter": [
@@ -71,6 +71,7 @@
     "express": "^4.17.1",
     "glslify-loader": "^2.0.0",
     "openssl": "^1.1.0",
+    "parsegraph-testsuite": "^1.4.1",
     "raw-loader": "^4.0.1",
     "ts-mocha": "^8.0.0",
     "webgl-mock": "^0.1.7"

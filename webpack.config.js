@@ -4,9 +4,9 @@ module.exports = {
   entry: path.resolve(__dirname, "src/index.ts"),
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "testsuite.js",
+    filename: "extent.js",
     globalObject: "this",
-    library: "TestSuite",
+    library: "Extent",
     libraryTarget: "umd",
   },
   module: {

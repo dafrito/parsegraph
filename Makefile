@@ -1,11 +1,8 @@
-DIST_NAME = testsuite
+DIST_NAME = extent
 
 SCRIPT_FILES = \
 	src/index.ts \
-	src/Test.ts \
-	src/TestResult.ts \
-	src/TestSuite.ts \
-	src/TestSuiteResult.ts
+	src/Extent.js
 
 all: build lint test coverage esdoc
 
