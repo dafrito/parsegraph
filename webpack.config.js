@@ -1,11 +1,11 @@
 const path = require("path");
 
 module.exports = {
-  entry: path.resolve(__dirname, "src/PagingBuffer.js"),
+  entry: path.resolve(__dirname, "src/PagingBuffer.ts"),
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "pagingbuffer.js",
-    library: "parsegraph",
+    library: "PagingBuffer",
     libraryTarget: "umd",
   },
   module: {

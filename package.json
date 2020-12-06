@@ -2,9 +2,10 @@
   "name": "pagingbuffer",
   "version": "1.4.0",
   "description": "",
-  "main": "src/PagingBuffer.js",
+  "main": "src/PagingBuffer.ts",
   "scripts": {
-    "test": "nyc mocha src",
+    "coverage": "nyc npm run test",
+    "test": "mocha --require @babel/register -r jsdom-global/register --recursive",
     "demo": "node demo/demo.js",
     "autobuild": "webpack --watch --config webpack.config.js",
     "build": "webpack --config webpack.config.js"
@@ -20,25 +21,8 @@
   },
   "homepage": "https://github.com/parsegraph/pagingbuffer#readme",
   "nyc": {
-    "include": [
-      "src/**/*.js",
-      "src/**/*.ts",
-      "src/**/*.tsx"
-    ],
-    "extension": [
-      ".js",
-      ".ts",
-      ".tsx"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "reporter": [
-      "text-summary",
-      "html"
-    ],
-    "sourceMap": true,
-    "instrument": true
+    "extends": "@istanbuljs/nyc-config-babel",
+    "reporter": ["html"]
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
@@ -46,12 +30,16 @@
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-typescript": "^7.10.4",
+    "@istanbuljs/nyc-config-babel": "^3.0.0",
     "@types/expect": "^24.3.0",
     "@types/mocha": "^8.0.4",
     "@typescript-eslint/eslint-plugin": "^4.8.0",
     "@typescript-eslint/parser": "^4.8.0",
+    "babel-plugin-istanbul": "^6.0.0",
     "eslint": "^7.13.0",
     "eslint-config-google": "^0.14.0",
+    "jsdom": "16.4.0",
+    "jsdom-global": "3.0.2",
     "mocha": "^8.2.1",
     "nyc": "^15.1.0",
     "prettier": "2.1.2",
@@ -64,16 +52,19 @@
     "webpack-cli": "^3.3.12"
   },
   "dependencies": {
-    "express": "^4.17.1",
     "@babel/polyfill": "^7.10.4",
+    "@babel/register": "^7.12.1",
+    "babel-core": "^6.26.3",
     "babel-loader": "^8.1.0",
     "core-js": "^3.6.5",
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
     "esdoc-typescript-plugin": "^1.0.1",
+    "express": "^4.17.1",
     "glslify-loader": "^2.0.0",
     "openssl": "^1.1.0",
     "raw-loader": "^4.0.1",
-    "ts-mocha": "^8.0.0"
+    "ts-mocha": "^8.0.0",
+    "webgl-mock": "^0.1.7"
   }
 }

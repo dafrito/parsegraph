@@ -1,4 +1,6 @@
-SCRIPT_FILES = src/PagingBuffer.js
+SCRIPT_FILES = \
+	src/PagingBuffer.js \
+	src/BufferPage.js
 
 build: dist/pagingbuffer.js
 .PHONY: build
@@ -25,6 +27,3 @@ esdoc:
 
 dist/pagingbuffer.js: $(SCRIPT_FILES)
 	npm run build
-
-%.js: %.ts
-	tsc $^
