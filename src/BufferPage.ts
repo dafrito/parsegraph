@@ -49,7 +49,7 @@ export default class BufferPage {
    * Adds each of the specified values to the working buffer. If the value is an
    * array, each of its internal values are added.
    */
-  appendData(attribIndex /* , ... */) {
+  appendData(attribIndex, ...args) {
     // Ensure attribIndex points to a valid attribute.
     if (attribIndex < 0 || attribIndex > this.buffers.length - 1) {
       throw new Error('attribIndex is out of range. Given: ' + attribIndex);
@@ -88,7 +88,7 @@ export default class BufferPage {
 
     // Add each argument individually.
     let cumulativeAdded = 0;
-    for (let i = 1; i < args.length; ++i) {
+    for (let i = 0; i < args.length; ++i) {
       cumulativeAdded += appendValue(args[i]);
     }
     return cumulativeAdded;
