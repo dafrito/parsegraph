@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 
-import BufferPage from './BufferPage';
+import BufferPage from "./BufferPage";
 
 /*
  * Manages the low-level paging of vertex attributes. For
@@ -8,10 +8,10 @@ import BufferPage from './BufferPage';
  */
 export default class PagingBuffer {
   constructor(gl, program) {
-    if(!gl) {
+    if (!gl) {
       throw new Error("gl must be provided");
     }
-    if(!program) {
+    if (!program) {
       throw new Error("program must be provided");
     }
     // Contains vertex attribute information used for drawing. Provide using
@@ -37,12 +37,9 @@ export default class PagingBuffer {
       }
     }
     return false;
-  };
+  }
 
-  addPage(
-      renderFunc,
-      renderFuncThisArg,
-  ) {
+  addPage(renderFunc, renderFuncThisArg) {
     ++this._currentPage;
 
     if (this._currentPage < this._pages.length) {
@@ -59,14 +56,14 @@ export default class PagingBuffer {
 
     // Return the working page.
     return page;
-  };
+  }
 
   getWorkingPage() {
     if (this._pages.length === 0) {
-      throw new Error('Refusing to create a new page; call addPage()');
+      throw new Error("Refusing to create a new page; call addPage()");
     }
     return this._pages[this._currentPage];
-  };
+  }
 
   /*
    * Defines an attribute for data entry.
@@ -76,16 +73,12 @@ export default class PagingBuffer {
    * type (1, 2, 3, or 4) drawMode - the WebGL draw mode.
    * Defaults to gl.STATIC_DRAW
    */
-  defineAttrib(
-      name,
-      numComponents,
-      drawMode,
-  ) {
+  defineAttrib(name, numComponents, drawMode?) {
     if (drawMode == undefined) {
       drawMode = this._gl.STATIC_DRAW;
     }
     // Add a new buffer entry for this new attribute.
-    this._pages.forEach(function(page) {
+    this._pages.forEach(function (page) {
       page.buffers.push([]);
       page.glBuffers.push(null);
     });
@@ -101,30 +94,30 @@ export default class PagingBuffer {
     this._attribs.push(attrib);
 
     return this._attribs.length - 1;
-  };
+  }
 
   appendRGB(...args) {
     const page = this.getWorkingPage();
-    return page.appendRGB.apply(page, ...args);
-  };
+    return page.appendRGB(...args);
+  }
 
   appendRGBA(...args) {
     const page = this.getWorkingPage();
-    return page.appendRGBA.apply(page, ...args);
-  };
+    return page.appendRGBA(...args);
+  }
 
   appendData(...args) {
     const page = this.getWorkingPage();
-    return page.appendData.apply(page, ...args);
-  };
+    return page.appendData(...args);
+  }
 
   /*
    * Deletes all buffers and empties values.
    */
   clear() {
     // Clear the buffers for all pages.
-    this._pages.forEach(function(page) {
-      this._attribs.forEach(function(attrib, attribIndex) {
+    this._pages.forEach(function (page) {
+      this._attribs.forEach(function (attrib, attribIndex) {
         // if(page.glBuffers[attribIndex] != null) {
         // this._gl.deleteBuffer(page.glBuffers[attribIndex]);
         // page.glBuffers[attribIndex] = null;
@@ -134,7 +127,7 @@ export default class PagingBuffer {
       page.needsUpdate = true;
     }, this);
     this._currentPage = -1;
-  };
+  }
 
   /*
    * Render each page. This function sets up vertex attribute
@@ -149,7 +142,7 @@ export default class PagingBuffer {
     let count = 0;
 
     // Enable used vertex attributes.
-    this._attribs.forEach(function(attrib) {
+    this._attribs.forEach(function (attrib) {
       if (attrib.location == -1) {
         return;
       }
@@ -157,7 +150,7 @@ export default class PagingBuffer {
     }, this);
 
     // Draw each page.
-    this._pages.forEach(function(page, index) {
+    this._pages.forEach(function (page, index) {
       if (index > this._currentPage) {
         return;
       }
@@ -165,7 +158,7 @@ export default class PagingBuffer {
       let numIndices;
 
       // Prepare each vertex attribute.
-      this._attribs.forEach(function(attrib, attribIndex) {
+      this._attribs.forEach(function (attrib, attribIndex) {
         if (attrib.location == -1) {
           return;
         }
@@ -180,58 +173,58 @@ export default class PagingBuffer {
         if (page.needsUpdate && bufferData.length > 0) {
           // console.log("Pushing bytes to GL");
           this._gl.bufferData(
-              this._gl.ARRAY_BUFFER,
-              new Float32Array(bufferData),
-              attrib.drawMode,
+            this._gl.ARRAY_BUFFER,
+            new Float32Array(bufferData),
+            attrib.drawMode
           );
         }
 
-      // Set up the vertex attribute pointer.
-      this._gl.vertexAttribPointer(
+        // Set up the vertex attribute pointer.
+        this._gl.vertexAttribPointer(
           attrib.location,
           attrib.numComponents,
           this._gl.FLOAT,
           false,
           0,
-          0,
-      );
-
-      const thisNumIndices = bufferData.length / attrib.numComponents;
-      if (Math.round(thisNumIndices) != thisNumIndices) {
-        throw new Error(
-            'Odd number of indices for attrib ' +
-            attrib.name +
-            '. Wanted ' +
-            Math.round(thisNumIndices) +
-            ', but got ' +
-            thisNumIndices,
+          0
         );
+
+        const thisNumIndices = bufferData.length / attrib.numComponents;
+        if (Math.round(thisNumIndices) != thisNumIndices) {
+          throw new Error(
+            "Odd number of indices for attrib " +
+              attrib.name +
+              ". Wanted " +
+              Math.round(thisNumIndices) +
+              ", but got " +
+              thisNumIndices
+          );
+        }
+        if (numIndices == undefined) {
+          numIndices = thisNumIndices;
+        } else {
+          numIndices = Math.min(numIndices, thisNumIndices);
+        }
+      }, this);
+
+      // Draw the page's triangles.
+      if (numIndices > 0) {
+        page.renderFunc.call(page.renderFuncThisArg, this._gl, numIndices);
+        count += numIndices / 3;
       }
-      if (numIndices == undefined) {
-        numIndices = thisNumIndices;
-      } else {
-        numIndices = Math.min(numIndices, thisNumIndices);
-      }
+
+      page.needsUpdate = false;
     }, this);
 
-    // Draw the page's triangles.
-    if (numIndices > 0) {
-      page.renderFunc.call(page.renderFuncThisArg, this._gl, numIndices);
-      count += numIndices / 3;
-    }
+    // Disable used variables.
+    this._attribs.forEach(function (attrib) {
+      if (attrib.location == -1) {
+        return;
+      }
+      this._gl.disableVertexAttribArray(attrib.location);
+    }, this);
 
-    page.needsUpdate = false;
-  }, this);
-
-  // Disable used variables.
-  this._attribs.forEach(function(attrib) {
-    if (attrib.location == -1) {
-      return;
-    }
-    this._gl.disableVertexAttribArray(attrib.location);
-  }, this);
-
-  return count;
+    return count;
   }
 }
 

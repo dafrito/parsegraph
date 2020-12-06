@@ -1,6 +1,8 @@
 SCRIPT_FILES = \
-	src/PagingBuffer.js \
-	src/BufferPage.js
+	src/PagingBuffer.ts \
+	src/BufferPage.ts
+
+all: build lint test coverage esdoc
 
 build: dist/pagingbuffer.js
 .PHONY: build
@@ -13,8 +15,15 @@ check:
 	npm run test
 .PHONY: check
 
+test: check
+.PHONY: test
+
+coverage:
+	npm run coverage
+.PHONY: coverage
+
 prettier:
-	npx prettier --write src www
+	npx prettier --write src test demo
 .PHONY: prettier
 
 lint:
@@ -25,9 +34,12 @@ esdoc:
 	npx esdoc
 .PHONY: esdoc
 
+doc: esdoc
+.PHONY: doc
+
 dist/pagingbuffer.js: $(SCRIPT_FILES)
 	npm run build
 
 clean:
-	rm -rf dist coverage .nyc_output
+	rm -rf dist .nyc_output
 .PHONY: clean
