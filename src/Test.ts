@@ -1,4 +1,5 @@
 import TestSuiteResult from './TestSuiteResult';
+import TestResult from './TestResult';
 
 export default class Test {
   _name:string;
