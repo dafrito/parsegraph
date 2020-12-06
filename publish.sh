@@ -1,2 +1,2 @@
 #!/bin/bash
-make clean && npm run build && npm run coverage && make esdoc && npm publish
+make clean && make && npm publish
