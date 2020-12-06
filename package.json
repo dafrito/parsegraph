@@ -1,6 +1,6 @@
 {
   "name": "parsegraph-testsuite",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Test class",
   "main": "dist/testsuite.js",
   "scripts": {
