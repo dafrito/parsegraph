@@ -15,6 +15,13 @@ check:
 	npm run test
 .PHONY: check
 
+test: check
+.PHONY: test
+
+coverage:
+	npm run coverage
+.PHONY: coverage
+
 prettier:
 	npx prettier --write src www
 .PHONY: prettier
