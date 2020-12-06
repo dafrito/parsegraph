@@ -1,8 +1,7 @@
-DIST_NAME = extent
+DIST_NAME = gettimeinmillis 
 
 SCRIPT_FILES = \
-	src/index.ts \
-	src/Extent.js
+	src/index.ts
 
 all: build lint test coverage esdoc
 

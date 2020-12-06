@@ -4,9 +4,9 @@ module.exports = {
   entry: path.resolve(__dirname, "src/index.ts"),
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "extent.js",
+    filename: "gettimeinmillis.js",
     globalObject: "this",
-    library: "Extent",
+    library: "getTimeInMillis",
     libraryTarget: "umd",
   },
   module: {

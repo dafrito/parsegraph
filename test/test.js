@@ -1,13 +1,8 @@
 var assert = require("assert");
-import TestSuite from "../dist/testsuite";
+import getTimeInMillis from "../dist/gettimeinmillis";
 
-describe("TestSuite", function () {
-  describe("#constructor()", function () {
-    it("works", ()=>{
-      assert.ok(new TestSuite('Default', true));
-    });
-    it("also works", ()=>{
-      assert.ok(new TestSuite('Default', true));
-    });
+describe("getTimeInMillis", function () {
+  it("works", ()=>{
+    assert.ok(!isNaN(getTimeInMillis()));
   });
 });

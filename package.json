@@ -1,8 +1,8 @@
 {
-  "name": "parsegraph-extent",
+  "name": "parsegraph-gettimeinmillis",
   "version": "1.4.0",
-  "description": "2D geometric container",
-  "main": "dist/testsuite.js",
+  "description": "Gets current time in milliseconds",
+  "main": "dist/gettimeinmillis.js",
   "scripts": {
     "coverage": "nyc npm run test",
     "test": "mocha -r @babel/register -r jsdom-global/register --recursive",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/parsegraph/extent.git"
+    "url": "git+ssh://git@github.com/parsegraph/gettimeinmillis.git"
   },
   "author": "Rainback, Inc.",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/parsegraph/extent/issues"
+    "url": "https://github.com/parsegraph/gettimeinmillis/issues"
   },
-  "homepage": "https://github.com/parsegraph/extent#readme",
+  "homepage": "https://github.com/parsegraph/gettimeinmillis#readme",
   "nyc": {
     "extends": "@istanbuljs/nyc-config-babel",
     "reporter": [

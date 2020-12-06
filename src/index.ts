@@ -1,2 +1,3 @@
-import Extent from './Extent';
-export default Extent;
+export default function getTimeInMillis() {
+  return new Date().getTime();
+}
