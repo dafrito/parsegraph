@@ -29,7 +29,7 @@ module.exports = {
   },
   resolve: {
     extensions: [".js", ".ts", ".tsx", ".glsl"],
-    modules: [path.resolve(__dirname, "src")],
+    modules: [path.resolve(__dirname, "src"), "node_modules"],
   },
   mode: "development",
   devtool: "eval-source-map",
