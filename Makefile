@@ -32,5 +32,5 @@ dist/pagingbuffer.js: $(SCRIPT_FILES)
 	npm run build
 
 clean:
-	rm -rf dist coverage .nyc_output
+	rm -rf dist .nyc_output
 .PHONY: clean

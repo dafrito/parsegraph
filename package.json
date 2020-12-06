@@ -23,7 +23,8 @@
   "nyc": {
     "extends": "@istanbuljs/nyc-config-babel",
     "reporter": ["html"],
-    "exclude": ["test/**.js", "dist/**.js"]
+    "exclude": ["test/**.js", "dist/**.js"],
+    "reportDir": "dist/coverage"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
