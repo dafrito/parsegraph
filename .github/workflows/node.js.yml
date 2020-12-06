@@ -23,3 +23,7 @@ jobs:
     - run: npm ci
     - run: make
     - run: tar cvzf pagingbuffer.tar.gz dist/
+    - uses: actions/upload-artifact@v2
+      with:
+        name: pagingbuffer.tar.gz
+        path: pagingbuffer.tar.gz
