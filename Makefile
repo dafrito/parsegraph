@@ -25,6 +25,9 @@ esdoc:
 	npx esdoc
 .PHONY: esdoc
 
+doc: esdoc
+.PHONY: doc
+
 dist/pagingbuffer.js: $(SCRIPT_FILES)
 	npm run build
 
