@@ -1,12 +1,12 @@
 import Test from './Test';
-import TestSuite, {AllTests} from './TestSuite';
+import TestSuite, {getAllTests} from './TestSuite';
 import TestSuiteResult from './TestSuiteResult';
 import TestResult from './TestResult';
 
-module.exports = {
+export default TestSuite;
+export {
   Test,
-  TestSuite,
   TestSuiteResult,
   TestResult,
-  AllTests
-}
+  getAllTests
+};

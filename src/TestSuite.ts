@@ -2,7 +2,7 @@ import Test from './Test';
 import TestSuiteResult from './TestSuiteResult';
 
 let allTests = null;
-export function AllTests() {
+export function getAllTests() {
   if(!allTests) {
     allTests = new TestSuite("parsegraph", true);
   }
@@ -22,8 +22,8 @@ export default class TestSuite {
 
     this._tests = [];
 
-    if (!dontAutoadd && AllTests()) {
-      AllTests().addTest(this);
+    if (!dontAutoadd && getAllTests()) {
+      getAllTests().addTest(this);
     }
   }
 
@@ -54,9 +54,9 @@ export default class TestSuite {
   };
 
   run(listener, listenerThisArg, resultDom, testResults) {
-    const notify = function() {
+    const notify = function(...args) {
       if (listener) {
-        listener.apply(listenerThisArg, arguments);
+        listener.apply(listenerThisArg, args);
       }
     };
 
@@ -67,7 +67,7 @@ export default class TestSuite {
     // Run the given listener for each test object.
     this._tests.forEach(function(test) {
       if (test.isTestSuite()) {
-        var resultLine = document.createElement('li');
+        const resultLine = document.createElement('li');
         resultLine.appendChild(document.createTextNode(test.name()));
         testResults.resultList().appendChild(resultLine);
 
@@ -75,7 +75,7 @@ export default class TestSuite {
         testResults.testStarted();
 
         // Run the test.
-        var result = test.run(listener, listenerThisArg, resultLine, testResults);
+        const result = test.run(listener, listenerThisArg, resultLine, testResults);
 
         if (result.testStatus() == 'Crashed') {
           resultLine.appendChild(document.createElement('br'));
@@ -105,7 +105,7 @@ export default class TestSuite {
             resultLine.firstChild.nextSibling,
         );
       } else if (test.isTest()) {
-        var resultLine = document.createElement('li');
+        const resultLine = document.createElement('li');
         resultLine.appendChild(document.createTextNode(test.name()));
         testResults.resultList().appendChild(resultLine);
 
@@ -113,7 +113,7 @@ export default class TestSuite {
         testResults.testStarted();
 
         // Run the test.
-        var result = test.run(listener, listenerThisArg, resultLine, testResults);
+        const result = test.run(listener, listenerThisArg, resultLine, testResults);
 
         testResults.testFinished(result);
         notify('TestFinished', result);

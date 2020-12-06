@@ -29,10 +29,12 @@ export default class Test {
     if (!suiteResult) {
       suiteResult = new TestSuiteResult();
     }
+    let testResult;
+    let testStatus;
     if (this.isTestSuite()) {
       try {
         // The runner is another test or test suite.
-        var testResult = this._runner[0].run(
+        testResult = this._runner[0].run(
             listener,
             listenerThisArg,
             resultDom,
@@ -53,8 +55,7 @@ export default class Test {
       }
     } else if (this.isTest()) {
       // The runner is a function.
-      var testStatus = 'Started';
-      var testResult;
+      testStatus = 'Started';
       try {
         testResult = this._runner[0].call(
             this._runner[1],
@@ -81,9 +82,9 @@ export default class Test {
     return new TestResult(testStatus, testResult, this);
   };
 
-  test() {
-    if (arguments.length > 0) {
-      return this.addTest.apply(this, arguments);
+  test(...args) {
+    if (args.length > 0) {
+      return this.addTest(...args);
     }
     return this.run();
   };
