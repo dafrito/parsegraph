@@ -24,5 +24,19 @@ describe('PagingBuffer', function() {
       pb.addPage(()=>{}, pb);
       assert.deepStrictEqual(pb.isEmpty(), true, "PagingBuffer remais empty");
     });
+    it('should throw on falsy GL', function() {
+      var canvas = new HTMLCanvasElement( 500, 500 );
+      var gl = canvas.getContext( 'webgl' );
+      assert.throws(()=>{
+        new PagingBuffer(null, 1);
+      });
+    });
+    it('should throw on falsy program', function() {
+      var canvas = new HTMLCanvasElement( 500, 500 );
+      var gl = canvas.getContext( 'webgl' );
+      assert.throws(()=>{
+        new PagingBuffer(gl, null);
+      });
+    });
   });
 });

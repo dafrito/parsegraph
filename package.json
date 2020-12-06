@@ -5,7 +5,7 @@
   "main": "src/PagingBuffer.ts",
   "scripts": {
     "coverage": "nyc npm run test",
-    "test": "mocha --require @babel/register -r jsdom-global/register --recursive",
+    "test": "mocha -r jsdom-global/register --recursive",
     "demo": "node demo/demo.js",
     "autobuild": "webpack --watch --config webpack.config.js",
     "build": "webpack --config webpack.config.js"
@@ -22,7 +22,8 @@
   "homepage": "https://github.com/parsegraph/pagingbuffer#readme",
   "nyc": {
     "extends": "@istanbuljs/nyc-config-babel",
-    "reporter": ["html"]
+    "reporter": ["html"],
+    "exclude": ["test/**.js", "dist/**.js"]
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
