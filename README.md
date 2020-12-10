@@ -37,6 +37,8 @@ This is for Node projects:
 
 7. Commit (e.g. Update documentation)
 
+8. Push the repository to Github.
+
 ## Deployment
 
 1. Await successful github build.
