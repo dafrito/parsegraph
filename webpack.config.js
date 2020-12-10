@@ -6,7 +6,7 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     filename: "TODO-PACKAGE-NAME.js",
     globalObject: "this",
-    library: "getTimeInMillis",
+    library: "TODO-PACKAGE-NAME",
     libraryTarget: "umd",
   },
   module: {
