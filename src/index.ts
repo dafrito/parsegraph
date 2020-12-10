@@ -1,3 +1,4 @@
-export default function getTimeInMillis() {
-  return new Date().getTime();
+// TODO Implement this.
+export default function todo() {
+  return 42;
 }

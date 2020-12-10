@@ -1,4 +1,4 @@
-DIST_NAME = gettimeinmillis 
+DIST_NAME = TODO-PACKAGE-NAME
 
 SCRIPT_FILES = \
 	src/index.ts

@@ -1,8 +1,8 @@
 var assert = require("assert");
-import getTimeInMillis from "../dist/gettimeinmillis";
+import todo from "../dist/TODO-PACKAGE-NAME";
 
-describe("getTimeInMillis", function () {
+describe("Package", function () {
   it("works", ()=>{
-    assert.ok(!isNaN(getTimeInMillis()));
+    assert.equal(todo(), 42);
   });
 });

@@ -1,8 +1,8 @@
 {
-  "name": "parsegraph-gettimeinmillis",
+  "name": "parsegraph-TODO-PACKAGE-NAME",
   "version": "1.4.0",
-  "description": "Gets current time in milliseconds",
-  "main": "dist/gettimeinmillis.js",
+  "description": "TODO-DESCRIPTION",
+  "main": "dist/TODO-PACKAGE-NAME.js",
   "scripts": {
     "coverage": "nyc npm run test",
     "test": "mocha -r @babel/register -r jsdom-global/register --recursive",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/parsegraph/gettimeinmillis.git"
+    "url": "git+ssh://git@github.com/parsegraph/TODO-PACKAGE-NAME.git"
   },
   "author": "Rainback, Inc.",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/parsegraph/gettimeinmillis/issues"
+    "url": "https://github.com/parsegraph/TODO-PACKAGE-NAME/issues"
   },
-  "homepage": "https://github.com/parsegraph/gettimeinmillis#readme",
+  "homepage": "https://github.com/parsegraph/TODO-PACKAGE-NAME#readme",
   "nyc": {
     "extends": "@istanbuljs/nyc-config-babel",
     "reporter": [
