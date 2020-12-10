@@ -18,21 +18,21 @@ This is for Node projects:
 
 5. Edit webpack.config.js and change the output filename and library to the name of the package, without parsegraph-.
 
-6. Edit README.md and change the title to the name of the package
+6. Edit .github/workflows/node.js.yml build file and change the archive name to the name of the package.
 
-7. Edit .github/workflows/node.js.yml build file and change the archive name to the name of the package.
+7. Commit all changes
 
-8. Commit all changes
+8. Implement src/index.ts
 
-9. Implement src/index.ts
+9. Implement test/test.ts
 
-10. Implement test/test.ts
+10. make clean
 
-11. make clean
+11. Run make and fix the build until it passes
 
-12. Run make and fix the build until it passes
+12. Commit changes that you made to implement the package.
 
-13. Commit changes that you made to implement the package.
+13. Edit README.md and change the title to the name of the package. Commit.
 
 14. Edit .git/config and change the git remote URL.
 
