@@ -12,8 +12,10 @@ This is for Node projects:
 
 4. Run ./update-package-name.sh with your package name:
 
+<pre>
   # Set the package name to test
   ./update-package-name.sh test
+</pre>
 
 5. Commit (e.g. "Give package a name")
 
