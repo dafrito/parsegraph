@@ -1,7 +1,7 @@
 {
   "name": "parsegraph-TODO-PACKAGE-NAME",
   "version": "1.4.0",
-  "description": "TODO-DESCRIPTION",
+  "description": "TODO-PACKAGE-NAME",
   "main": "dist/TODO-PACKAGE-NAME.js",
   "scripts": {
     "coverage": "nyc npm run test",
