@@ -25,12 +25,12 @@ app.get('/', async (req, res) => {
   write(`<!DOCTYPE html>`);
   write(`<html>`);
   write(`<head>`);
-  write(`<title>parsegraph</title>`);
+  write(`<title>TODO-PACKAGE-NAME</title>`);
   write(`</head>`);
   write(`<body>`);
-  write(`<h1><a href='/TODO-PACKAGE-NAME.js'>TODO-PACKAGE-NAME</a></h1>`);
-  write(`<h2><a href='/coverage'>Test coverage results</a><h2>`);
-  write(`<h2><a href='/docs'>Documentation</a><h2>`);
+  write(`<h1>TODO-PACKAGE-NAME <a href='/coverage'>Coverage</a> <a href='/docs'>Docs</a></h1>`);
+  write(`<p>This library is available as JavaScript UMD module: <a href='/TODO-PACKAGE-NAME.js'>TODO-PACKAGE-NAME.js</a></p>`);
+  write(`<h2>Samples &amp; Demos</h2>`);
   write(`<ul>`);
   (await getDemos()).forEach((demo)=>{
     write(`<li><a href='/${demo}'>${demo}.html</li>`);
@@ -47,6 +47,6 @@ app.use(express.static("./dist"));
 app.use(express.static("./www"));
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`See TODO-PACKAGE-NAME build information at http://localhost:${port}`);
 });
 
