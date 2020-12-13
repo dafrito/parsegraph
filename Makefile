@@ -38,7 +38,7 @@ esdoc:
 doc: esdoc
 .PHONY: doc
 
-dist/$(DIST_NAME).js: $(SCRIPT_FILES)
+dist/$(DIST_NAME).js: package.json package-lock.json $(SCRIPT_FILES)
 	npm run build
 
 clean:
