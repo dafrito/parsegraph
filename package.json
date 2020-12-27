@@ -3,6 +3,7 @@
   "version": "1.4.0",
   "description": "TODO-PACKAGE-NAME",
   "main": "dist/TODO-PACKAGE-NAME.js",
+  "types": "dist/src/index.d.ts",
   "scripts": {
     "coverage": "nyc npm run test",
     "test": "mocha -r @babel/register -r jsdom-global/register --recursive",
