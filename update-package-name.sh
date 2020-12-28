@@ -22,3 +22,5 @@ git commit -m"Rename to $PACKAGE_NAME"
 echo Rename to $PACKAGE_NAME complete.
 cat ./README.md
 npm i
+make clean build
+make
