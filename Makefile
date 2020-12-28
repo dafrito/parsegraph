@@ -3,19 +3,26 @@ DIST_NAME = TODO-PACKAGE-NAME
 SCRIPT_FILES = \
 	src/$(DIST_NAME).ts
 
+DECLARATION_FILES = \
+	dist/$(DIST_NAME).d.ts \
+	dist/$(DIST_NAME).d.ts.map
+
 all: build lint test coverage esdoc
 
-build: dist/$(DIST_NAME).js dist/$(DIST_NAME).d.ts
+build: dist/$(DIST_NAME).js $(DECLARATION_FILES)
 .PHONY: build
 
-demo: dist/$(DIST_NAME).js dist/$(DIST_NAME).d.ts
+demo: dist/$(DIST_NAME).js $(DECLARATION_FILES)
 	npm run demo
 .PHONY: demo
 
 dist/$(DIST_NAME).d.ts: dist/src/$(DIST_NAME).d.ts
 	mv $^ $@
 
-dist/src/$(DIST_NAME).d.ts: dist/$(DIST_NAME).js
+dist/$(DIST_NAME).d.ts.map: dist/src/$(DIST_NAME).d.ts.map
+	mv $^ $@
+
+dist/src/$(DIST_NAME).d.ts dist/src/$(DIST_NAME).d.ts.map: dist/$(DIST_NAME).js
 
 check:
 	npm run test
