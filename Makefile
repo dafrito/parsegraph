@@ -17,10 +17,10 @@ demo: dist/$(DIST_NAME).js $(DECLARATION_FILES)
 .PHONY: demo
 
 dist/$(DIST_NAME).d.ts: dist/src/$(DIST_NAME).d.ts
-	mv $^ $@
+	cp -u $^ $@
 
 dist/$(DIST_NAME).d.ts.map: dist/src/$(DIST_NAME).d.ts.map
-	mv $^ $@
+	cp -u $^ $@
 
 dist/src/$(DIST_NAME).d.ts dist/src/$(DIST_NAME).d.ts.map: dist/$(DIST_NAME).js
 
