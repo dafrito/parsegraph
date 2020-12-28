@@ -1,7 +1,7 @@
 const path = require("path");
 
 module.exports = {
-  entry: path.resolve(__dirname, "src/index.ts"),
+  entry: path.resolve(__dirname, "src/TODO-PACKAGE-NAME.ts"),
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "TODO-PACKAGE-NAME.js",
