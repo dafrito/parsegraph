@@ -74,6 +74,7 @@
     "openssl": "^1.1.0",
     "parsegraph-testsuite": "^1.4.1",
     "raw-loader": "^4.0.1",
+    "ts-loader": "^8.0.12",
     "ts-mocha": "^8.0.0",
     "webgl-mock": "^0.1.7"
   }
