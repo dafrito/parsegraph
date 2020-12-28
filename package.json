@@ -61,6 +61,7 @@
     "webpack-cli": "^3.3.12"
   },
   "dependencies": {
+    "@atscm/esdoc-typescript-plugin": "^0.1.0",
     "@babel/polyfill": "^7.10.4",
     "@babel/register": "^7.12.10",
     "babel-core": "^6.26.3",
@@ -68,7 +69,6 @@
     "core-js": "^3.8.1",
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
-    "esdoc-typescript-plugin": "^1.0.1",
     "express": "^4.17.1",
     "glslify-loader": "^2.0.0",
     "openssl": "^1.1.0",

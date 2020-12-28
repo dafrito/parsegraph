@@ -4,6 +4,6 @@
   "excludes": ["index.js"],
   "plugins": [
     {"name": "esdoc-standard-plugin"},
-    {"name": "esdoc-typescript-plugin", "option": {"enable": true}}
+    {"name": "@atscm/esdoc-typescript-plugin", "option": {"enable": true}}
   ]
 }
