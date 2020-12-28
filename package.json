@@ -1,6 +1,6 @@
 {
   "name": "parsegraph-TODO-PACKAGE-NAME",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "TODO-PACKAGE-NAME",
   "main": "dist/TODO-PACKAGE-NAME.js",
   "types": "dist/TODO-PACKAGE-NAME.d.ts",
