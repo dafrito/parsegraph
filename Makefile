@@ -1,4 +1,4 @@
-DIST_NAME = TODO-PACKAGE-NAME
+DIST_NAME = layout
 
 SCRIPT_FILES = \
 	src/$(DIST_NAME).ts
