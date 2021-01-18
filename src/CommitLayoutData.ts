@@ -88,6 +88,10 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
    * and is positive to indicate a negative offset.
    *
    * The result is in this node's space.
+   * 
+   * @param {LayoutNode} node the node to retrieve alignment offset
+   * @param {Direction} childDirection the direction where alignment offset is retrieved
+   * @return {number} the alignment offset
    */
   getAlignment(node: LayoutNode, childDirection: Direction): number {
     // Calculate the alignment adjustment for both nodes.
@@ -149,6 +153,11 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
    * These values should in this node's space.
    *
    * The child's position is in this node's space.
+   * 
+   * @param {LayoutNode} node the node to position
+   * @param {Direction} childDirection the direction to position
+   * @param {Alignment} alignment the alignment used for the given direction
+   * @param {number} separation the separation used for the given child
    */
   positionChild(
       node: LayoutNode,
@@ -502,6 +511,11 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
    *
    * separation is the distance from the center of this node to the center
    * of the node in the specified direction.
+   * 
+   * @param {LayoutNode} node the node to work with
+   * @param {Direction} childDirection the direction used for combining extents
+   * @param {Alignment} alignment the alignment in the given direction
+   * @param {number} separation the separation between nodes
    */
   combineExtents(
       node: LayoutNode,
