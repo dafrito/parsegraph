@@ -1,7 +1,17 @@
 DIST_NAME = layout
 
 SCRIPT_FILES = \
-	src/$(DIST_NAME).ts
+	src/$(DIST_NAME).ts \
+	src/Alignment.ts \
+	src/AxisOverlap.ts \
+	src/BaseCommitLayoutData.ts \
+	src/CommitLayoutData.ts \
+	src/Exception.ts \
+	src/Fit.ts \
+	src/LayoutCaret.ts \
+	src/LayoutNode.ts \
+	src/autocommit.ts \
+	src/checkExtentsEqual.ts
 
 all: build lint test coverage esdoc
 
