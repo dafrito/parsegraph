@@ -1,0 +1,17 @@
+{
+    "name": "parsegraph-layout",
+    "version": "1.5.6",
+    "description": "layout",
+    "main": "dist/parsegraph-layout.js",
+    "types": "dist/parsegraph-layout.d.ts",
+    "repository": {
+      "type": "git",
+      "url": "git+ssh://git@github.com/parsegraph/layout.git"
+    },
+    "author": "Rainback, Inc.",
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/parsegraph/layout/issues"
+    },
+    "homepage": "https://github.com/parsegraph/layout#readme"
+  }
