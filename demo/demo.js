@@ -2,7 +2,8 @@ const glob = require("glob");
 
 const express = require("express");
 const app = express();
-const port = 3000;
+const args = process.argv.slice(2);
+const port = args.length > 0 ? parseInt(args[0]) : 3001;
 
 async function getDemos() {
   return new Promise((respond, reject) => {
@@ -13,7 +14,9 @@ async function getDemos() {
       // files is an array of filenames.
       respond(
         files.map((file) => {
-          return file.match(/www\/(\w+)\.html/)[1];
+          const m = file.match(/www\/(\w+)\.html/);
+          [1];
+          return m ? m[1] : null;
         })
       );
     });
@@ -29,19 +32,19 @@ app.get("/", async (req, res) => {
   write(`<!DOCTYPE html>`);
   write(`<html>`);
   write(`<head>`);
-  write(`<title>layout</title>`);
+  write(`<title>node</title>`);
   write(`</head>`);
   write(`<body>`);
   write(
-    `<h1>layout <a href='/coverage'>Coverage</a> <a href='/docs'>Docs</a></h1>`
+    `<h1>node <a href='/coverage'>Coverage</a> <a href='/docs'>Docs</a></h1>`
   );
   write(
-    `<p>This library is available as JavaScript UMD module: <a href='/layout.js'>layout.js</a></p>`
+    `<p>This library is available as JavaScript UMD module: <a href='/node.js'>node.js</a></p>`
   );
   write(`<h2>Samples &amp; Demos</h2>`);
   write(`<ul>`);
   (await getDemos()).forEach((demo) => {
-    write(`<li><a href='/${demo}.html'>${demo}</li>`);
+    demo && write(`<li><a href='/${demo}.html'>${demo}</li>`);
   });
   write(`</ul>`);
   write(`</body>`);
@@ -55,5 +58,5 @@ app.use(express.static("./dist"));
 app.use(express.static("./www"));
 
 app.listen(port, () => {
-  console.log(`See layout build information at http://localhost:${port}`);
+  console.log(`See node build information at http://localhost:${port}`);
 });
