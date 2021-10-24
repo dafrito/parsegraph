@@ -1,14 +1,14 @@
 import createException, {
   BAD_NODE_DIRECTION,
   NO_NODE_FOUND,
-  NODE_DIRTY
-} from './Exception';
+  NODE_DIRTY,
+} from "./Exception";
 
-import CommitLayoutData from './CommitLayoutData';
+import CommitLayoutData from "./CommitLayoutData";
 
-import Rect from 'parsegraph-rect';
-import Size from 'parsegraph-size';
-import Extent from 'parsegraph-extent';
+import Rect from "parsegraph-rect";
+import Size from "parsegraph-size";
+import Extent from "parsegraph-extent";
 
 import Direction, {
   NeighborData,
@@ -16,12 +16,12 @@ import Direction, {
   reverseDirection,
   nameDirection,
   isVerticalDirection,
-  isCardinalDirection
-} from 'parsegraph-direction';
+  isCardinalDirection,
+} from "parsegraph-direction";
 
-import Fit from './Fit';
-import AxisOverlap from './AxisOverlap';
-import Alignment from './Alignment';
+import Fit from "./Fit";
+import AxisOverlap from "./AxisOverlap";
+import Alignment from "./Alignment";
 
 // ////////////////////////////////////////////////////////////////////////////
 //
@@ -49,16 +49,16 @@ export class TypedNeighborData extends NeighborData {
     this.yPos = null;
   }
 
-  getNode():LayoutNode {
+  getNode(): LayoutNode {
     return this.node as LayoutNode;
   }
 
-  getOwner():LayoutNode {
+  getOwner(): LayoutNode {
     return this.owner as LayoutNode;
   }
 }
 
-import AutocommitBehavior, {getAutocommitBehavior} from './autocommit';
+import AutocommitBehavior, { getAutocommitBehavior } from "./autocommit";
 
 export default class LayoutNode extends DirectionNode {
   _style: object;
@@ -83,12 +83,7 @@ export default class LayoutNode extends DirectionNode {
     this._scale = 1.0;
 
     // Layout
-    this._extents = [
-      new Extent(),
-      new Extent(),
-      new Extent(),
-      new Extent(),
-    ];
+    this._extents = [new Extent(), new Extent(), new Extent(), new Extent()];
 
     this._nodeFit = Fit.LOOSE;
     this._absoluteVersion = 0;
@@ -102,7 +97,7 @@ export default class LayoutNode extends DirectionNode {
     this._groupScale = NaN;
   }
 
-  parentNeighbor():TypedNeighborData {
+  parentNeighbor(): TypedNeighborData {
     return this._parentNeighbor as TypedNeighborData;
   }
 
@@ -111,7 +106,7 @@ export default class LayoutNode extends DirectionNode {
   }
 
   toString(): string {
-    return '[LayoutNode ' + this._id + ']';
+    return "[LayoutNode " + this._id + "]";
   }
 
   x(): number {
@@ -132,7 +127,7 @@ export default class LayoutNode extends DirectionNode {
     return this._scale;
   }
 
-  setScale(scale:number): void {
+  setScale(scale: number): void {
     this._scale = scale;
     this.layoutWasChanged(Direction.INWARD);
   }
@@ -146,14 +141,14 @@ export default class LayoutNode extends DirectionNode {
     return this._rightToLeft;
   }
 
-  autocommitAbsolutePos():void {
+  autocommitAbsolutePos(): void {
     if (getAutocommitBehavior() === AutocommitBehavior.THROW) {
       throw createException(NODE_DIRTY);
     }
     this.commitAbsolutePos();
   }
 
-  autocommitLayoutIteratively():void {
+  autocommitLayoutIteratively(): void {
     if (getAutocommitBehavior() === AutocommitBehavior.THROW) {
       throw createException(NODE_DIRTY);
     }
@@ -161,10 +156,12 @@ export default class LayoutNode extends DirectionNode {
   }
 
   needsAbsolutePos(): boolean {
-    return !this._absoluteDirty &&
+    return (
+      !this._absoluteDirty &&
       !this.isRoot() &&
       this._absoluteVersion ===
-        this.parentNode().findPaintGroup()._absoluteVersion;
+        this.parentNode().findPaintGroup()._absoluteVersion
+    );
   }
 
   commitAbsolutePos(): void {
@@ -179,7 +176,7 @@ export default class LayoutNode extends DirectionNode {
     this._absoluteScale = null;
 
     // Retrieve a stack of nodes to determine the absolute position.
-    let node:LayoutNode = this;
+    let node: LayoutNode = this;
     const nodeList = [];
     let parentScale = 1.0;
     let scale = 1.0;
@@ -228,8 +225,8 @@ export default class LayoutNode extends DirectionNode {
         node._absoluteDirty = false;
         if (!node.isRoot()) {
           node._absoluteVersion = node
-              .parentNode()
-              .findPaintGroup()._absoluteVersion;
+            .parentNode()
+            .findPaintGroup()._absoluteVersion;
         }
       }
       scale *= node.scaleAt(directionToChild);
@@ -243,8 +240,7 @@ export default class LayoutNode extends DirectionNode {
     this._absoluteScale = scale;
     this._absoluteDirty = false;
     if (!this.isRoot()) {
-      this._absoluteVersion =
-              this.parentNode().findPaintGroup()._absoluteVersion;
+      this._absoluteVersion = this.parentNode().findPaintGroup()._absoluteVersion;
     }
   }
 
@@ -283,7 +279,7 @@ export default class LayoutNode extends DirectionNode {
     }
 
     // Retrieve a stack of nodes to determine the group position.
-    let node:LayoutNode = this;
+    let node: LayoutNode = this;
     const nodeList = [];
     let parentScale = 1.0;
     let scale = 1.0;
@@ -342,7 +338,7 @@ export default class LayoutNode extends DirectionNode {
       this.autocommitLayoutIteratively();
     }
     if (this._groupXPos === null || isNaN(this._groupXPos)) {
-      throw new Error('Group X position must not be ' + this._groupXPos);
+      throw new Error("Group X position must not be " + this._groupXPos);
     }
     return this._groupXPos;
   }
@@ -375,19 +371,22 @@ export default class LayoutNode extends DirectionNode {
     this.layoutWasChanged(Direction.INWARD);
   }
 
-  supportsDirection(_:Direction):boolean {
+  supportsDirection(_: Direction): boolean {
     return true;
   }
 
-  invalidateLayout():void {
+  invalidateLayout(): void {
     super.invalidateLayout();
     this._hasGroupPos = false;
   }
 
   connectNode(inDirection: Direction, node: this): this {
     if (!this.supportsDirection(inDirection)) {
-      throw new Error('This node does not support children in the ' +
-        nameDirection(inDirection) + ' direction.');
+      throw new Error(
+        "This node does not support children in the " +
+          nameDirection(inDirection) +
+          " direction."
+      );
     }
 
     // Allow alignments to be set before children are spawned.
@@ -453,16 +452,18 @@ export default class LayoutNode extends DirectionNode {
   }
 
   setNodeAlignmentMode(
-      inDirection: Direction | Alignment,
-      newAlignmentMode?: Alignment
+    inDirection: Direction | Alignment,
+    newAlignmentMode?: Alignment
   ): void {
     if (newAlignmentMode === undefined) {
       return this.parentNode().setNodeAlignmentMode(
-          reverseDirection(this.parentDirection()),
-          inDirection as Alignment
+        reverseDirection(this.parentDirection()),
+        inDirection as Alignment
       );
     }
-    this.ensureNeighbor(inDirection as Direction).alignmentMode = newAlignmentMode;
+    this.ensureNeighbor(
+      inDirection as Direction
+    ).alignmentMode = newAlignmentMode;
     // console.log(nameNodeAlignment(newAlignmentMode));
     this.layoutWasChanged(inDirection as Direction);
   }
@@ -475,23 +476,25 @@ export default class LayoutNode extends DirectionNode {
   }
 
   setAxisOverlap(
-      inDirection: Direction | AxisOverlap,
-      newAxisOverlap?: AxisOverlap
+    inDirection: Direction | AxisOverlap,
+    newAxisOverlap?: AxisOverlap
   ): void {
     if (newAxisOverlap === undefined) {
       return this.parentNode().setAxisOverlap(
-          reverseDirection(this.parentDirection()),
-          inDirection as AxisOverlap
+        reverseDirection(this.parentDirection()),
+        inDirection as AxisOverlap
       );
     }
-    this.ensureNeighbor(inDirection as Direction).allowAxisOverlap = newAxisOverlap;
+    this.ensureNeighbor(
+      inDirection as Direction
+    ).allowAxisOverlap = newAxisOverlap;
     this.layoutWasChanged(inDirection as Direction);
   }
 
   axisOverlap(inDirection?: Direction): AxisOverlap {
     if (inDirection === undefined) {
       return this.parentNode().axisOverlap(
-          reverseDirection(this.parentDirection()),
+        reverseDirection(this.parentDirection())
       );
     }
     if (this.hasNode(inDirection)) {
@@ -526,7 +529,7 @@ export default class LayoutNode extends DirectionNode {
     return this.blockStyle().borderThickness;
   }
 
-  absoluteSizeRect(rect?: Rect):Rect {
+  absoluteSizeRect(rect?: Rect): Rect {
     const absoluteSize = this.absoluteSize();
     if (!rect) {
       return new Rect(
@@ -562,11 +565,11 @@ export default class LayoutNode extends DirectionNode {
     return bodySize;
   }
 
-  neighborAt(inDirection:Direction):TypedNeighborData {
+  neighborAt(inDirection: Direction): TypedNeighborData {
     return super.neighborAt(inDirection) as TypedNeighborData;
   }
 
-  ensureNeighbor(inDirection:Direction):TypedNeighborData {
+  ensureNeighbor(inDirection: Direction): TypedNeighborData {
     return super.ensureNeighbor(inDirection) as TypedNeighborData;
   }
 
@@ -587,10 +590,10 @@ export default class LayoutNode extends DirectionNode {
   }
 
   inNodeBody(
-      x: number,
-      y: number,
-      userScale: number,
-      bodySize?: Size,
+    x: number,
+    y: number,
+    userScale: number,
+    bodySize?: Size
   ): boolean {
     const s = this.size(bodySize);
     const ax = this.absoluteX();
@@ -621,10 +624,10 @@ export default class LayoutNode extends DirectionNode {
   }
 
   inNodeExtents(
-      x: number,
-      y: number,
-      userScale: number,
-      extentSize?: Size,
+    x: number,
+    y: number,
+    userScale: number,
+    extentSize?: Size
   ): boolean {
     const ax = this.absoluteX();
     const ay = this.absoluteY();
@@ -692,7 +695,7 @@ export default class LayoutNode extends DirectionNode {
     const extentSize: Size = new Size();
     const candidates: this[] = [this];
 
-    const addCandidate = (node: this, direction: Direction)=>{
+    const addCandidate = (node: this, direction: Direction) => {
       if (direction !== undefined) {
         if (!node.hasChildAt(direction)) {
           return;
@@ -705,7 +708,7 @@ export default class LayoutNode extends DirectionNode {
       candidates.push(node);
     };
 
-    const FORCE_SELECT_PRIOR:this = null;
+    const FORCE_SELECT_PRIOR: this = null;
     while (candidates.length > 0) {
       const candidate = candidates[candidates.length - 1];
       // console.log("Checking node " +
@@ -721,8 +724,8 @@ export default class LayoutNode extends DirectionNode {
         if (candidate.hasNode(Direction.INWARD)) {
           if (
             candidate
-                .nodeAt(Direction.INWARD)
-                .inNodeExtents(x, y, userScale, extentSize)
+              .nodeAt(Direction.INWARD)
+              .inNodeExtents(x, y, userScale, extentSize)
           ) {
             // console.log("Testing inward node");
             candidates.push(FORCE_SELECT_PRIOR);
@@ -824,22 +827,22 @@ export default class LayoutNode extends DirectionNode {
     // extent.boundingValues() returns [totalLength, minSize, maxSize]
     const backwardOffset: number = this.extentOffsetAt(Direction.BACKWARD);
     this.extentsAt(Direction.BACKWARD).dump(
-        'Backward extent (center at ' + backwardOffset + ')',
+      "Backward extent (center at " + backwardOffset + ")"
     );
 
     const forwardOffset: number = this.extentOffsetAt(Direction.FORWARD);
     this.extentsAt(Direction.FORWARD).dump(
-        'Forward extent (center at ' + forwardOffset + ')',
+      "Forward extent (center at " + forwardOffset + ")"
     );
 
     const downwardOffset: number = this.extentOffsetAt(Direction.DOWNWARD);
     this.extentsAt(Direction.DOWNWARD).dump(
-        'Downward extent (center at ' + downwardOffset + ')',
+      "Downward extent (center at " + downwardOffset + ")"
     );
 
     const upwardOffset: number = this.extentOffsetAt(Direction.UPWARD);
     this.extentsAt(Direction.UPWARD).dump(
-        'Upward extent (center at ' + upwardOffset + ')',
+      "Upward extent (center at " + upwardOffset + ")"
     );
 
     /*

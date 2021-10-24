@@ -1,13 +1,8 @@
-import {
-  Direction,
-  LayoutState
-} from 'parsegraph-direction';
-import LayoutNode from './LayoutNode';
-import createException, {
-  BAD_LAYOUT_STATE
-} from './Exception';
-import Size from 'parsegraph-size';
-import {elapsed} from 'parsegraph-timing';
+import { Direction, LayoutState } from "parsegraph-direction";
+import LayoutNode from "./LayoutNode";
+import createException, { BAD_LAYOUT_STATE } from "./Exception";
+import Size from "parsegraph-size";
+import { elapsed } from "parsegraph-timing";
 
 export default class BaseCommitLayoutData {
   bodySize: Size;
@@ -32,24 +27,24 @@ export default class BaseCommitLayoutData {
   }
 
   restarter(): Function {
-    return (timeout:number)=> {
+    return (timeout: number) => {
       this.commitLayoutLoop(timeout || this.timeout);
     };
   }
 
   initExtent(
-      node: LayoutNode,
-      inDirection: Direction,
-      length: number,
-      size: number,
-      offset: number,
+    node: LayoutNode,
+    inDirection: Direction,
+    length: number,
+    size: number,
+    offset: number
   ) {
     const extent = node.extentsAt(inDirection);
     extent.clear();
     extent.appendLS(length, size);
     node.setExtentOffsetAt(inDirection, offset);
     // console.log(new Error("OFFSET = " + offset));
-  };
+  }
 
   commitLayout(node: LayoutNode): boolean {
     // Do nothing if this node already has a layout committed.
@@ -73,47 +68,51 @@ export default class BaseCommitLayoutData {
     const bodySize = node.size(this.bodySize);
 
     // This node's horizontal bottom, used with downward nodes.
-    this.initExtent(node,
-        Direction.DOWNWARD,
-        // Length:
-        bodySize.width(),
-        // Size:
-        bodySize.height() / 2,
-        // Offset to body center:
-        bodySize.width() / 2,
+    this.initExtent(
+      node,
+      Direction.DOWNWARD,
+      // Length:
+      bodySize.width(),
+      // Size:
+      bodySize.height() / 2,
+      // Offset to body center:
+      bodySize.width() / 2
     );
 
     // This node's horizontal top, used with upward nodes.
-    this.initExtent(node,
-        Direction.UPWARD,
-        // Length:
-        bodySize.width(),
-        // Size:
-        bodySize.height() / 2,
-        // Offset to body center:
-        bodySize.width() / 2,
+    this.initExtent(
+      node,
+      Direction.UPWARD,
+      // Length:
+      bodySize.width(),
+      // Size:
+      bodySize.height() / 2,
+      // Offset to body center:
+      bodySize.width() / 2
     );
 
     // This node's vertical back, used with backward nodes.
-    this.initExtent(node,
-        Direction.BACKWARD,
-        // Length:
-        bodySize.height(),
-        // Size:
-        bodySize.width() / 2,
-        // Offset to body center:
-        bodySize.height() / 2,
+    this.initExtent(
+      node,
+      Direction.BACKWARD,
+      // Length:
+      bodySize.height(),
+      // Size:
+      bodySize.width() / 2,
+      // Offset to body center:
+      bodySize.height() / 2
     );
 
     // This node's vertical front, used with forward nodes.
-    this.initExtent(node,
-        Direction.FORWARD,
-        // Length:
-        bodySize.height(),
-        // Size:
-        bodySize.width() / 2,
-        // Offset to body center:
-        bodySize.height() / 2,
+    this.initExtent(
+      node,
+      Direction.FORWARD,
+      // Length:
+      bodySize.height(),
+      // Size:
+      bodySize.width() / 2,
+      // Offset to body center:
+      bodySize.height() / 2
     );
 
     // Implementations should actually commit the layout here.
@@ -123,7 +122,7 @@ export default class BaseCommitLayoutData {
     return true;
   }
 
-  commitLayoutPhaseOne(pastTime:Function): boolean {
+  commitLayoutPhaseOne(pastTime: Function): boolean {
     // Commit layout for all nodes.
     while (this.layoutPhase === 1) {
       if (this.paintGroup === null) {
@@ -176,7 +175,7 @@ export default class BaseCommitLayoutData {
     return true;
   }
 
-  commitLayoutPhaseTwo(pastTime:Function): boolean {
+  commitLayoutPhaseTwo(pastTime: Function): boolean {
     // Calculate position.
     while (this.needsPosition && this.layoutPhase === 2) {
       // console.log("Now in layout phase 2");
@@ -244,7 +243,7 @@ export default class BaseCommitLayoutData {
 
     const startTime: Date = new Date();
     let i: number = 0;
-    const pastTime = function(val?: any) {
+    const pastTime = function (val?: any) {
       ++i;
       if (i % 10 === 0) {
         const ct = new Date();
@@ -253,7 +252,7 @@ export default class BaseCommitLayoutData {
           console.log(val);
         }
         if (el > 5 * 1000) {
-          throw new Error('Commit Layout is taking too long');
+          throw new Error("Commit Layout is taking too long");
         }
         if (timeout !== undefined && el > timeout) {
           return true;

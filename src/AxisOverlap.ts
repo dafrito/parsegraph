@@ -1,6 +1,4 @@
-import createException, {
-  BAD_AXIS_OVERLAP,
-} from './Exception';
+import createException, { BAD_AXIS_OVERLAP } from "./Exception";
 
 export enum AxisOverlap {
   NULL = 18,
@@ -13,33 +11,33 @@ export default AxisOverlap;
 export function nameAxisOverlap(given: AxisOverlap): string {
   switch (given) {
     case AxisOverlap.NULL:
-      return 'NULL';
+      return "NULL";
     case AxisOverlap.ALLOWED:
-      return 'ALLOWED';
+      return "ALLOWED";
     case AxisOverlap.PREVENTED:
-      return 'PREVENTED';
+      return "PREVENTED";
     case AxisOverlap.DEFAULT:
-      return 'DEFAULT';
+      return "DEFAULT";
   }
   throw createException(BAD_AXIS_OVERLAP);
 }
 
 export function readAxisOverlap(given: string): AxisOverlap {
-  if (typeof given === 'number') {
+  if (typeof given === "number") {
     return given;
   }
-  if (typeof given === 'string') {
+  if (typeof given === "string") {
     given = given.toLowerCase();
     switch (given) {
-      case 'a':
-      case 'allow':
+      case "a":
+      case "allow":
         return AxisOverlap.ALLOWED;
-      case 'p':
-      case 'prevent':
+      case "p":
+      case "prevent":
         return AxisOverlap.PREVENTED;
-      case 'd':
-      case 'def':
-      case 'default':
+      case "d":
+      case "def":
+      case "default":
         return AxisOverlap.DEFAULT;
     }
   }

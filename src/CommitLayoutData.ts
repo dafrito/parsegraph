@@ -1,4 +1,4 @@
-import Extent from 'parsegraph-extent';
+import Extent from "parsegraph-extent";
 import {
   Direction,
   Axis,
@@ -12,19 +12,18 @@ import {
   isVerticalDirection,
   forEachCardinalDirection,
   PreferredAxis,
-  LayoutState
-} from 'parsegraph-direction';
-import LayoutNode, {
-} from './LayoutNode';
-import Fit from './Fit';
-import Alignment from './Alignment';
-import AxisOverlap from './AxisOverlap';
+  LayoutState,
+} from "parsegraph-direction";
+import LayoutNode from "./LayoutNode";
+import Fit from "./Fit";
+import Alignment from "./Alignment";
+import AxisOverlap from "./AxisOverlap";
 import createException, {
   BAD_NODE_DIRECTION,
   BAD_NODE_ALIGNMENT,
-} from './Exception';
-import Size from 'parsegraph-size';
-import BaseCommitLayoutData from './BaseCommitLayoutData';
+} from "./Exception";
+import Size from "parsegraph-size";
+import BaseCommitLayoutData from "./BaseCommitLayoutData";
 
 /**
  * The thickness (diameter) of the line.
@@ -88,7 +87,7 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
    * and is positive to indicate a negative offset.
    *
    * The result is in this node's space.
-   * 
+   *
    * @param {LayoutNode} node the node to retrieve alignment offset
    * @param {Direction} childDirection the direction where alignment offset is retrieved
    * @return {number} the alignment offset
@@ -113,13 +112,13 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
         break;
       case Alignment.CENTER: {
         const negativeLength: number = this.findConsecutiveLength(
-            child,
-            getNegativeDirection(axis),
+          child,
+          getNegativeDirection(axis)
         );
 
         const positiveLength: number = this.findConsecutiveLength(
-            child,
-            getPositiveDirection(axis),
+          child,
+          getPositiveDirection(axis)
         );
 
         const halfLength: number = (negativeLength + positiveLength) / 2;
@@ -153,21 +152,21 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
    * These values should in this node's space.
    *
    * The child's position is in this node's space.
-   * 
+   *
    * @param {LayoutNode} node the node to position
    * @param {Direction} childDirection the direction to position
    * @param {Alignment} alignment the alignment used for the given direction
    * @param {number} separation the separation used for the given child
    */
   positionChild(
-      node: LayoutNode,
-      childDirection: Direction,
-      alignment: Alignment,
-      separation: number,
+    node: LayoutNode,
+    childDirection: Direction,
+    alignment: Alignment,
+    separation: number
   ): void {
     // Validate arguments.
     if (separation < 0) {
-      throw new Error('separation must always be positive.');
+      throw new Error("separation must always be positive.");
     }
     if (!isCardinalDirection(childDirection)) {
       throw createException(BAD_NODE_DIRECTION);
@@ -191,13 +190,14 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
       }
     } else {
       extentSize = child
-          .extentsAt(reversedDirection)
-          .sizeAt(
-              node.neighborAt(childDirection).getNode().extentOffsetAt(
-                  reversedDirection,
-              ) -
-            alignment / node.scaleAt(childDirection),
-          );
+        .extentsAt(reversedDirection)
+        .sizeAt(
+          node
+            .neighborAt(childDirection)
+            .getNode()
+            .extentOffsetAt(reversedDirection) -
+            alignment / node.scaleAt(childDirection)
+        );
     }
     const lineLength = separation - node.scaleAt(childDirection) * extentSize;
     node.neighborAt(childDirection).lineLength = lineLength;
@@ -220,26 +220,26 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
               this.neighborAt(childDirection).xPos + ", " +
               this.neighborAt(childDirection).yPos + ")"
           );*/
-  };
+  }
 
   initExtent(
-      node: LayoutNode,
-      inDirection: Direction,
-      length: number,
-      size: number,
-      offset: number,
+    node: LayoutNode,
+    inDirection: Direction,
+    length: number,
+    size: number,
+    offset: number
   ) {
     const extent = node.extentsAt(inDirection);
     extent.clear();
     extent.appendLS(length, size);
     node.setExtentOffsetAt(inDirection, offset);
     // console.log(new Error("OFFSET = " + offset));
-  };
+  }
 
   commitLayout(node: LayoutNode): boolean {
     const laidOut = super.commitLayout(node);
 
-    if(node._layoutState === LayoutState.COMMITTED) {
+    if (node._layoutState === LayoutState.COMMITTED) {
       return laidOut;
     }
 
@@ -249,23 +249,23 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     }
 
     if (node.isRootlike()) {
-      if(this.commitRootlikeLayout(node)) {
+      if (this.commitRootlikeLayout(node)) {
         node._layoutState = LayoutState.NEEDS_COMMIT;
         return true;
       }
     } else {
-      if(this.commitAxisBasedLayout(node)) {
+      if (this.commitAxisBasedLayout(node)) {
         node._layoutState = LayoutState.NEEDS_COMMIT;
         return true;
       }
     }
 
     // Set our extents, combined with non-point neighbors.
-    forEachCardinalDirection((dir:Direction)=>{
+    forEachCardinalDirection((dir: Direction) => {
       this.addLineBounds(node, dir);
     });
 
-    if(this.commitInwardLayout(node) === true) {
+    if (this.commitInwardLayout(node) === true) {
       return true;
     }
 
@@ -281,16 +281,14 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
       const firstAxis: Axis = getPerpendicularAxis(node.parentDirection());
 
       // Check for nodes perpendicular to parent's direction
-      const hasFirstAxisNodes: [Direction, Direction] = node.hasNodes(firstAxis);
+      const hasFirstAxisNodes: [Direction, Direction] = node.hasNodes(
+        firstAxis
+      );
       const oppositeFromParent: Direction = reverseDirection(
-          node.parentDirection(),
+        node.parentDirection()
       );
       if (
-        this.layoutAxis(node,
-            hasFirstAxisNodes[0],
-            hasFirstAxisNodes[1],
-            false,
-        )
+        this.layoutAxis(node, hasFirstAxisNodes[0], hasFirstAxisNodes[1], false)
       ) {
         return true;
       }
@@ -305,23 +303,23 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     } else {
       // Layout this node's second-axis child, if that child exists.
       const oppositeFromParent: Direction = reverseDirection(
-          node.parentDirection(),
+        node.parentDirection()
       );
 
       // Check for nodes perpendicular to parent's direction
       const perpendicularNodes: [Direction, Direction] = node.hasNodes(
-          getPerpendicularAxis(node.parentDirection()),
+        getPerpendicularAxis(node.parentDirection())
       );
 
       if (node.hasNode(oppositeFromParent)) {
         // Layout the second-axis child.
         if (
           this.layoutSingle(
-              node,
-              oppositeFromParent,
-              // perpendicularNodes[0] !== Direction.NULL ||
-              //   perpendicularNodes[1] !== Direction.NULL
-              true
+            node,
+            oppositeFromParent,
+            // perpendicularNodes[0] !== Direction.NULL ||
+            //   perpendicularNodes[1] !== Direction.NULL
+            true
           )
         ) {
           return true;
@@ -330,10 +328,10 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
       if (
         this.layoutAxis(
-            node,
-            perpendicularNodes[0],
-            perpendicularNodes[1],
-            true,
+          node,
+          perpendicularNodes[0],
+          perpendicularNodes[1],
+          true
         )
       ) {
         return true;
@@ -348,11 +346,11 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     ) {
       // Root-like, so just lay out both axes.
       if (
-        this.layoutAxis(node, 
-            Direction.BACKWARD,
-            Direction.FORWARD,
-            !node.hasNode(Direction.UPWARD) &&
-                    !node.hasNode(Direction.DOWNWARD),
+        this.layoutAxis(
+          node,
+          Direction.BACKWARD,
+          Direction.FORWARD,
+          !node.hasNode(Direction.UPWARD) && !node.hasNode(Direction.DOWNWARD)
         )
       ) {
         return true;
@@ -366,11 +364,11 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     } else {
       // Root-like, so just lay out both axes.
       if (
-        this.layoutAxis(node, 
-            Direction.UPWARD,
-            Direction.DOWNWARD,
-            !node.hasNode(Direction.BACKWARD) &&
-            !node.hasNode(Direction.FORWARD),
+        this.layoutAxis(
+          node,
+          Direction.UPWARD,
+          Direction.DOWNWARD,
+          !node.hasNode(Direction.BACKWARD) && !node.hasNode(Direction.FORWARD)
         )
       ) {
         return true;
@@ -378,9 +376,7 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
       // This node is root-like, so it lays out the second-axis children in
       // the same method as the first axis.
-      if (
-        this.layoutAxis(node, Direction.BACKWARD, Direction.FORWARD, true)
-      ) {
+      if (this.layoutAxis(node, Direction.BACKWARD, Direction.FORWARD, true)) {
         return true;
       }
     }
@@ -400,40 +396,40 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
       node.nodeAlignmentMode(Direction.INWARD) === Alignment.INWARD_VERTICAL
     ) {
       node.setPosAt(
-          Direction.INWARD,
-          nestedNode.scale() *
+        Direction.INWARD,
+        nestedNode.scale() *
           (nestedNode.extentOffsetAt(Direction.DOWNWARD) -
             nestedSize.width() / 2),
-          this.bodySize.height() / 2 -
+        this.bodySize.height() / 2 -
           node.verticalPadding() -
           node.borderThickness() +
           nestedNode.scale() *
             (-nestedSize.height() +
-              nestedNode.extentOffsetAt(Direction.FORWARD)),
+              nestedNode.extentOffsetAt(Direction.FORWARD))
       );
     } else {
       // console.log(this.horizontalPadding(), this.borderThickness());
       node.setPosAt(
-          Direction.INWARD,
-          this.bodySize.width() / 2 -
+        Direction.INWARD,
+        this.bodySize.width() / 2 -
           node.horizontalPadding() -
           node.borderThickness() +
           nestedNode.scale() *
             (-nestedSize.width() +
               nestedNode.extentOffsetAt(Direction.DOWNWARD)),
-          nestedNode.scale() *
+        nestedNode.scale() *
           (nestedNode.extentOffsetAt(Direction.FORWARD) -
-            nestedSize.height() / 2),
+            nestedSize.height() / 2)
       );
     }
   }
 
   combineExtent(
-      node: LayoutNode,
-      childDirection: Direction,
-      direction: Direction,
-      lengthAdjustment: number,
-      sizeAdjustment: number,
+    node: LayoutNode,
+    childDirection: Direction,
+    direction: Direction,
+    lengthAdjustment: number,
+    sizeAdjustment: number
   ): void {
     /* console.log(
                 "combineExtent(" +
@@ -461,18 +457,18 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     const scale: number = node.scaleAt(childDirection);
     if (node.nodeFit() == Fit.LOOSE) {
       e.combineExtentAndSimplify(
-          child.extentsAt(direction),
-          lengthOffset,
-          sizeAdjustment,
-          scale,
-          this.bv,
+        child.extentsAt(direction),
+        lengthOffset,
+        sizeAdjustment,
+        scale,
+        this.bv
       );
     } else {
       e.combineExtent(
-          child.extentsAt(direction),
-          lengthOffset,
-          sizeAdjustment,
-          scale,
+        child.extentsAt(direction),
+        lengthOffset,
+        sizeAdjustment,
+        scale
       );
     }
 
@@ -480,8 +476,8 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     if (lengthOffset < 0) {
       // console.log("Adjusting negative extent offset.");
       node.setExtentOffsetAt(
-          direction,
-          node.extentOffsetAt(direction) + Math.abs(lengthOffset),
+        direction,
+        node.extentOffsetAt(direction) + Math.abs(lengthOffset)
       );
     }
 
@@ -497,9 +493,9 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
     // Assert the extent offset is positive.
     if (node.extentOffsetAt(direction) < 0) {
-      throw new Error('Extent offset must not be negative.');
+      throw new Error("Extent offset must not be negative.");
     }
-  };
+  }
 
   /**
    * Merge this node's extents in the given direction with the
@@ -511,17 +507,17 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
    *
    * separation is the distance from the center of this node to the center
    * of the node in the specified direction.
-   * 
+   *
    * @param {LayoutNode} node the node to work with
    * @param {Direction} childDirection the direction used for combining extents
    * @param {Alignment} alignment the alignment in the given direction
    * @param {number} separation the separation between nodes
    */
   combineExtents(
-      node: LayoutNode,
-      childDirection: Direction,
-      alignment: Alignment,
-      separation: number,
+    node: LayoutNode,
+    childDirection: Direction,
+    alignment: Alignment,
+    separation: number
   ): void {
     // Combine an extent.
     // lengthAdjustment and sizeAdjustment are in this node's space.
@@ -529,35 +525,131 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     switch (childDirection) {
       case Direction.DOWNWARD:
         // Downward child.
-        this.combineExtent(node, childDirection, Direction.DOWNWARD, alignment, separation);
-        this.combineExtent(node, childDirection, Direction.UPWARD, alignment, -separation);
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.DOWNWARD,
+          alignment,
+          separation
+        );
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.UPWARD,
+          alignment,
+          -separation
+        );
 
-        this.combineExtent(node, childDirection, Direction.FORWARD, separation, alignment);
-        this.combineExtent(node, childDirection, Direction.BACKWARD, separation, -alignment);
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.FORWARD,
+          separation,
+          alignment
+        );
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.BACKWARD,
+          separation,
+          -alignment
+        );
         break;
       case Direction.UPWARD:
         // Upward child.
-        this.combineExtent(node, childDirection, Direction.DOWNWARD, alignment, -separation);
-        this.combineExtent(node, childDirection, Direction.UPWARD, alignment, separation);
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.DOWNWARD,
+          alignment,
+          -separation
+        );
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.UPWARD,
+          alignment,
+          separation
+        );
 
-        this.combineExtent(node, childDirection, Direction.FORWARD, -separation, alignment);
-        this.combineExtent(node, childDirection, Direction.BACKWARD, -separation, -alignment);
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.FORWARD,
+          -separation,
+          alignment
+        );
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.BACKWARD,
+          -separation,
+          -alignment
+        );
         break;
       case Direction.FORWARD:
         // Forward child.
-        this.combineExtent(node, childDirection, Direction.DOWNWARD, separation, alignment);
-        this.combineExtent(node, childDirection, Direction.UPWARD, separation, -alignment);
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.DOWNWARD,
+          separation,
+          alignment
+        );
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.UPWARD,
+          separation,
+          -alignment
+        );
 
-        this.combineExtent(node, childDirection, Direction.FORWARD, alignment, separation);
-        this.combineExtent(node, childDirection, Direction.BACKWARD, alignment, -separation);
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.FORWARD,
+          alignment,
+          separation
+        );
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.BACKWARD,
+          alignment,
+          -separation
+        );
         break;
       case Direction.BACKWARD:
         // Backward child.
-        this.combineExtent(node, childDirection, Direction.DOWNWARD, -separation, alignment);
-        this.combineExtent(node, childDirection, Direction.UPWARD, -separation, -alignment);
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.DOWNWARD,
+          -separation,
+          alignment
+        );
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.UPWARD,
+          -separation,
+          -alignment
+        );
 
-        this.combineExtent(node, childDirection, Direction.FORWARD, alignment, -separation);
-        this.combineExtent(node, childDirection, Direction.BACKWARD, alignment, separation);
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.FORWARD,
+          alignment,
+          -separation
+        );
+        this.combineExtent(
+          node,
+          childDirection,
+          Direction.BACKWARD,
+          alignment,
+          separation
+        );
         break;
       default:
         throw createException(BAD_NODE_DIRECTION);
@@ -566,9 +658,9 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
   // Layout a single node in the given direction.
   layoutSingle(
-      node: LayoutNode,
-      direction: Direction,
-      allowAxisOverlap: boolean
+    node: LayoutNode,
+    direction: Direction,
+    allowAxisOverlap: boolean
   ): boolean {
     if (!node.hasNode(direction)) {
       return;
@@ -612,15 +704,17 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
     // Separate the child from this node.
 
-    let separationFromChild: number = node.extentsAt(direction).separation(
+    let separationFromChild: number = node
+      .extentsAt(direction)
+      .separation(
         childExtent,
         node.extentOffsetAt(direction) +
-        alignment -
-        node.scaleAt(direction) * child.extentOffsetAt(reversed),
+          alignment -
+          node.scaleAt(direction) * child.extentOffsetAt(reversed),
         allowAxisOverlap,
         node.scaleAt(direction),
-        LINE_THICKNESS / 2,
-    );
+        LINE_THICKNESS / 2
+      );
     // console.log("Calculated unpadded separation of " +
     //   separationFromChild + ".");
 
@@ -629,17 +723,17 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     child.size(this.firstSize);
     if (getDirectionAxis(direction) == Axis.VERTICAL) {
       separationFromChild = Math.max(
-          separationFromChild,
-          node.scaleAt(direction) * (this.firstSize.height() / 2) +
-          this.bodySize.height() / 2,
+        separationFromChild,
+        node.scaleAt(direction) * (this.firstSize.height() / 2) +
+          this.bodySize.height() / 2
       );
       separationFromChild +=
         node.verticalSeparation(direction) * node.scaleAt(direction);
     } else {
       separationFromChild = Math.max(
-          separationFromChild,
-          node.scaleAt(direction) * (this.firstSize.width() / 2) +
-          this.bodySize.width() / 2,
+        separationFromChild,
+        node.scaleAt(direction) * (this.firstSize.width() / 2) +
+          this.bodySize.width() / 2
       );
       separationFromChild +=
         node.horizontalSeparation(direction) * node.scaleAt(direction);
@@ -652,13 +746,14 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
     // Combine the extents of the child and this node.
     this.combineExtents(node, direction, alignment, separationFromChild);
-  };
+  }
 
   // Layout a pair of nodes in the given directions.
-  layoutAxis(node: LayoutNode, 
-      firstDirection: Direction,
-      secondDirection: Direction,
-      allowAxisOverlap: boolean,
+  layoutAxis(
+    node: LayoutNode,
+    firstDirection: Direction,
+    secondDirection: Direction,
+    allowAxisOverlap: boolean
   ): boolean {
     if (
       firstDirection === secondDirection &&
@@ -676,18 +771,12 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     }
 
     // Return if there are no directions.
-    if (
-      firstDirection == Direction.NULL &&
-      secondDirection == Direction.NULL
-    ) {
+    if (firstDirection == Direction.NULL && secondDirection == Direction.NULL) {
       return;
     }
 
     // Test if this node has a first-axis child in only one direction.
-    if (
-      firstDirection == Direction.NULL ||
-      secondDirection == Direction.NULL
-    ) {
+    if (firstDirection == Direction.NULL || secondDirection == Direction.NULL) {
       // Find the direction of the only first-axis child.
       let firstAxisDirection: Direction;
       if (firstDirection != Direction.NULL) {
@@ -717,21 +806,24 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
     // Get the alignments for the children.
     const firstNodeAlignment: number = this.getAlignment(node, firstDirection);
-    const secondNodeAlignment: number = this.getAlignment(node, secondDirection);
+    const secondNodeAlignment: number = this.getAlignment(
+      node,
+      secondDirection
+    );
     // console.log("First alignment: " + firstNodeAlignment);
     // console.log("Second alignment: " + secondNodeAlignment);
 
     let separationBetweenChildren: number = firstNode
-        .extentsAt(secondDirection)
-        .separation(
-            secondNode.extentsAt(firstDirection),
-            (node.scaleAt(secondDirection) / node.scaleAt(firstDirection)) *
+      .extentsAt(secondDirection)
+      .separation(
+        secondNode.extentsAt(firstDirection),
+        (node.scaleAt(secondDirection) / node.scaleAt(firstDirection)) *
           (secondNodeAlignment - secondNode.extentOffsetAt(firstDirection)) -
           (firstNodeAlignment - firstNode.extentOffsetAt(secondDirection)),
-            true,
-            node.scaleAt(secondDirection) / node.scaleAt(firstDirection),
-            0,
-        );
+        true,
+        node.scaleAt(secondDirection) / node.scaleAt(firstDirection),
+        0
+      );
     separationBetweenChildren *= node.scaleAt(firstDirection);
 
     // console.log("Separation between children="
@@ -799,31 +891,31 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
     // Allow some overlap if we have both first-axis sides, but
     // nothing ahead on the second axis.
-    let separationFromFirst: number = node.extentsAt(
-        firstDirection,
-    ).separation(
+    let separationFromFirst: number = node
+      .extentsAt(firstDirection)
+      .separation(
         firstNode.extentsAt(secondDirection),
         node.extentOffsetAt(firstDirection) +
-        firstNodeAlignment -
-        node.scaleAt(firstDirection) *
-          firstNode.extentOffsetAt(secondDirection),
+          firstNodeAlignment -
+          node.scaleAt(firstDirection) *
+            firstNode.extentOffsetAt(secondDirection),
         firstAxisOverlap,
         node.scaleAt(firstDirection),
-        LINE_THICKNESS / 2,
-    );
+        LINE_THICKNESS / 2
+      );
 
-    let separationFromSecond: number = node.extentsAt(
-        secondDirection,
-    ).separation(
+    let separationFromSecond: number = node
+      .extentsAt(secondDirection)
+      .separation(
         secondNode.extentsAt(firstDirection),
         node.extentOffsetAt(secondDirection) +
-        secondNodeAlignment -
-        node.scaleAt(secondDirection) *
-          secondNode.extentOffsetAt(firstDirection),
+          secondNodeAlignment -
+          node.scaleAt(secondDirection) *
+            secondNode.extentOffsetAt(firstDirection),
         secondAxisOverlap,
         node.scaleAt(secondDirection),
-        LINE_THICKNESS / 2,
-    );
+        LINE_THICKNESS / 2
+      );
 
     /* console.log(
               "Separation from this " + nameType(this.type()) + " to " +
@@ -851,12 +943,12 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
       // Center them as much as possible.
       separationFromFirst = Math.max(
-          separationFromFirst,
-          separationBetweenChildren / 2,
+        separationFromFirst,
+        separationBetweenChildren / 2
       );
       separationFromSecond = Math.max(
-          separationFromSecond,
-          separationBetweenChildren / 2,
+        separationFromSecond,
+        separationBetweenChildren / 2
       );
     } else {
       // separationBetweenChildren
@@ -870,36 +962,35 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     secondNode.size(this.secondSize);
     if (getDirectionAxis(firstDirection) === Axis.VERTICAL) {
       separationFromFirst = Math.max(
-          separationFromFirst,
-          node.scaleAt(firstDirection) * (this.firstSize.height() / 2) +
-          this.bodySize.height() / 2,
+        separationFromFirst,
+        node.scaleAt(firstDirection) * (this.firstSize.height() / 2) +
+          this.bodySize.height() / 2
       );
       separationFromFirst +=
-        node.verticalSeparation(firstDirection) *
-        node.scaleAt(firstDirection);
+        node.verticalSeparation(firstDirection) * node.scaleAt(firstDirection);
 
       separationFromSecond = Math.max(
-          separationFromSecond,
-          node.scaleAt(secondDirection) * (this.secondSize.height() / 2) +
-          this.bodySize.height() / 2,
+        separationFromSecond,
+        node.scaleAt(secondDirection) * (this.secondSize.height() / 2) +
+          this.bodySize.height() / 2
       );
       separationFromSecond +=
         node.verticalSeparation(secondDirection) *
         node.scaleAt(secondDirection);
     } else {
       separationFromFirst = Math.max(
-          separationFromFirst,
-          node.scaleAt(firstDirection) * (this.firstSize.width() / 2) +
-          this.bodySize.width() / 2,
+        separationFromFirst,
+        node.scaleAt(firstDirection) * (this.firstSize.width() / 2) +
+          this.bodySize.width() / 2
       );
       separationFromFirst +=
         node.horizontalSeparation(firstDirection) *
         node.scaleAt(firstDirection);
 
       separationFromSecond = Math.max(
-          separationFromSecond,
-          node.scaleAt(secondDirection) * (this.secondSize.width() / 2) +
-          this.bodySize.width() / 2,
+        separationFromSecond,
+        node.scaleAt(secondDirection) * (this.secondSize.width() / 2) +
+          this.bodySize.width() / 2
       );
       separationFromSecond +=
         node.horizontalSeparation(secondDirection) *
@@ -907,27 +998,31 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     }
 
     // Set the positions of the nodes.
-    this.positionChild(node,
-        firstDirection,
-        firstNodeAlignment,
-        separationFromFirst,
+    this.positionChild(
+      node,
+      firstDirection,
+      firstNodeAlignment,
+      separationFromFirst
     );
-    this.positionChild(node,
-        secondDirection,
-        secondNodeAlignment,
-        separationFromSecond,
+    this.positionChild(
+      node,
+      secondDirection,
+      secondNodeAlignment,
+      separationFromSecond
     );
 
     // Combine their extents.
-    this.combineExtents(node,
-        firstDirection,
-        firstNodeAlignment,
-        separationFromFirst,
+    this.combineExtents(
+      node,
+      firstDirection,
+      firstNodeAlignment,
+      separationFromFirst
     );
-    this.combineExtents(node,
-        secondDirection,
-        secondNodeAlignment,
-        separationFromSecond,
+    this.combineExtents(
+      node,
+      secondDirection,
+      secondNodeAlignment,
+      separationFromSecond
     );
   }
 
@@ -940,10 +1035,10 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     const dirSign: number = directionSign(given);
 
     let positiveOffset: number = node.extentOffsetAt(
-        getPositiveDirection(perpAxis),
+      getPositiveDirection(perpAxis)
     );
     let negativeOffset: number = node.extentOffsetAt(
-        getNegativeDirection(perpAxis),
+      getNegativeDirection(perpAxis)
     );
 
     if (dirSign < 0) {
@@ -961,16 +1056,12 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
         lineSize = this.bodySize.width() / 2;
       }
       // lineSize = this.scaleAt(given) * LINE_THICKNESS / 2;
-      node.extentsAt(getPositiveDirection(perpAxis)).combineBound(
-          positiveOffset,
-          node.lineLengthAt(given),
-          lineSize,
-      );
-      node.extentsAt(getNegativeDirection(perpAxis)).combineBound(
-          negativeOffset,
-          node.lineLengthAt(given),
-          lineSize,
-      );
+      node
+        .extentsAt(getPositiveDirection(perpAxis))
+        .combineBound(positiveOffset, node.lineLengthAt(given), lineSize);
+      node
+        .extentsAt(getNegativeDirection(perpAxis))
+        .combineBound(negativeOffset, node.lineLengthAt(given), lineSize);
     }
   }
 }

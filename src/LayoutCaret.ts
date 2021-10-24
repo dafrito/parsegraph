@@ -1,24 +1,23 @@
-import Direction, {
-  readDirection,
-  DirectionCaret,
-} from 'parsegraph-direction';
-import LayoutNode from './LayoutNode';
-import Fit from './Fit';
-import AxisOverlap, {readAxisOverlap} from './AxisOverlap';
-import Alignment, {readAlignment} from './Alignment';
+import Direction, { readDirection, DirectionCaret } from "parsegraph-direction";
+import LayoutNode from "./LayoutNode";
+import Fit from "./Fit";
+import AxisOverlap, { readAxisOverlap } from "./AxisOverlap";
+import Alignment, { readAlignment } from "./Alignment";
 
 // The scale at which shrunk nodes are shrunk.
 export const SHRINK_SCALE = 0.85;
 
-export default class LayoutCaret<T extends LayoutNode> extends DirectionCaret<T> {
+export default class LayoutCaret<T extends LayoutNode> extends DirectionCaret<
+  T
+> {
   clone(): LayoutCaret<T> {
     return new LayoutCaret(this.palette(), this.node());
   }
 
   spawn(
-      inDirection: Direction | string,
-      newType?: any,
-      newAlignmentMode?: Alignment | string,
+    inDirection: Direction | string,
+    newType?: any,
+    newAlignmentMode?: Alignment | string
   ): T {
     const created = super.spawn(inDirection, newType);
     created.setNodeFit(this.node().nodeFit());
@@ -36,9 +35,9 @@ export default class LayoutCaret<T extends LayoutNode> extends DirectionCaret<T>
   }
 
   spawnMove(
-      inDirection: Direction | string,
-      newType: T | string,
-      newAlignmentMode?: Alignment | string,
+    inDirection: Direction | string,
+    newType: T | string,
+    newAlignmentMode?: Alignment | string
   ): T {
     const created: T = this.spawn(inDirection, newType, newAlignmentMode);
     this.move(inDirection);
@@ -46,8 +45,8 @@ export default class LayoutCaret<T extends LayoutNode> extends DirectionCaret<T>
   }
 
   align(
-      inDirection: Direction | string,
-      newAlignmentMode: Alignment | string,
+    inDirection: Direction | string,
+    newAlignmentMode: Alignment | string
   ): void {
     // Interpret the arguments.
     inDirection = readDirection(inDirection);
