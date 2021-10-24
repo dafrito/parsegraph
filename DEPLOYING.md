@@ -7,4 +7,3 @@
 3. Unzip tarball file in project directory.
 
 4. npm publish <tarball>
-
