@@ -11,6 +11,7 @@ import AutocommitBehavior, {
 } from "./autocommit";
 import LayoutNodePalette, { style } from "./LayoutNodePalette";
 import checkExtentsEqual from "./checkExtentsEqual";
+import BasicLayoutNode from "./BasicLayoutNode";
 
 export {
   Alignment,
@@ -35,4 +36,5 @@ export {
   LayoutNodePalette,
   style,
   checkExtentsEqual,
+  BasicLayoutNode
 };

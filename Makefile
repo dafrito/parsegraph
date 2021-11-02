@@ -5,6 +5,7 @@ SCRIPT_FILES = \
 	src/Alignment.ts \
 	src/AxisOverlap.ts \
 	src/BaseCommitLayoutData.ts \
+	src/BasicLayoutNode.ts \
 	src/CommitLayoutData.ts \
 	src/Exception.ts \
 	src/Fit.ts \

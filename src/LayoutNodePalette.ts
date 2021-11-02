@@ -1,4 +1,5 @@
 import { NodePalette } from "parsegraph-direction";
+import BasicLayoutNode from "./BasicLayoutNode";
 import LayoutNode from "./LayoutNode";
 
 const minSize = 10;
@@ -60,11 +61,11 @@ export default class LayoutNodePalette extends NodePalette<LayoutNode> {
     if (given instanceof LayoutNode) {
       return given;
     }
-    const node = new LayoutNode();
+    const node = new BasicLayoutNode();
     this.replace(node, given);
     return node;
   }
   replace(node: LayoutNode, given?: any): void {
-    node.setBlockStyle(style(given));
+    (node as BasicLayoutNode).setBlockStyle(style(given));
   }
 }
