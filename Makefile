@@ -10,6 +10,7 @@ SCRIPT_FILES = \
 	src/Fit.ts \
 	src/LayoutCaret.ts \
 	src/LayoutNode.ts \
+	src/LayoutNodePalette.ts \
 	src/autocommit.ts \
 	src/checkExtentsEqual.ts
 
