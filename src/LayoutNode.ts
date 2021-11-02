@@ -60,7 +60,7 @@ export class TypedNeighborData extends NeighborData {
 
 import AutocommitBehavior, { getAutocommitBehavior } from "./autocommit";
 
-export default class LayoutNode extends DirectionNode {
+export default abstract class LayoutNode extends DirectionNode {
   _style: object;
   _rightToLeft: boolean;
   _scale: number;
@@ -371,24 +371,12 @@ export default class LayoutNode extends DirectionNode {
     this.layoutWasChanged(Direction.INWARD);
   }
 
-  supportsDirection(_: Direction): boolean {
-    return true;
-  }
-
   invalidateLayout(): void {
     super.invalidateLayout();
     this._hasGroupPos = false;
   }
 
   connectNode(inDirection: Direction, node: this): this {
-    if (!this.supportsDirection(inDirection)) {
-      throw new Error(
-        "This node does not support children in the " +
-          nameDirection(inDirection) +
-          " direction."
-      );
-    }
-
     // Allow alignments to be set before children are spawned.
     const neighbor = this.ensureNeighbor(inDirection);
     if (neighbor.alignmentMode == Alignment.NULL) {
