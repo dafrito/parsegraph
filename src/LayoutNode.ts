@@ -17,6 +17,7 @@ import Direction, {
   nameDirection,
   isVerticalDirection,
   isCardinalDirection,
+  Axis,
 } from "parsegraph-direction";
 
 import Fit from "./Fit";
@@ -61,7 +62,6 @@ export class TypedNeighborData extends NeighborData {
 import AutocommitBehavior, { getAutocommitBehavior } from "./autocommit";
 
 export default abstract class LayoutNode extends DirectionNode {
-  _style: object;
   _rightToLeft: boolean;
   _scale: number;
   _extents: Extent[];
@@ -78,7 +78,6 @@ export default abstract class LayoutNode extends DirectionNode {
 
   constructor(fromNode?: LayoutNode, parentDirection?: Direction) {
     super(fromNode, parentDirection);
-    this._style = {};
     this._rightToLeft = false;
     this._scale = 1.0;
 
@@ -95,6 +94,22 @@ export default abstract class LayoutNode extends DirectionNode {
     this._groupXPos = NaN;
     this._groupYPos = NaN;
     this._groupScale = NaN;
+  }
+
+  abstract size(bodySize?: Size): Size;
+
+  abstract getSeparation(axis:Axis, dir: Direction): number;
+
+  innerSeparation(dir: Direction): number {
+    return this.getSeparation(Axis.Z, dir);
+  }
+
+  horizontalSeparation(dir: Direction): number {
+    return this.getSeparation(Axis.HORIZONTAL, dir);
+  }
+
+  verticalSeparation(dir: Direction): number {
+    return this.getSeparation(Axis.VERTICAL, dir);
   }
 
   parentNeighbor(): TypedNeighborData {
@@ -491,19 +506,6 @@ export default abstract class LayoutNode extends DirectionNode {
     return AxisOverlap.NULL;
   }
 
-  blockStyle(): any {
-    return this._style;
-  }
-
-  setBlockStyle(style: object): void {
-    if (this._style == style) {
-      // Ignore idempotent style changes.
-      return;
-    }
-    this._style = style;
-    this.layoutWasChanged(Direction.INWARD);
-  }
-
   sizeIn(direction: Direction, bodySize?: Size): number {
     const rv = this.size(bodySize);
     if (isVerticalDirection(direction)) {
@@ -511,10 +513,6 @@ export default abstract class LayoutNode extends DirectionNode {
     } else {
       return rv.width() / 2;
     }
-  }
-
-  borderThickness(): number {
-    return this.blockStyle().borderThickness;
   }
 
   absoluteSizeRect(rect?: Rect): Rect {
@@ -534,15 +532,6 @@ export default abstract class LayoutNode extends DirectionNode {
     return rect;
   }
 
-  size(bodySize?: Size): Size {
-    bodySize = this.sizeWithoutPadding(bodySize);
-    bodySize[0] += 2 * this.horizontalPadding() + 2 * this.borderThickness();
-    bodySize[1] += 2 * this.verticalPadding() + 2 * this.borderThickness();
-    // console.log("Calculated node size of (" + bodySize[0] + ", " +
-    // bodySize[1] + ")");
-    return bodySize;
-  }
-
   absoluteSize(bodySize?: Size): Size {
     return this.size(bodySize).scaled(this.absoluteScale());
   }
@@ -559,22 +548,6 @@ export default abstract class LayoutNode extends DirectionNode {
 
   ensureNeighbor(inDirection: Direction): TypedNeighborData {
     return super.ensureNeighbor(inDirection) as TypedNeighborData;
-  }
-
-  horizontalPadding(): number {
-    return this.blockStyle().horizontalPadding;
-  }
-
-  verticalPadding(): number {
-    return this.blockStyle().verticalPadding;
-  }
-
-  verticalSeparation(_: Direction): number {
-    return this.blockStyle().verticalSeparation;
-  }
-
-  horizontalSeparation(_: Direction): number {
-    return this.blockStyle().horizontalSeparation;
   }
 
   inNodeBody(
@@ -780,16 +753,6 @@ export default abstract class LayoutNode extends DirectionNode {
 
     // console.log("Found nothing.");
     return null;
-  }
-
-  sizeWithoutPadding(size: Size): Size {
-    if (!size) {
-      size = new Size(this.blockStyle().minWidth, this.blockStyle().minHeight);
-    } else {
-      size.setWidth(this.blockStyle().minWidth);
-      size.setHeight(this.blockStyle().minHeight);
-    }
-    return size;
   }
 
   separationAt(inDirection: Direction): number {
