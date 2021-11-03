@@ -14,7 +14,6 @@ import Direction, {
   NeighborData,
   DirectionNode,
   reverseDirection,
-  nameDirection,
   isVerticalDirection,
   isCardinalDirection,
   Axis,
