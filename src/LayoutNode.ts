@@ -344,6 +344,16 @@ export default abstract class LayoutNode extends DirectionNode {
       this._groupYPos += node.y() * parentScale;
     }
 
+    if (isNaN(this._groupXPos)) {
+      throw new Error("Calculated NaN group X pos");
+    }
+    if (isNaN(this._groupYPos)) {
+      throw new Error("Calculated NaN group Y pos");
+    }
+    if (isNaN(this._groupScale)) {
+      throw new Error("Calculated NaN group scale");
+    }
+
     this._hasGroupPos = true;
   }
 
