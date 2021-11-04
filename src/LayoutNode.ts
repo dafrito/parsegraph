@@ -97,7 +97,7 @@ export default abstract class LayoutNode extends DirectionNode {
 
   abstract size(bodySize?: Size): Size;
 
-  abstract getSeparation(axis:Axis, dir: Direction): number;
+  abstract getSeparation(axis: Axis, dir: Direction): number;
 
   innerSeparation(dir: Direction): number {
     return this.getSeparation(Axis.Z, dir);

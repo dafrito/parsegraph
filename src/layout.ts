@@ -36,5 +36,5 @@ export {
   LayoutNodePalette,
   style,
   checkExtentsEqual,
-  BasicLayoutNode
+  BasicLayoutNode,
 };

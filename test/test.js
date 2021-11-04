@@ -1,4 +1,9 @@
-import { FORWARD, DOWNWARD, UPWARD, BACKWARD } from "parsegraph-direction";
+import Direction, {
+  FORWARD,
+  DOWNWARD,
+  UPWARD,
+  BACKWARD,
+} from "parsegraph-direction";
 import {
   LayoutCaret,
   LayoutNodePalette,
@@ -1301,7 +1306,13 @@ describe("Package", function () {
     car.root().commitLayoutIteratively();
     if (ax === anode.groupX()) {
       //simpleGraph(out, car);
-      throw new Error("Bud must move when another node grows in size. (ax=" + ax + ", x=" + anode.groupX() +")");
+      throw new Error(
+        "Bud must move when another node grows in size. (ax=" +
+          ax +
+          ", x=" +
+          anode.groupX() +
+          ")"
+      );
     }
     if (gx + increase / 2 !== mnode.groupX()) {
       //simpleGraph(out, car);

@@ -1,4 +1,4 @@
-import Direction, {Axis} from "parsegraph-direction";
+import Direction, { Axis } from "parsegraph-direction";
 import Size from "parsegraph-size";
 import Alignment from "./Alignment";
 import LayoutNode from "./LayoutNode";
@@ -11,7 +11,7 @@ export interface LayoutNodeStyle {
   horizontalPadding: number;
   verticalSeparation: number;
   horizontalSeparation: number;
-};
+}
 
 export default class BasicLayoutNode extends LayoutNode {
   _minHeight: number;
@@ -22,7 +22,7 @@ export default class BasicLayoutNode extends LayoutNode {
   _verticalSeparation: number;
   _horizontalSeparation: number;
 
-  setBlockStyle(style:LayoutNodeStyle) {
+  setBlockStyle(style: LayoutNodeStyle) {
     this._minHeight = style.minHeight;
     this._minWidth = style.minWidth;
     this._borderThickness = style.borderThickness;
@@ -33,16 +33,16 @@ export default class BasicLayoutNode extends LayoutNode {
     this.layoutWasChanged(Direction.INWARD);
   }
 
-  blockStyle():LayoutNodeStyle {
+  blockStyle(): LayoutNodeStyle {
     return {
-      minHeight:this._minHeight,
-      minWidth:this._minWidth,
-      borderThickness:this._borderThickness,
-      verticalPadding:this._verticalPadding,
-      horizontalPadding:this._horizontalPadding,
-      verticalSeparation:this._verticalSeparation,
-      horizontalSeparation:this._horizontalSeparation
-    }
+      minHeight: this._minHeight,
+      minWidth: this._minWidth,
+      borderThickness: this._borderThickness,
+      verticalPadding: this._verticalPadding,
+      horizontalPadding: this._horizontalPadding,
+      verticalSeparation: this._verticalSeparation,
+      horizontalSeparation: this._horizontalSeparation,
+    };
   }
 
   size(bodySize?: Size): Size {
@@ -50,26 +50,25 @@ export default class BasicLayoutNode extends LayoutNode {
       bodySize = new Size();
     }
     bodySize.setHeight(
-      this._borderThickness * 2 +
-      this._verticalPadding * 2 +
-      this._minHeight);
+      this._borderThickness * 2 + this._verticalPadding * 2 + this._minHeight
+    );
     bodySize.setWidth(
-      this._borderThickness * 2 +
-      this._horizontalPadding * 2 +
-      this._minWidth
-      );
+      this._borderThickness * 2 + this._horizontalPadding * 2 + this._minWidth
+    );
     return bodySize;
   }
 
-  getSeparation(axis:Axis): number {
-    switch(axis) {
+  getSeparation(axis: Axis): number {
+    switch (axis) {
       case Axis.VERTICAL:
         return this._verticalSeparation;
       case Axis.HORIZONTAL:
         return this._horizontalSeparation;
       case Axis.Z:
-        if (this.nodeAlignmentMode(Direction.INWARD) === Alignment.INWARD_VERTICAL) {
-            return this._verticalPadding - this._borderThickness;
+        if (
+          this.nodeAlignmentMode(Direction.INWARD) === Alignment.INWARD_VERTICAL
+        ) {
+          return this._verticalPadding - this._borderThickness;
         }
         return this._horizontalPadding - this._borderThickness;
     }
