@@ -28,7 +28,7 @@ export default class BaseCommitLayoutData {
 
   restarter(): Function {
     return (timeout: number) => {
-      this.commitLayoutLoop(timeout || this.timeout);
+      return this.commitLayoutLoop(timeout || this.timeout);
     };
   }
 
