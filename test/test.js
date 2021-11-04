@@ -1389,6 +1389,15 @@ describe("Package", function () {
     node.setRightToLeft(true);
   });
 
+  it("Crease test", function () {
+    const node = makeNode(BLOCK);
+    const inner = makeNode(BUD);
+    inner.setPaintGroup(true);
+    node.connectNode(Direction.INWARD, inner);
+    inner.groupScale();
+    node.groupScale();
+  });
+
   it("Disconnect trivial test", function () {
     const car = makeCaret(BUD);
     car.node().commitLayoutIteratively();
