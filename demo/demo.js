@@ -32,14 +32,14 @@ app.get("/", async (req, res) => {
   write(`<!DOCTYPE html>`);
   write(`<html>`);
   write(`<head>`);
-  write(`<title>node</title>`);
+  write(`<title>layout</title>`);
   write(`</head>`);
   write(`<body>`);
   write(
-    `<h1>node <a href='/coverage'>Coverage</a> <a href='/docs'>Docs</a></h1>`
+    `<h1>layout <a href='/coverage'>Coverage</a> <a href='/docs'>Docs</a></h1>`
   );
   write(
-    `<p>This library is available as JavaScript UMD module: <a href='/node.js'>node.js</a></p>`
+    `<p>This library is available as JavaScript UMD module: <a href='/parsegraph-layout.js'>parsegraph-layout.js</a></p>`
   );
   write(`<h2>Samples &amp; Demos</h2>`);
   write(`<ul>`);
@@ -58,5 +58,5 @@ app.use(express.static("./dist"));
 app.use(express.static("./www"));
 
 app.listen(port, () => {
-  console.log(`See node build information at http://localhost:${port}`);
+  console.log(`See layout build information at http://localhost:${port}`);
 });
