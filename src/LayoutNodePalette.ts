@@ -1,5 +1,5 @@
-import { NodePalette } from "parsegraph-direction";
-import BasicLayoutNode from "./BasicLayoutNode";
+import Direction, { DirectionNode, NodePalette } from "parsegraph-direction";
+import BasicPositioned from "./BasicPositioned";
 import LayoutNode from "./LayoutNode";
 
 const minSize = 10;
@@ -56,16 +56,18 @@ export function style(given?: any): any {
   }
 }
 
-export default class LayoutNodePalette extends NodePalette<LayoutNode> {
-  spawn(given?: any): LayoutNode {
-    if (given instanceof LayoutNode) {
+export default class LayoutNodePalette extends NodePalette<BasicPositioned> {
+  spawn(given?: any) {
+    if (given instanceof DirectionNode) {
       return given;
     }
-    const node = new BasicLayoutNode();
+    const node = new DirectionNode<BasicPositioned>();
+    node.setValue(new BasicPositioned(node));
     this.replace(node, given);
     return node;
   }
   replace(node: LayoutNode, given?: any): void {
-    (node as BasicLayoutNode).setBlockStyle(style(given));
+    (node.value() as BasicPositioned).setBlockStyle(style(given));
+    node.layoutHasChanged(Direction.INWARD);
   }
 }

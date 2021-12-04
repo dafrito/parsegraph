@@ -1,14 +1,13 @@
 DIST_NAME = layout
 
 SCRIPT_FILES = \
-	src/$(DIST_NAME).ts \
-	src/Alignment.ts \
-	src/AxisOverlap.ts \
+	src/index.ts \
 	src/BaseCommitLayoutData.ts \
-	src/BasicLayoutNode.ts \
+	src/Positioned.ts \
+	src/BasicPositioned.ts \
+	src/Layout.ts \
 	src/CommitLayoutData.ts \
 	src/Exception.ts \
-	src/Fit.ts \
 	src/LayoutCaret.ts \
 	src/LayoutNode.ts \
 	src/LayoutNodePalette.ts \
@@ -56,14 +55,14 @@ doc: esdoc
 dist/parsegraph-$(DIST_NAME).js: package.json package-lock.json $(SCRIPT_FILES)
 	npm run build
 	mv -v dist-types/src/* dist/
-	mv dist/$(DIST_NAME).d.ts dist/parsegraph-$(DIST_NAME).d.ts
-	mv dist/$(DIST_NAME).d.ts.map dist/parsegraph-$(DIST_NAME).d.ts.map
+	mv dist/index.d.ts dist/parsegraph-$(DIST_NAME).d.ts
+	mv dist/index.d.ts.map dist/parsegraph-$(DIST_NAME).d.ts.map
 
 dist-prod/parsegraph-$(DIST_NAME).js: package.json package-lock.json $(SCRIPT_FILES)
 	npm run build-prod
 	mv -v dist-types/src/* dist-prod/
-	mv dist-prod/$(DIST_NAME).d.ts dist-prod/parsegraph-$(DIST_NAME).d.ts
-	mv dist-prod/$(DIST_NAME).d.ts.map dist-prod/parsegraph-$(DIST_NAME).d.ts.map
+	mv dist-prod/index.d.ts dist-prod/parsegraph-$(DIST_NAME).d.ts
+	mv dist-prod/index.d.ts.map dist-prod/parsegraph-$(DIST_NAME).d.ts.map
 
 tar: parsegraph-$(DIST_NAME)-dev.tgz
 .PHONY: tar

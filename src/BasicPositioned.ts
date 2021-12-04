@@ -1,7 +1,8 @@
 import Direction, { Axis } from "parsegraph-direction";
 import Size from "parsegraph-size";
-import Alignment from "./Alignment";
+import Layout from "./Layout";
 import LayoutNode from "./LayoutNode";
+import Positioned from "./Positioned";
 
 export interface LayoutNodeStyle {
   minWidth: number;
@@ -13,7 +14,7 @@ export interface LayoutNodeStyle {
   horizontalSeparation: number;
 }
 
-export default class BasicLayoutNode extends LayoutNode {
+export default class BasicPositioned implements Positioned {
   _minHeight: number;
   _minWidth: number;
   _borderThickness: number;
@@ -21,6 +22,16 @@ export default class BasicLayoutNode extends LayoutNode {
   _horizontalPadding: number;
   _verticalSeparation: number;
   _horizontalSeparation: number;
+
+  _layout: Layout;
+
+  constructor(node: LayoutNode) {
+    this._layout = new Layout(node);
+  }
+
+  getLayout() {
+    return this._layout;
+  }
 
   setBlockStyle(style: LayoutNodeStyle) {
     this._minHeight = style.minHeight;
@@ -30,7 +41,6 @@ export default class BasicLayoutNode extends LayoutNode {
     this._horizontalPadding = style.horizontalPadding;
     this._verticalSeparation = style.verticalSeparation;
     this._horizontalSeparation = style.horizontalSeparation;
-    this.layoutWasChanged(Direction.INWARD);
   }
 
   blockStyle(): LayoutNodeStyle {
@@ -58,16 +68,14 @@ export default class BasicLayoutNode extends LayoutNode {
     return bodySize;
   }
 
-  getSeparation(axis: Axis): number {
+  getSeparation(axis: Axis, _: Direction, preferVertical: boolean): number {
     switch (axis) {
       case Axis.VERTICAL:
         return this._verticalSeparation;
       case Axis.HORIZONTAL:
         return this._horizontalSeparation;
       case Axis.Z:
-        if (
-          this.nodeAlignmentMode(Direction.INWARD) === Alignment.INWARD_VERTICAL
-        ) {
+        if (preferVertical) {
           return this._verticalPadding - this._borderThickness;
         }
         return this._horizontalPadding - this._borderThickness;

@@ -39,10 +39,10 @@ export default class BaseCommitLayoutData {
     size: number,
     offset: number
   ) {
-    const extent = node.extentsAt(inDirection);
+    const extent = node.value().getLayout().extentsAt(inDirection);
     extent.clear();
     extent.appendLS(length, size);
-    node.setExtentOffsetAt(inDirection, offset);
+    node.value().getLayout().setExtentOffsetAt(inDirection, offset);
     // console.log(new Error("OFFSET = " + offset));
   }
 
@@ -65,7 +65,7 @@ export default class BaseCommitLayoutData {
     // Begin the layout.
     node._layoutState = LayoutState.IN_COMMIT;
 
-    const bodySize = node.size(this.bodySize);
+    const bodySize = node.value().size(this.bodySize);
 
     // This node's horizontal bottom, used with downward nodes.
     this.initExtent(
@@ -160,7 +160,10 @@ export default class BaseCommitLayoutData {
           }
         } while (this.node !== this.root);
       } else {
-        this.needsPosition = this.needsPosition || this.root.needsPosition();
+        this.needsPosition =
+          this.needsPosition ||
+          this.root.needsCommit() ||
+          this.root.value().getLayout().needsPosition();
       }
       if (this.paintGroup === this.rootPaintGroup) {
         // console.log("Commit layout phase 1 done");
@@ -193,30 +196,36 @@ export default class BaseCommitLayoutData {
         //   phase 2 (Commit group position). Next node is ", paintGroup);
         return false;
       }
-      if (this.paintGroup.needsPosition() || this.node) {
+      if (
+        this.paintGroup.needsCommit() ||
+        this.paintGroup.value().getLayout().needsPosition() ||
+        this.node
+      ) {
         // console.log(paintGroup + " needs a position update");
         if (!this.node) {
           this.node = this.paintGroup;
         }
         do {
           // Loop from the root to the last node.
-          this.node._absoluteDirty = true;
-          this.node._hasGroupPos = false;
-          this.node.commitGroupPos();
+          const layout = this.node.value().getLayout();
+          layout._absoluteDirty = true;
+          layout._hasGroupPos = false;
+          layout.commitGroupPos();
           this.node = this.node._layoutPrev;
           if (pastTime(this.node._id)) {
             // console.log("Ran out of time mid-group during
             //   phase 2 (Commit group position). Next node is ", node);
-            this.paintGroup._hasGroupPos = false;
+            this.paintGroup.value().getLayout()._hasGroupPos = false;
             return false;
           }
         } while (this.node !== this.root);
       } else {
         // console.log(paintGroup + " does not need a position update.");
       }
-      ++this.paintGroup._absoluteVersion;
-      this.paintGroup._absoluteDirty = true;
-      this.paintGroup.commitAbsolutePos();
+      const layout = this.paintGroup.value().getLayout();
+      ++layout._absoluteVersion;
+      layout._absoluteDirty = true;
+      layout.commitAbsolutePos();
       this.paintGroup = this.paintGroup._paintGroupPrev;
       if (this.paintGroup === this.rootPaintGroup) {
         // console.log("Commit layout phase 2 done");
