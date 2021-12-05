@@ -243,23 +243,23 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
   commitLayout(node: LayoutNode): boolean {
     const laidOut = super.commitLayout(node);
 
-    if (node._layoutState === LayoutState.COMMITTED) {
+    if (node.getLayoutState() === LayoutState.COMMITTED) {
       return laidOut;
     }
 
-    if (node._nodeFit === Fit.NAIVE && (node.isRoot() || node.x() !== null)) {
-      node._layoutState = LayoutState.COMMITTED;
+    if (node.nodeFit() === Fit.NAIVE && (node.isRoot() || node.x() !== null)) {
+      node.setLayoutState(LayoutState.COMMITTED);
       return;
     }
 
     if (node.isRootlike()) {
       if (this.commitRootlikeLayout(node)) {
-        node._layoutState = LayoutState.NEEDS_COMMIT;
+        node.setLayoutState(LayoutState.NEEDS_COMMIT);
         return true;
       }
     } else {
       if (this.commitAxisBasedLayout(node)) {
-        node._layoutState = LayoutState.NEEDS_COMMIT;
+        node.setLayoutState(LayoutState.NEEDS_COMMIT);
         return true;
       }
     }
@@ -273,7 +273,7 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
       return true;
     }
 
-    node._layoutState = LayoutState.COMMITTED;
+    node.setLayoutState(LayoutState.COMMITTED);
 
     // Needed a commit, so return true.
     return true;
@@ -345,8 +345,8 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
   commitRootlikeLayout(node: LayoutNode): boolean {
     if (
-      node._layoutPreference === PreferredAxis.HORIZONTAL ||
-      node._layoutPreference == PreferredAxis.PERPENDICULAR
+      node.getLayoutPreference() === PreferredAxis.HORIZONTAL ||
+      node.getLayoutPreference() === PreferredAxis.PERPENDICULAR
     ) {
       // Root-like, so just lay out both axes.
       if (
@@ -391,8 +391,8 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
       return false;
     }
     const nestedNode: LayoutNode = node.nodeAt(Direction.INWARD);
-    if (nestedNode._layoutState !== LayoutState.COMMITTED) {
-      node._layoutState = LayoutState.NEEDS_COMMIT;
+    if (nestedNode.getLayoutState() !== LayoutState.COMMITTED) {
+      node.setLayoutState(LayoutState.NEEDS_COMMIT);
       return true;
     }
     const nestedSize: Size = nestedNode
@@ -455,7 +455,7 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
     // Combine the two extents in the given direction.
     /* console.log("Combining " + nameDirection(direction) + ", " );
-            console.log("Child: " + nameLayoutState(child._layoutState));
+            console.log("Child: " + nameLayoutState(child.getLayoutState()));
             console.log("Length offset: " + lengthOffset);
             console.log("Size adjustment: " + sizeAdjustment);
             console.log("ExtentOffset : " +
@@ -701,17 +701,17 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     const reversed: Direction = reverseDirection(direction);
     const childExtent: Extent = child.value().getLayout().extentsAt(reversed);
 
-    if (child._layoutState !== LayoutState.COMMITTED) {
-      node._layoutState = LayoutState.NEEDS_COMMIT;
+    if (child.getLayoutState() !== LayoutState.COMMITTED) {
+      node.setLayoutState(LayoutState.NEEDS_COMMIT);
       // console.log(Node.getLayoutNodes(child.findPaintGroup()));
-      // console.log(namePreferredAxis(child._layoutPreference));
+      // console.log(namePreferredAxis(child.getLayoutPreference()));
       // console.log("Child's paint group is dirty: " +
       //   child.findPaintGroup().isDirty());
       // console.log(nameDirection(direction) + " Child " +
-      //   nameType(child.type()) + " " + (child._id) +
+      //   nameType(child.type()) + " " + (child.id()) +
       //   " does not have a committed layout.
       //   Child's layout state is " +
-      //   nameLayoutState(child._layoutState), child);
+      //   nameLayoutState(child.getLayoutState()), child);
       return true;
     }
 
@@ -806,7 +806,7 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
       // Layout that node.
       if (this.layoutSingle(node, firstAxisDirection, allowAxisOverlap)) {
-        node._layoutState = LayoutState.NEEDS_COMMIT;
+        node.setLayoutState(LayoutState.NEEDS_COMMIT);
         return true;
       }
       return;

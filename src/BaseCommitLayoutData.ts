@@ -48,22 +48,19 @@ export default class BaseCommitLayoutData {
 
   commitLayout(node: LayoutNode): boolean {
     // Do nothing if this node already has a layout committed.
-    if (node._layoutState === LayoutState.COMMITTED) {
-      return false;
-    }
-
-    // Check for invalid layout states.
-    if (node._layoutState === LayoutState.NULL) {
-      throw createException(BAD_LAYOUT_STATE);
-    }
-
-    // Do not allow overlapping layout commits.
-    if (node._layoutState === LayoutState.IN_COMMIT) {
-      throw createException(BAD_LAYOUT_STATE);
+    switch (node.getLayoutState()) {
+      case LayoutState.COMMITTED:
+        return false;
+      case LayoutState.NULL:
+        // Check for invalid layout states.
+        throw createException(BAD_LAYOUT_STATE);
+      case LayoutState.IN_COMMIT:
+        // Do not allow overlapping layout commits.
+        throw createException(BAD_LAYOUT_STATE);
     }
 
     // Begin the layout.
-    node._layoutState = LayoutState.IN_COMMIT;
+    node.setLayoutState(LayoutState.IN_COMMIT);
 
     const bodySize = node.value().size(this.bodySize);
 
@@ -116,7 +113,7 @@ export default class BaseCommitLayoutData {
     );
 
     // Implementations should actually commit the layout here.
-    // node._layoutState = LayoutState.COMMITTED;
+    // node.setLayoutState(LayoutState.COMMITTED);
 
     // Needed a commit, so return true.
     return true;
@@ -127,13 +124,13 @@ export default class BaseCommitLayoutData {
     while (this.layoutPhase === 1) {
       if (this.paintGroup === null) {
         // console.log("Beginning new commit layout phase 1");
-        this.paintGroup = this.rootPaintGroup._paintGroupNext;
+        this.paintGroup = this.rootPaintGroup.nextPaintGroup();
         this.root = this.paintGroup;
         this.node = this.root;
       } else {
         // console.log("Continuing commit layout phase 1");
       }
-      if (pastTime(this.node._id)) {
+      if (pastTime(this.node.id())) {
         // console.log("Ran out of time between groups during
         //   phase 1 (Commit layout, timeout=" + timeout +")");
         return false;
@@ -142,7 +139,7 @@ export default class BaseCommitLayoutData {
         this.needsPosition = true;
         do {
           // Loop back to the first node, from the root.
-          this.node = this.node._layoutNext;
+          this.node = this.node.nextLayout();
           if (this.node.needsCommit()) {
             this.commitLayout(this.node);
             if (this.node.needsCommit()) {
@@ -151,9 +148,9 @@ export default class BaseCommitLayoutData {
               this.paintGroup = null;
               return false;
             }
-            this.node._currentPaintGroup = this.paintGroup;
+            this.node.setCurrentPaintGroup(this.paintGroup);
           }
-          if (pastTime(this.node._id)) {
+          if (pastTime(this.node.id())) {
             // console.log("Ran out of time mid-group during
             //   phase 1 (Commit layout)");
             return false;
@@ -171,7 +168,7 @@ export default class BaseCommitLayoutData {
         this.paintGroup = null;
         break;
       }
-      this.paintGroup = this.paintGroup._paintGroupNext;
+      this.paintGroup = this.paintGroup.nextPaintGroup();
       this.root = this.paintGroup;
       this.node = this.root;
     }
@@ -191,7 +188,7 @@ export default class BaseCommitLayoutData {
         // console.log("Continuing layout phase 2");
       }
       // console.log("Processing position for ", paintGroup);
-      if (pastTime(this.paintGroup._id)) {
+      if (pastTime(this.paintGroup.id())) {
         // console.log("Ran out of time between groups during
         //   phase 2 (Commit group position). Next node is ", paintGroup);
         return false;
@@ -211,8 +208,8 @@ export default class BaseCommitLayoutData {
           layout._absoluteDirty = true;
           layout._hasGroupPos = false;
           layout.commitGroupPos();
-          this.node = this.node._layoutPrev;
-          if (pastTime(this.node._id)) {
+          this.node = this.node.prevLayout();
+          if (pastTime(this.node.id())) {
             // console.log("Ran out of time mid-group during
             //   phase 2 (Commit group position). Next node is ", node);
             this.paintGroup.value().getLayout()._hasGroupPos = false;
@@ -226,7 +223,7 @@ export default class BaseCommitLayoutData {
       ++layout._absoluteVersion;
       layout._absoluteDirty = true;
       layout.commitAbsolutePos();
-      this.paintGroup = this.paintGroup._paintGroupPrev;
+      this.paintGroup = this.paintGroup.prevPaintGroup();
       if (this.paintGroup === this.rootPaintGroup) {
         // console.log("Commit layout phase 2 done");
         ++this.layoutPhase;
