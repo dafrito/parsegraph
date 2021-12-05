@@ -1,4 +1,7 @@
-import Direction, { DirectionNode, NodePalette } from "parsegraph-direction";
+import Direction, {
+  DirectionNode,
+  InplaceNodePalette,
+} from "parsegraph-direction";
 import BasicPositioned from "./BasicPositioned";
 import LayoutNode from "./LayoutNode";
 
@@ -56,7 +59,8 @@ export function style(given?: any): any {
   }
 }
 
-export default class LayoutNodePalette extends NodePalette<BasicPositioned> {
+export default class LayoutNodePalette
+  implements InplaceNodePalette<BasicPositioned> {
   spawn(given?: any) {
     if (given instanceof DirectionNode) {
       return given;

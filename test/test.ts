@@ -51,7 +51,7 @@ export function getLayoutNodes(node: LayoutNode) {
 }
 
 function makeCaret(given?: any) {
-  return new DirectionCaret<BasicPositioned>(new LayoutNodePalette(), given);
+  return new DirectionCaret<BasicPositioned>(given, new LayoutNodePalette());
 }
 
 const palette = new LayoutNodePalette();
