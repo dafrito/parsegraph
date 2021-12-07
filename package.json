@@ -1,6 +1,6 @@
 {
   "name": "parsegraph-layout",
-  "version": "1.7.2-dev",
+  "version": "1.7.3-dev",
   "description": "layout",
   "main": "dist/parsegraph-layout.js",
   "types": "dist/parsegraph-layout.d.ts",
