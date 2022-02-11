@@ -14,14 +14,14 @@ import {
   LayoutNode,
   BasicPositioned,
   Layout,
-  Positioned
+  Positioned,
 } from "../dist/parsegraph-layout";
 import Extent from "parsegraph-extent";
-import Size from 'parsegraph-size';
+import Size from "parsegraph-size";
 
 import { elapsed } from "parsegraph-timing";
 
-import { assert } from 'chai';
+import { assert } from "chai";
 
 const BUD = "u";
 const BLOCK = "b";
@@ -61,9 +61,9 @@ function makeCaret(given?: any) {
 }
 
 class EmptySpace implements Positioned {
-  _layout:Layout;
+  _layout: Layout;
 
-  constructor(node:LayoutNode) {
+  constructor(node: LayoutNode) {
     this._layout = new Layout(node);
   }
 
@@ -1364,7 +1364,7 @@ describe("Package", function () {
     };
 
     const root = makeBlock();
-    let creased:LayoutNode = null;
+    let creased: LayoutNode = null;
 
     let n: LayoutNode = root;
     for (let i = 0; i < 10; ++i) {
@@ -1373,17 +1373,27 @@ describe("Package", function () {
       n = child;
       if (i == 5) {
         n.setPaintGroup(true);
+        n.setScale(0.5);
         creased = n;
       }
     }
 
     root.value().getLayout().commitLayoutIteratively();
 
-    root.forEachPaintGroup(pg=>{
-      assert(!pg.value().getLayout().needsAbsolutePos())
+    root.forEachPaintGroup((pg) => {
+      assert(!pg.value().getLayout().needsAbsolutePos());
     });
-    assert(!root.value().getLayout().needsAbsolutePos())
-    assert(!creased.value().getLayout().needsAbsolutePos())
+    assert(!root.value().getLayout().needsAbsolutePos());
+    assert(!creased.value().getLayout().needsAbsolutePos());
+
+    assert(
+      creased.value().getLayout().absoluteScale() !== null,
+      "Scale must not be null"
+    );
+    assert(
+      creased.value().getLayout().absoluteScale() === 0.5,
+      "Scale must be 0.5"
+    );
   });
 
   it("Proportion pull test", function () {

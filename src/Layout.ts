@@ -79,7 +79,7 @@ export default class Layout {
   commitAbsolutePos(): void {
     if (!this.needsAbsolutePos()) {
       // console.log(this +
-      //   " does not need an absolute version update, so just return.");
+      // " does not need an absolute version update, so just return.");
       return;
     }
     // console.log(this + " needs an absolute version update");
@@ -171,9 +171,11 @@ export default class Layout {
     if (this.owner().isRoot()) {
       return false;
     }
-    return this._absoluteVersion !==
-        this.owner().parentNode().findPaintGroup().value().getLayout()
-          ._absoluteVersion;
+    return (
+      this._absoluteVersion !==
+      this.owner().parentNode().findPaintGroup().value().getLayout()
+        ._absoluteVersion
+    );
   }
 
   needsPosition(): boolean {
