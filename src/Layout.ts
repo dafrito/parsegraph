@@ -77,7 +77,7 @@ export default class Layout {
   }
 
   commitAbsolutePos(): void {
-    if (this.needsAbsolutePos()) {
+    if (!this.needsAbsolutePos()) {
       // console.log(this +
       //   " does not need an absolute version update, so just return.");
       return;
