@@ -1,9 +1,11 @@
 import Direction, {
+  Axis,
   FORWARD,
   DOWNWARD,
   UPWARD,
   BACKWARD,
   DirectionCaret,
+  DirectionNode,
 } from "parsegraph-direction";
 import {
   LayoutNodePalette,
@@ -11,14 +13,18 @@ import {
   checkExtentsEqual,
   LayoutNode,
   BasicPositioned,
+  Layout,
+  Positioned
 } from "../dist/parsegraph-layout";
 import Extent from "parsegraph-extent";
+import Size from 'parsegraph-size';
 
 import { elapsed } from "parsegraph-timing";
 
+import { assert } from 'chai';
+
 const BUD = "u";
 const BLOCK = "b";
-const SLOT = "s";
 const SHRINK_SCALE = 0.85;
 
 const expect = function (expected: any, actual: any) {
@@ -52,6 +58,28 @@ export function getLayoutNodes(node: LayoutNode) {
 
 function makeCaret(given?: any) {
   return new DirectionCaret<BasicPositioned>(given, new LayoutNodePalette());
+}
+
+class EmptySpace implements Positioned {
+  _layout:Layout;
+
+  constructor(node:LayoutNode) {
+    this._layout = new Layout(node);
+  }
+
+  getLayout(): Layout {
+    return this._layout;
+  }
+
+  size(bodySize: Size = new Size()): Size {
+    bodySize.setWidth(100);
+    bodySize.setHeight(100);
+    return bodySize;
+  }
+
+  getSeparation(axis: Axis, dir: Direction, preferVertical: boolean): number {
+    return 25;
+  }
 }
 
 const palette = new LayoutNodePalette();
@@ -1325,6 +1353,37 @@ describe("Package", function () {
     car.disconnect();
     originalRoot.value().getLayout().commitLayoutIteratively();
     newRoot.value().getLayout().commitLayoutIteratively();
+  });
+
+  it("Diagonal block test", function () {
+    const makeBlock = () => {
+      const node: LayoutNode = new DirectionNode<Positioned>();
+      const b = new EmptySpace(node);
+      node.setValue(b);
+      return node;
+    };
+
+    const root = makeBlock();
+    let creased:LayoutNode = null;
+
+    let n: LayoutNode = root;
+    for (let i = 0; i < 10; ++i) {
+      const child = makeBlock();
+      n.connectNode(i % 2 ? Direction.FORWARD : Direction.DOWNWARD, child);
+      n = child;
+      if (i == 5) {
+        n.setPaintGroup(true);
+        creased = n;
+      }
+    }
+
+    root.value().getLayout().commitLayoutIteratively();
+
+    root.forEachPaintGroup(pg=>{
+      assert(!pg.value().getLayout().needsAbsolutePos())
+    });
+    assert(!root.value().getLayout().needsAbsolutePos())
+    assert(!creased.value().getLayout().needsAbsolutePos())
   });
 
   it("Proportion pull test", function () {
