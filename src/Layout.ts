@@ -352,6 +352,23 @@ export default class Layout {
     }
   }
 
+  groupSizeRect(rect?: Rect): Rect {
+    const groupSize = this.groupSize();
+    if (!rect) {
+      return new Rect(
+        this.groupX(),
+        this.groupY(),
+        groupSize.width(),
+        groupSize.height()
+      );
+    }
+    rect.setX(this.groupX());
+    rect.setY(this.groupY());
+    rect.setWidth(groupSize.width());
+    rect.setHeight(groupSize.height());
+    return rect;
+  }
+
   absoluteSizeRect(rect?: Rect): Rect {
     const absoluteSize = this.absoluteSize();
     if (!rect) {
