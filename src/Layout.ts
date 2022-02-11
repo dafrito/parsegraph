@@ -165,13 +165,15 @@ export default class Layout {
   }
 
   needsAbsolutePos(): boolean {
-    return (
-      !this._absoluteDirty &&
-      !this.owner().isRoot() &&
-      this._absoluteVersion ===
+    if (this._absoluteDirty) {
+      return true;
+    }
+    if (this.owner().isRoot()) {
+      return false;
+    }
+    return this._absoluteVersion !==
         this.owner().parentNode().findPaintGroup().value().getLayout()
-          ._absoluteVersion
-    );
+          ._absoluteVersion;
   }
 
   needsPosition(): boolean {
