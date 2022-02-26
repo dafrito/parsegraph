@@ -203,7 +203,8 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
             alignment / node.nodeAt(childDirection).state().scale()
         );
     }
-    const lineLength = separation - node.nodeAt(childDirection).state().scale() * extentSize;
+    const lineLength =
+      separation - node.nodeAt(childDirection).state().scale() * extentSize;
     node.neighborAt(childDirection).lineLength = lineLength;
     // console.log(
     //   "Line length: " + lineLength + ",
@@ -247,7 +248,10 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
       return laidOut;
     }
 
-    if (node.state().nodeFit() === Fit.NAIVE && (node.isRoot() || node.x() !== null)) {
+    if (
+      node.state().nodeFit() === Fit.NAIVE &&
+      (node.isRoot() || node.x() !== null)
+    ) {
       node.setLayoutState(LayoutState.COMMITTED);
       return;
     }
@@ -837,13 +841,15 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
       .extentsAt(secondDirection)
       .separation(
         secondNode.value().getLayout().extentsAt(firstDirection),
-        (node.nodeAt(secondDirection).state().scale() / node.nodeAt(firstDirection).state().scale()) *
+        (node.nodeAt(secondDirection).state().scale() /
+          node.nodeAt(firstDirection).state().scale()) *
           (secondNodeAlignment -
             secondNode.value().getLayout().extentOffsetAt(firstDirection)) -
           (firstNodeAlignment -
             firstNode.value().getLayout().extentOffsetAt(secondDirection)),
         true,
-        node.nodeAt(secondDirection).state().scale() / node.nodeAt(firstDirection).state().scale(),
+        node.nodeAt(secondDirection).state().scale() /
+          node.nodeAt(firstDirection).state().scale(),
         0
       );
     separationBetweenChildren *= node.nodeAt(firstDirection).state().scale();
@@ -989,7 +995,8 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     if (getDirectionAxis(firstDirection) === Axis.VERTICAL) {
       separationFromFirst = Math.max(
         separationFromFirst,
-        node.nodeAt(firstDirection).state().scale() * (this.firstSize.height() / 2) +
+        node.nodeAt(firstDirection).state().scale() *
+          (this.firstSize.height() / 2) +
           this.bodySize.height() / 2
       );
       separationFromFirst +=
@@ -998,7 +1005,8 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
       separationFromSecond = Math.max(
         separationFromSecond,
-        node.nodeAt(secondDirection).state().scale() * (this.secondSize.height() / 2) +
+        node.nodeAt(secondDirection).state().scale() *
+          (this.secondSize.height() / 2) +
           this.bodySize.height() / 2
       );
       separationFromSecond +=
@@ -1007,7 +1015,8 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     } else {
       separationFromFirst = Math.max(
         separationFromFirst,
-        node.nodeAt(firstDirection).state().scale() * (this.firstSize.width() / 2) +
+        node.nodeAt(firstDirection).state().scale() *
+          (this.firstSize.width() / 2) +
           this.bodySize.width() / 2
       );
       separationFromFirst +=
@@ -1016,7 +1025,8 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
 
       separationFromSecond = Math.max(
         separationFromSecond,
-        node.nodeAt(secondDirection).state().scale() * (this.secondSize.width() / 2) +
+        node.nodeAt(secondDirection).state().scale() *
+          (this.secondSize.width() / 2) +
           this.bodySize.width() / 2
       );
       separationFromSecond +=

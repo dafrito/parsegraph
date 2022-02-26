@@ -1,5 +1,4 @@
 import Direction, {
-  Axis,
   FORWARD,
   DOWNWARD,
   UPWARD,
@@ -77,7 +76,7 @@ class EmptySpace implements Positioned {
     return bodySize;
   }
 
-  getSeparation(axis: Axis, dir: Direction, preferVertical: boolean): number {
+  getSeparation(): number {
     return 25;
   }
 }
