@@ -4,15 +4,6 @@
   "description": "layout",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
-  "scripts": {
-    "coverage": "nyc npm run test",
-    "test": "cross-env TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha",
-    "autotest": "cross-env TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha --watch",
-    "demo": "node demo/demo.js",
-    "autobuild": "webpack --watch --config webpack.config.js",
-    "build": "webpack --config webpack.config.js",
-    "build-prod": "NODE_ENV=production webpack --config webpack.prod.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/parsegraph/layout.git"
