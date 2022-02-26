@@ -1,4 +1,4 @@
-import {LINE_THICKNESS} from ".";
+import { LINE_THICKNESS } from ".";
 
 document.addEventListener("DOMContentLoaded", () => {
   const root = document.getElementById("demo");

@@ -1001,7 +1001,7 @@ describe("Package", function () {
       console.log(downwardExtent.dump(""));
       caret.node().value().getLayout().extentsAt(DOWNWARD).dump("");
       throw new Error("Downward extent differs");
-      /*// graph._nodePainter.enableExtentRendering();
+      /* // graph._nodePainter.enableExtentRendering();
       // resultDom.appendChild(
       // graph._container
       // );
@@ -1053,7 +1053,7 @@ describe("Package", function () {
       !caret.node().value().getLayout().extentsAt(FORWARD).equals(forwardExtent)
     ) {
       throw new Error("Forward extent differs");
-      /*graph._nodePainter.enableExtentRendering();
+      /* graph._nodePainter.enableExtentRendering();
       resultDom.appendChild(graph._container);
       resultDom.appendChild(forwardExtent.toDom("Expected forward extent"));
       resultDom.appendChild(
@@ -1267,7 +1267,7 @@ describe("Package", function () {
     bnode.layoutHasChanged();
     car.root().value().getLayout().commitLayoutIteratively();
     if (ax === anode.value().getLayout().groupX()) {
-      //simpleGraph(out, car);
+      // simpleGraph(out, car);
       throw new Error(
         "Bud must move when another node grows in size. (ax=" +
           ax +
@@ -1277,7 +1277,7 @@ describe("Package", function () {
       );
     }
     if (gx + increase / 2 !== mnode.value().getLayout().groupX()) {
-      //simpleGraph(out, car);
+      // simpleGraph(out, car);
       throw new Error(
         "Node must be moved when another node grows in size. (expected " +
           (gx + increase / 2) +
