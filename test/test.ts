@@ -1263,7 +1263,7 @@ describe("Package", function () {
     const increase = 100;
     ns.minWidth += increase;
     bnode.value().setBlockStyle(ns);
-    bnode.layoutHasChanged();
+    bnode.layoutChanged();
     car.root().value().getLayout().commitLayoutIteratively();
     if (ax === anode.value().getLayout().groupX()) {
       // simpleGraph(out, car);
@@ -1330,13 +1330,13 @@ describe("Package", function () {
 
   it("Right-to-left test", function () {
     const node = makeNode(BUD);
-    node.setRightToLeft(true);
+    node.state().setRightToLeft(true);
   });
 
   it("Crease test", function () {
     const node = makeNode(BLOCK);
     const inner = makeNode(BUD);
-    inner.setPaintGroup(true);
+    inner.crease();
     node.connectNode(Direction.INWARD, inner);
     inner.value().getLayout().groupScale();
     node.value().getLayout().groupScale();
@@ -1371,8 +1371,8 @@ describe("Package", function () {
       n.connectNode(i % 2 ? Direction.FORWARD : Direction.DOWNWARD, child);
       n = child;
       if (i == 5) {
-        n.setPaintGroup(true);
-        n.setScale(0.5);
+        n.crease();
+        n.state().setScale(0.5);
         creased = n;
       }
     }
@@ -1380,7 +1380,7 @@ describe("Package", function () {
     root.value().getLayout().commitLayoutIteratively();
 
     root.forEachPaintGroup((pg) => {
-      assert(!pg.value().getLayout().needsAbsolutePos());
+      assert(!(pg as LayoutNode).value().getLayout().needsAbsolutePos());
     });
     assert(!root.value().getLayout().needsAbsolutePos());
     assert(!creased.value().getLayout().needsAbsolutePos());
@@ -1399,7 +1399,7 @@ describe("Package", function () {
     const car = makeCaret(BUD);
     car.node().value().getLayout().commitLayoutIteratively();
     const originalRoot = car.node();
-    originalRoot._id = "ROOT";
+    originalRoot.state().setId("ROOT");
     // car.spawn('b', 'u');
     // car.spawn('f', 'u');
 
@@ -1422,10 +1422,10 @@ describe("Package", function () {
       */
 
     car.spawnMove("d", "b");
-    car.node()._id = "CENTER BLOCK";
+    car.node().state().setId("CENTER BLOCK");
     car.push();
     car.spawnMove("b", "u");
-    car.node()._id = "DOWN BUD";
+    car.node().state().setId("DOWN BUD");
     // car.spawnMove('d', 's');
     // car.label('1');
     car.pop();
