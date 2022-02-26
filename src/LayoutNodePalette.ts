@@ -72,6 +72,6 @@ export default class LayoutNodePalette
   }
   replace(node: LayoutNode, given?: any): void {
     (node.value() as BasicPositioned).setBlockStyle(style(given));
-    node.layoutHasChanged(Direction.INWARD);
+    node.layoutChanged(Direction.INWARD);
   }
 }
