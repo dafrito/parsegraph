@@ -4,12 +4,15 @@
 name: Production CI
 
 on:
-  push:
-  pull_request:
+  workflow_run:
+    workflows: ["Development CI"]
+    types:
+      - completed
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     strategy:
       matrix:
         node-version: [16.x]
@@ -20,9 +23,13 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: NODE_ENV=production npm ci --omit=dev
-    - run: NODE_ENV=production make clean build-prod
-    - run: NODE_ENV=production make tar-prod
+        registry-url: 'https://registry.npmjs.org'
+    - run: make install-deps
+    - run: make build-prod
+    - run: make tar-prod
+    - run: ./publish-prod.sh
+      env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
     - uses: actions/upload-artifact@v2
       with:
         name: parsegraph-layout-prod-${{ github.run_number }}

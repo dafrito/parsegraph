@@ -5,7 +5,7 @@ name: Development CI
 
 on:
   push:
-  pull_request:
+    branches: main
 
 jobs:
   build:
@@ -17,12 +17,19 @@ jobs:
     - uses: actions/checkout@v2
     - run: ls -R
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm ci
+        registry-url: 'https://registry.npmjs.org'
+    - run: make install-deps
+    - run: make build
     - run: make tar
+    - run: ./publish.sh
+      if: ${{ matrix.node-version == '16.x' }}
+      env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+    - run: git push --tags
     - uses: actions/upload-artifact@v2
       with:
-        name: parsegraph-layout-dev-${{ github.run_number }}
+        name: parsegraph-layout-dev-${{ github.run_number }}-${{ matrix.node-version }}
         path: parsegraph-layout-dev.tgz
