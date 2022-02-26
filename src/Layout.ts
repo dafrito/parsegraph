@@ -501,11 +501,6 @@ export default class Layout {
     return true;
   }
 
-  invalidateLayout(): void {
-    this.owner().invalidateLayout();
-    this._hasGroupPos = false;
-  }
-
   nodeUnderCoords(x: number, y: number, userScale?: number): LayoutNode {
     // console.log("nodeUnderCoords: " + x + ", " + y)
     if (userScale === undefined) {
