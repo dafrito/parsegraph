@@ -3997,15 +3997,15 @@ parse5@6.0.1:
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-6.0.1.tgz#e1a1c085c569b3dc08321184f19a39cc27f7c30b"
   integrity sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==
 
-parsegraph-direction@^1.7.5:
-  version "1.7.5"
-  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-1.7.5.tgz#5577a19955bb73a5c60eb5264c78b81f2c374be8"
-  integrity sha512-Jzhi/aNvcpJ5PHKzGh7tiQVQ0sfSvFhsC4m6HKH2YriFCgrikIDuNZsYAVcHEJWQbl3QdmRNV0qEtQRCZyltMw==
+parsegraph-direction@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.0.0.tgz#a76920baddbe1e57cbdb586735087709bd156350"
+  integrity sha512-q4MawFspo/1DHYtL6vp6yx8/2fEhFu76Ol/5p+JgaBAPiKmy85NZJ0f5qktN05lOXyk9AZ4I2inEx1xut9Qsmw==
   dependencies:
     parsegraph-generateid "^1.4.5"
     parsegraph-timing "^1.4.8"
 
-parsegraph-extent@^1.4.6:
+parsegraph-extent@^1.4.8:
   version "1.4.8"
   resolved "https://registry.yarnpkg.com/parsegraph-extent/-/parsegraph-extent-1.4.8.tgz#6fbd157be0572a8aacaa227208cc1c3134f1cadb"
   integrity sha512-h94r8nLnbjwZmbxxRsLZdm8vRMwciAXk+/tJwZykJ1cKkX+OvBGER+39yE3Z1oHBMxfbo0M16yKA1rFgr+Jk+g==
@@ -4038,12 +4038,12 @@ parsegraph-rect@^1.4.5:
   resolved "https://registry.yarnpkg.com/parsegraph-rect/-/parsegraph-rect-1.4.5.tgz#aad0401b4c22381231014fd558ea967e01cdb45f"
   integrity sha512-hgsP9N15mYeSISgeMU2l1GHJEjAouuFgdQW89EGTav8ntM93xC628Lz5+mYvx/mljbuC5lR/OBSw6EuV0A9GxA==
 
-parsegraph-size@^1.5.6:
+parsegraph-size@^1.5.7:
   version "1.5.7"
   resolved "https://registry.yarnpkg.com/parsegraph-size/-/parsegraph-size-1.5.7.tgz#0e79ddc6cfe3fab250bf7352ef1c907aaa1bd488"
   integrity sha512-fiyWET1Vn6IKNLitOo9aM6kJ6GZIibabdw2fvApNxkZTsiZHO0RylVAV3jKKSY3mZPXL99XH+9q/lOQWlvPk5Q==
 
-parsegraph-timing@^1.4.8:
+parsegraph-timing@^1.4.8, parsegraph-timing@^1.4.9:
   version "1.4.9"
   resolved "https://registry.yarnpkg.com/parsegraph-timing/-/parsegraph-timing-1.4.9.tgz#48deb90b39e88f51eeedeeb9f24d0d3637f38b14"
   integrity sha512-tu5s98rL87ieXdZC3+NNhjjBqjSn4yWoRl7HNOnDpThmY2tB9RW9IhVNGstd82gtKt7yc19Kiy3JRdnIt0749w==
