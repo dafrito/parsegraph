@@ -15,7 +15,7 @@ import {
   BasicPositioned,
   Layout,
   Positioned,
-} from "../dist/parsegraph-layout";
+} from "../src/index";
 import Extent from "parsegraph-extent";
 import Size from "parsegraph-size";
 
