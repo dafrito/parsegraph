@@ -109,7 +109,7 @@ export default class Layout {
         // Just use the parent's absolute position to start.
         this._absoluteXPos = par._absoluteXPos;
         this._absoluteYPos = par._absoluteYPos;
-        scale = par._absoluteScale * node.scale();
+        scale = par._absoluteScale * node.state().scale();
         parentScale = par._absoluteScale;
         break;
       }
@@ -145,7 +145,7 @@ export default class Layout {
             .getLayout()._absoluteVersion;
         }
       }
-      scale *= node.scaleAt(directionToChild);
+      scale *= node.nodeAt(directionToChild).state().scale();
       node = node.nodeAt(directionToChild);
     }
 
@@ -229,7 +229,7 @@ export default class Layout {
         // Just use the parent's position to start.
         this._groupXPos = par._groupXPos;
         this._groupYPos = par._groupYPos;
-        scale = par._groupScale * node.scale();
+        scale = par._groupScale * node.state().scale();
         parentScale = par._groupScale;
         break;
       }
@@ -253,7 +253,7 @@ export default class Layout {
       }
 
       parentScale = scale;
-      scale *= node.scaleAt(directionToChild);
+      scale *= node.nodeAt(directionToChild).state().scale();
       node = node.nodeAt(directionToChild);
     }
     // console.log("Assigning scale for " + this + " to " + scale);
