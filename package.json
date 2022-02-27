@@ -14,6 +14,13 @@
     "url": "https://github.com/parsegraph/layout/issues"
   },
   "homepage": "https://github.com/parsegraph/layout#readme",
+  "dependencies": {
+    "parsegraph-direction": "^2.0.0",
+    "parsegraph-extent": "^1.4.8",
+    "parsegraph-rect": "^1.4.5",
+    "parsegraph-size": "^1.5.7",
+    "parsegraph-timing": "^1.4.9"
+  },
   "devDependencies": {
     "@babel/cli": "^7.12.10",
     "@babel/core": "^7.12.10",
@@ -31,11 +38,6 @@
     "eslint-config-prettier": "^7.1.0",
     "jsdom": "16.4.0",
     "jsdom-global": "3.0.2",
-    "parsegraph-direction": "^2.0.0",
-    "parsegraph-extent": "^1.4.8",
-    "parsegraph-rect": "^1.4.5",
-    "parsegraph-size": "^1.5.7",
-    "parsegraph-timing": "^1.4.9",
     "prettier": "2.1.2",
     "raw-loader": "^4.0.1",
     "source-map-loader": "^1.0.2",
