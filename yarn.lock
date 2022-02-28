@@ -3997,10 +3997,10 @@ parse5@6.0.1:
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-6.0.1.tgz#e1a1c085c569b3dc08321184f19a39cc27f7c30b"
   integrity sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==
 
-parsegraph-direction@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.0.1.tgz#f75a09b2b1c7f5d6cd3087bd512f1298e99d2087"
-  integrity sha512-5mwJk02tSktjVfYrY4mzenyQSHbTGevnsFB92MyDCb/Bcm2+a+9NBk2B0c+6bDmv0jmwCOKqO7IPdyrN6Dfr3Q==
+parsegraph-direction@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.0.2.tgz#7fa4f30f04ca4cbfd2f53504505f18b35bc20fe5"
+  integrity sha512-2i1NzeyRr92L5MIhCadwvb2F3fYnt3xMzxHc8lgeZBdboF6D5KJUDA1hhnkHxFOTN6TjxFNin8CXo76y6d5sJg==
   dependencies:
     parsegraph-generateid "^1.4.7"
     parsegraph-timing "^1.4.9"
