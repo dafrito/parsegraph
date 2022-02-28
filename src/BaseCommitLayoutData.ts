@@ -139,7 +139,7 @@ export default class BaseCommitLayoutData {
         this.needsPosition = true;
         do {
           // Loop back to the first node, from the root.
-          this.node = this.node.siblings().next();
+          this.node = this.node.siblings().next() as LayoutNode;
           if (this.node.needsCommit()) {
             this.commitLayout(this.node);
             if (this.node.needsCommit()) {
@@ -208,7 +208,7 @@ export default class BaseCommitLayoutData {
           layout._absoluteDirty = true;
           layout._hasGroupPos = false;
           layout.commitGroupPos();
-          this.node = this.node.siblings().prev();
+          this.node = this.node.siblings().prev() as LayoutNode;
           if (pastTime(this.node.id())) {
             // console.log("Ran out of time mid-group during
             //   phase 2 (Commit group position). Next node is ", node);
