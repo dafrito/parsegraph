@@ -56,7 +56,7 @@ stop-tmux:
 	tmuxify stop
 .PHONY: stop-tmux
 
-RUN_TEST=npx jest --env=jsdom
+RUN_TEST=npx jest --env=jsdom --no-cache
 
 check:
 	$(RUN_TEST)
