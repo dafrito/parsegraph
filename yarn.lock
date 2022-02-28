@@ -2379,13 +2379,6 @@ escodegen@^2.0.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-esdoc-typescript-plugin@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/esdoc-typescript-plugin/-/esdoc-typescript-plugin-1.0.1.tgz#d4b929677f2ee5587a86ec70e766537040b98662"
-  integrity sha512-QV9rdis5PkypVK1fh2wuESZPQZUVjTwt4hj97Pivb9M8wGPMOTxYu5ofkyGWm3xgNL+K0VxZY6TGEO07kfGAtg==
-  dependencies:
-    typescript "^2.8.3"
-
 eslint-config-google@^0.14.0:
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/eslint-config-google/-/eslint-config-google-0.14.0.tgz#4f5f8759ba6e11b424294a219dbfa18c508bcc1a"
@@ -3997,13 +3990,13 @@ parse5@6.0.1:
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-6.0.1.tgz#e1a1c085c569b3dc08321184f19a39cc27f7c30b"
   integrity sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==
 
-parsegraph-direction@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.0.2.tgz#7fa4f30f04ca4cbfd2f53504505f18b35bc20fe5"
-  integrity sha512-2i1NzeyRr92L5MIhCadwvb2F3fYnt3xMzxHc8lgeZBdboF6D5KJUDA1hhnkHxFOTN6TjxFNin8CXo76y6d5sJg==
+parsegraph-direction@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.0.3.tgz#0eca7e6e05c2a2c5645e62ac8cc1b7a6db12be25"
+  integrity sha512-h+KYyIM4NmcfEPjDtkPd60iI885PlTbEvuIj++3CdRNirOJ+e/YTphNZd5xWm8dCNpLpefJNNc7g7hUoh5M3UA==
   dependencies:
     parsegraph-generateid "^1.4.7"
-    parsegraph-timing "^1.4.9"
+    parsegraph-timing "^1.4.10"
 
 parsegraph-extent@^1.4.9:
   version "1.4.9"
@@ -4023,12 +4016,12 @@ parsegraph-generateid@^1.4.7:
   resolved "https://registry.yarnpkg.com/parsegraph-generateid/-/parsegraph-generateid-1.4.7.tgz#d9636e891837ac8b579f29c6ff2fb9c3e9624cd3"
   integrity sha512-GJne91gMUMUStaypi8mKCXrUzf0DKSROBXakOQob7mx765iQsIGzxbsXFL2Vk2+FcvGdLyIzTtiAgrghg5GDAA==
 
-parsegraph-gettimeinmillis@^1.4.3, parsegraph-gettimeinmillis@^1.4.5:
+parsegraph-gettimeinmillis@^1.4.5:
   version "1.4.5"
   resolved "https://registry.yarnpkg.com/parsegraph-gettimeinmillis/-/parsegraph-gettimeinmillis-1.4.5.tgz#b2bb3c8351b4fa827a3e4a4f404336b2f3366493"
   integrity sha512-J53sQzXiHZB/lenyB8Ep45aF2MoX46TPpY9lvkurl3PtxTNKoOH68Pjcn+zYEUpQh61gY/T21WvKaSmHD3YoGw==
 
-parsegraph-method@^1.4.9:
+parsegraph-method@^1.4.20:
   version "1.4.20"
   resolved "https://registry.yarnpkg.com/parsegraph-method/-/parsegraph-method-1.4.20.tgz#89097ebded9abab1691365c059fcfd48a0682213"
   integrity sha512-LFqTsUhgN1k6UOBMvbPNL8vBMWeWfP1bBFqcEFbA6iNxt5X7q6XsaOCUAAAB0lf87Wt7rX9Go1HA2PrdO8P7mQ==
@@ -4043,14 +4036,13 @@ parsegraph-size@^1.5.7:
   resolved "https://registry.yarnpkg.com/parsegraph-size/-/parsegraph-size-1.5.7.tgz#0e79ddc6cfe3fab250bf7352ef1c907aaa1bd488"
   integrity sha512-fiyWET1Vn6IKNLitOo9aM6kJ6GZIibabdw2fvApNxkZTsiZHO0RylVAV3jKKSY3mZPXL99XH+9q/lOQWlvPk5Q==
 
-parsegraph-timing@^1.4.9:
-  version "1.4.9"
-  resolved "https://registry.yarnpkg.com/parsegraph-timing/-/parsegraph-timing-1.4.9.tgz#48deb90b39e88f51eeedeeb9f24d0d3637f38b14"
-  integrity sha512-tu5s98rL87ieXdZC3+NNhjjBqjSn4yWoRl7HNOnDpThmY2tB9RW9IhVNGstd82gtKt7yc19Kiy3JRdnIt0749w==
+parsegraph-timing@^1.4.10:
+  version "1.4.10"
+  resolved "https://registry.yarnpkg.com/parsegraph-timing/-/parsegraph-timing-1.4.10.tgz#3db6707fa33aa1aed1e293c2510e7dbfbc8e7717"
+  integrity sha512-/VSRZ49vlUSP63UuxZtaUWipLOyaREb6zvnW110V67Mvj5W57+6qX4OhHYbrzbWNm1MVSMRssHfevA5pOB1tmA==
   dependencies:
-    esdoc-typescript-plugin "^1.0.1"
-    parsegraph-gettimeinmillis "^1.4.3"
-    parsegraph-method "^1.4.9"
+    parsegraph-gettimeinmillis "^1.4.5"
+    parsegraph-method "^1.4.20"
 
 path-exists@^3.0.0:
   version "3.0.0"
@@ -4849,11 +4841,6 @@ typedoc@^0.22.12:
     marked "^4.0.10"
     minimatch "^3.0.4"
     shiki "^0.10.0"
-
-typescript@^2.8.3:
-  version "2.9.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.9.2.tgz#1cbf61d05d6b96269244eb6a3bce4bd914e0f00c"
-  integrity sha512-Gr4p6nFNaoufRIY4NMdpQRNmgxVIGMs4Fcu/ujdYk3nAZqk7supzBE9idmvfZIlH/Cuj//dvi+019qEue9lV0w==
 
 typescript@^4.1.3:
   version "4.5.5"
