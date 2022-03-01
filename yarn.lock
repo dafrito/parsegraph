@@ -3990,13 +3990,13 @@ parse5@6.0.1:
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-6.0.1.tgz#e1a1c085c569b3dc08321184f19a39cc27f7c30b"
   integrity sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==
 
-parsegraph-direction@^2.0.6:
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.0.6.tgz#4ff9be580d5a9071e5400a47564743cd863723fd"
-  integrity sha512-FQD6AZxUzSEWSnh/11z1HP5L/ZYFmGrkx+4ESBaQMyEHeG5/A3zMM9JZrzmT4RuptHpHuYJthxEZlyG8TBdp8w==
+parsegraph-direction@^2.0.7:
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.0.7.tgz#ee17904610938d8738d5237fe9af6aed605247d0"
+  integrity sha512-G+8HUPdfLn/E3oTDrXUDkBW8vxkaYDA8xOFMQeg22joxmBDoOXVfMMu8cpO2tli8EupQXW/uOML4rXCIxzzi8g==
   dependencies:
     parsegraph-generateid "^1.4.8"
-    parsegraph-timing "^1.4.12"
+    parsegraph-timing "^1.4.13"
 
 parsegraph-extent@^1.4.11:
   version "1.4.11"
@@ -4036,10 +4036,10 @@ parsegraph-size@^1.5.8:
   resolved "https://registry.yarnpkg.com/parsegraph-size/-/parsegraph-size-1.5.8.tgz#4912322c2df92546232d2db3fc6ba38b8b3ac7b1"
   integrity sha512-5n4sg3LHdJKK1i8PkeQEffIt7OYW0P6dZ50nAl/m1Zw/IzYj5/9ZhZ/TPGilvKPEnIfI+z+s+F7Q1VwYDgd2ag==
 
-parsegraph-timing@^1.4.12:
-  version "1.4.12"
-  resolved "https://registry.yarnpkg.com/parsegraph-timing/-/parsegraph-timing-1.4.12.tgz#cb5ec1ffb494153dd83864ed2fe42dc2c7699442"
-  integrity sha512-ICMsDKoE5KpoOhk2CjCHboWc41fBHYHEBAtttT/Etl0KOvzw5A1wOEbFzN+VfejymuFyaJ6rS7I2SkuIrLFSNA==
+parsegraph-timing@^1.4.13:
+  version "1.4.13"
+  resolved "https://registry.yarnpkg.com/parsegraph-timing/-/parsegraph-timing-1.4.13.tgz#74d653dda1ba9233ebf6d13cec42616921178bc7"
+  integrity sha512-TrUkChXU7GyAmwD+qd3GMiz1SVupIst9V9ePur1jNf6vaJttSmBgKBrl8qxsnm04alKiKcEYafVGb7KA6E1SCQ==
   dependencies:
     parsegraph-gettimeinmillis "^1.4.6"
     parsegraph-method "^1.4.20"
