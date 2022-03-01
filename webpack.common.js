@@ -15,6 +15,10 @@ const hasShaderFiles = ()=>{
   return hasFiles("glsl");
 }
 
+const hasCSSFiles = ()=>{
+  return hasFiles("css");
+}
+
 const hasCSVFiles = ()=>{
   return hasFiles("csv") || hasFiles("tsv") || hasFiles("txt");
 }
@@ -25,6 +29,12 @@ const recognizedExternals = {
     commonjs2:"react",
     amd:"react",
     root:"React"
+  },
+  "react-dom":{
+    commonjs:"react-dom",
+    commonjs2:"react-dom",
+    amd:"react-dom",
+    root:"ReactDOM"
   },
   "parsegraph-log":{
     commonjs:"parsegraph-log",
@@ -91,6 +101,13 @@ const webpackConfig = (prod)=>{
     extensions.push(".tsv");
     extensions.push(".txt");
     extensions.push(".csv");
+  }
+  if (hasCSSFiles()) {
+    rules.push({
+      test: /\.(css)$/,
+      use: ["raw-loader"],
+    });
+    extensions.push(".css");
   }
 
   return {
