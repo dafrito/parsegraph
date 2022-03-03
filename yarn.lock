@@ -3891,13 +3891,13 @@ parse5@6.0.1:
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-6.0.1.tgz#e1a1c085c569b3dc08321184f19a39cc27f7c30b"
   integrity sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==
 
-parsegraph-direction@^2.0.9:
-  version "2.0.9"
-  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.0.9.tgz#e21ef8de382601c92bc4bbd2b6a203dd24a76fbc"
-  integrity sha512-I4L9/83rBh0jsAEqnqYvbli6kUhAK42+oKLd3JZ6BC7Z18BhszcpKnw1G6oe3pEJHlr+92TP7qdnC8T2P4aPYA==
+parsegraph-direction@^2.0.10:
+  version "2.0.10"
+  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.0.10.tgz#53bf4c2bbcdaae2b334569f10b6048180d9ec948"
+  integrity sha512-VNflO0h3e5CTHddKTnaM4wCl41dq5pWEjlZNwx53DnH+wZ+4IOgpCw7QcYG+LsNrAWKzpJd6xsjkTAv+4BP32w==
   dependencies:
     parsegraph-generateid "^1.4.8"
-    parsegraph-timing "^1.4.15"
+    parsegraph-timing "^1.4.16"
 
 parsegraph-extent@^1.4.11:
   version "1.4.11"
@@ -3922,10 +3922,10 @@ parsegraph-gettimeinmillis@^1.4.6:
   resolved "https://registry.yarnpkg.com/parsegraph-gettimeinmillis/-/parsegraph-gettimeinmillis-1.4.6.tgz#edb341bf5b2faaaf918e8c0ba31f63d643afe942"
   integrity sha512-ARG/HOV6rb8R8U6tLgJ5l8IYL21DoKIki7Ktrm4+kckKyLBLBLGFY0HH5fzzcIue9bhbjI5Kj0pUCGazSIUj5w==
 
-parsegraph-method@^1.4.20:
-  version "1.4.20"
-  resolved "https://registry.yarnpkg.com/parsegraph-method/-/parsegraph-method-1.4.20.tgz#89097ebded9abab1691365c059fcfd48a0682213"
-  integrity sha512-LFqTsUhgN1k6UOBMvbPNL8vBMWeWfP1bBFqcEFbA6iNxt5X7q6XsaOCUAAAB0lf87Wt7rX9Go1HA2PrdO8P7mQ==
+parsegraph-method@^1.4.22:
+  version "1.4.22"
+  resolved "https://registry.yarnpkg.com/parsegraph-method/-/parsegraph-method-1.4.22.tgz#e73605b8f69a6040df3f1e689bde1f26c5b163d2"
+  integrity sha512-7l1YOim5QH+Gc/HQYqBGvRPtyf1EwvjHODcYZIyxrQQVbnjkkG1vrhqIpdm3TlfRl2k9YU0BbfDNY9BmyL/UdA==
 
 parsegraph-rect@^1.4.7:
   version "1.4.7"
@@ -3937,13 +3937,13 @@ parsegraph-size@^1.5.8:
   resolved "https://registry.yarnpkg.com/parsegraph-size/-/parsegraph-size-1.5.8.tgz#4912322c2df92546232d2db3fc6ba38b8b3ac7b1"
   integrity sha512-5n4sg3LHdJKK1i8PkeQEffIt7OYW0P6dZ50nAl/m1Zw/IzYj5/9ZhZ/TPGilvKPEnIfI+z+s+F7Q1VwYDgd2ag==
 
-parsegraph-timing@^1.4.15:
-  version "1.4.15"
-  resolved "https://registry.yarnpkg.com/parsegraph-timing/-/parsegraph-timing-1.4.15.tgz#114dce3837395fce5c415daf635317cc641150ea"
-  integrity sha512-qozFGdX6Z2YBZN7TejVAKBwpNTqjaAlEDJLRWO7VR3OV0bhsCgPqzY4pJQVRqpw2ZeJ95FMogoSj8g/sjIqjJg==
+parsegraph-timing@^1.4.16:
+  version "1.4.16"
+  resolved "https://registry.yarnpkg.com/parsegraph-timing/-/parsegraph-timing-1.4.16.tgz#066d4a1e68d95e0cb6ddba73fc30b7546b157298"
+  integrity sha512-b8lkM44tpWgUKehjIpqqaeJJMiK2nnrsWPVJXDe+oZNlyS30AJEzjnVroYtCQLciX4N2B9pcM198awKuHw5Psw==
   dependencies:
     parsegraph-gettimeinmillis "^1.4.6"
-    parsegraph-method "^1.4.20"
+    parsegraph-method "^1.4.22"
 
 path-exists@^3.0.0:
   version "3.0.0"
