@@ -289,9 +289,8 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
       const firstAxis: Axis = getPerpendicularAxis(node.parentDirection());
 
       // Check for nodes perpendicular to parent's direction
-      const hasFirstAxisNodes: [Direction, Direction] = node.hasNodes(
-        firstAxis
-      );
+      const hasFirstAxisNodes: [Direction, Direction] =
+        node.hasNodes(firstAxis);
       const oppositeFromParent: Direction = reverseDirection(
         node.parentDirection()
       );

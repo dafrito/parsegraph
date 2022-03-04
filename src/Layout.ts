@@ -94,8 +94,11 @@ export default class Layout {
     let scale = 1.0;
     let neededVersion;
     if (!node.isRoot()) {
-      neededVersion = node.parentNode().findPaintGroup().value().getLayout()
-        ._absoluteVersion;
+      neededVersion = node
+        .parentNode()
+        .findPaintGroup()
+        .value()
+        .getLayout()._absoluteVersion;
     }
     while (true) {
       if (node.isRoot()) {

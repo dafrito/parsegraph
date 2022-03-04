@@ -28,5 +28,5 @@ export {
   LayoutCaret,
   style,
   checkExtentsEqual,
-  paintGroupBounds
+  paintGroupBounds,
 };

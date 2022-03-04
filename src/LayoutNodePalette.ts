@@ -60,7 +60,8 @@ export function style(given?: any): any {
 }
 
 export default class LayoutNodePalette
-  implements InplaceNodePalette<BasicPositioned> {
+  implements InplaceNodePalette<BasicPositioned>
+{
   spawn(given?: any) {
     if (given instanceof DirectionNode) {
       return given;
