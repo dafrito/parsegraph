@@ -11,6 +11,7 @@ import LayoutCaret from "./LayoutCaret";
 import LayoutNodePalette, { style } from "./LayoutNodePalette";
 import checkExtentsEqual from "./checkExtentsEqual";
 import BasicPositioned from "./BasicPositioned";
+import paintGroupBounds from "./paintGroupBounds";
 
 export {
   BaseCommitLayoutData,
@@ -27,4 +28,5 @@ export {
   LayoutCaret,
   style,
   checkExtentsEqual,
+  paintGroupBounds
 };
