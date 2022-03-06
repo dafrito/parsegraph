@@ -3932,10 +3932,10 @@ parsegraph-rect@^1.4.7:
   resolved "https://registry.yarnpkg.com/parsegraph-rect/-/parsegraph-rect-1.4.7.tgz#0d9bf8aa4156dcf7a6f197b461350c290817ad34"
   integrity sha512-DSaDOeCnqZB2nEopMXahk6Kfv1rZYPSiZNFKkbt8PGUV2eLcoh67zGWuL1FeEn/gxDx+2cAj6JAKPe8aiJ4bsw==
 
-parsegraph-size@^1.5.8:
-  version "1.5.8"
-  resolved "https://registry.yarnpkg.com/parsegraph-size/-/parsegraph-size-1.5.8.tgz#4912322c2df92546232d2db3fc6ba38b8b3ac7b1"
-  integrity sha512-5n4sg3LHdJKK1i8PkeQEffIt7OYW0P6dZ50nAl/m1Zw/IzYj5/9ZhZ/TPGilvKPEnIfI+z+s+F7Q1VwYDgd2ag==
+parsegraph-size@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/parsegraph-size/-/parsegraph-size-1.6.0.tgz#ccfd7c22756756c59d16d0123a0034c2a13c3ce1"
+  integrity sha512-fvV5ejIPN3Eb2tlwg8UsuxuEGjhLYuYFCuSvKsx9APkXmTnCuq0pFy/e30NdkWXV0Wt3X+Ai6/ecJFg9Ksv31Q==
 
 parsegraph-timing@^1.4.16:
   version "1.4.16"
