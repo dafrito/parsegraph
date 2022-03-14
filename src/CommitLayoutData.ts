@@ -420,7 +420,7 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
       // console.log(this.horizontalPadding(), this.borderThickness());
       node.setPosAt(
         Direction.INWARD,
-        this.bodySize.width() / 2 -
+        this.bodySize.width() / 2 +
           node.value().getSeparation(Axis.Z, Direction.INWARD, false) +
           nestedNode.state().scale() *
             (-nestedSize.width() +
