@@ -411,7 +411,7 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
           (nestedNode.value().getLayout().extentOffsetAt(Direction.DOWNWARD) -
             nestedSize.width() / 2),
         this.bodySize.height() / 2 -
-          node.value().getSeparation(Axis.Z, Direction.INWARD, true)/2 +
+          node.value().getSeparation(Axis.Z, Direction.INWARD, true) / 2 +
           nestedNode.state().scale() *
             (-nestedSize.height() +
               nestedNode.value().getLayout().extentOffsetAt(Direction.FORWARD))
@@ -421,7 +421,7 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
       node.setPosAt(
         Direction.INWARD,
         this.bodySize.width() / 2 -
-          node.value().getSeparation(Axis.Z, Direction.INWARD, false)/2 +
+          node.value().getSeparation(Axis.Z, Direction.INWARD, false) / 2 +
           nestedNode.state().scale() *
             (-nestedSize.width() +
               nestedNode
