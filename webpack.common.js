@@ -23,6 +23,18 @@ const hasCSVFiles = ()=>{
   return hasFiles("csv") || hasFiles("tsv") || hasFiles("txt");
 }
 
+const hasDependency = (dep)=>{
+  const info = getPackageJSON();
+  return (info.peerDependencies && info.peerDependencies[dep]) ||
+    (info.dependencies && info.dependencies[dep]) ||
+    (info.devDependencies && info.devDependencies[dep]) ||
+    (info.optionalDependencies && info.optionalDependencies[dep]);
+}
+
+const hasReact = ()=>{
+  return hasDependency("react") || hasDependency("react-dom");
+}
+
 const recognizedExternals = {
   "react":{
     commonjs:"react",
@@ -105,7 +117,7 @@ const webpackConfig = (prod)=>{
   if (hasCSSFiles()) {
     rules.push({
       test: /\.(css)$/,
-      use: ["raw-loader"],
+      use: hasReact() ? ["style-loader", "css-loader"] : ["raw-loader"],
     });
     extensions.push(".css");
   }
