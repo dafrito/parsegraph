@@ -23,6 +23,10 @@ const hasCSVFiles = ()=>{
   return hasFiles("csv") || hasFiles("tsv") || hasFiles("txt");
 }
 
+const hasPNGFiles = ()=>{
+  return hasFiles("png");
+}
+
 const hasDependency = (dep)=>{
   const info = getPackageJSON();
   return (info.peerDependencies && info.peerDependencies[dep]) ||
@@ -120,6 +124,12 @@ const webpackConfig = (prod)=>{
       use: hasReact() ? ["style-loader", "css-loader"] : ["raw-loader"],
     });
     extensions.push(".css");
+  }
+  if (hasPNGFiles()) {
+    rules.push({
+      test: /\.png/,
+      type: "asset/inline"
+    });
   }
 
   return {
