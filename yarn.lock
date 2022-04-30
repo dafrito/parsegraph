@@ -3848,12 +3848,12 @@ parsegraph-method@^1.4.22:
   resolved "https://registry.yarnpkg.com/parsegraph-method/-/parsegraph-method-1.4.22.tgz#e73605b8f69a6040df3f1e689bde1f26c5b163d2"
   integrity sha512-7l1YOim5QH+Gc/HQYqBGvRPtyf1EwvjHODcYZIyxrQQVbnjkkG1vrhqIpdm3TlfRl2k9YU0BbfDNY9BmyL/UdA==
 
-parsegraph-rect@^1.4.7:
+parsegraph-rect@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/parsegraph-rect/-/parsegraph-rect-1.5.1.tgz#ee95591098bacc34284f04969a73f5b851ddfdb4"
   integrity sha512-ScHgiKnEpvOKVbc0aIn0mMJSZoqCGkak1Nlud9oezvHLDsVsMcHUO6KzPiN1DNfLaqQGn+mNBvSf0B04OeFIYw==
 
-parsegraph-size@^1.7.0:
+parsegraph-size@^1.7.1:
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/parsegraph-size/-/parsegraph-size-1.7.1.tgz#8c107adc1043646b3c05299e65ab1da635adfd93"
   integrity sha512-0XFXxuMPrkHC4fsU2waqeFcMWVJKRrwEmN72WmTs8jrP5nq9W4T35DhPIn4zoqLm3HvA0YoXn2kbSod7oiwtYQ==

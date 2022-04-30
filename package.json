@@ -17,8 +17,8 @@
   "dependencies": {
     "parsegraph-direction": "^2.1.0",
     "parsegraph-extent": "^1.4.11",
-    "parsegraph-rect": "^1.4.7",
-    "parsegraph-size": "^1.7.0",
+    "parsegraph-rect": "^1.5.1",
+    "parsegraph-size": "^1.7.1",
     "parsegraph-timing": "^1.4.16"
   },
   "devDependencies": {
