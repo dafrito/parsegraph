@@ -3812,10 +3812,10 @@ parse5@6.0.1:
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-6.0.1.tgz#e1a1c085c569b3dc08321184f19a39cc27f7c30b"
   integrity sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==
 
-parsegraph-direction@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.1.0.tgz#216d5930265e0b823f0f8bc424589ef7af55c94f"
-  integrity sha512-gh1K13Yl0sVrRjbZPpmsE3/yd6nNOThgFZNdrO/t1nM35WA4TWKqoIkfvLaUXfThIbmU6w+YXgSD72i0L1LLTg==
+parsegraph-direction@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.1.1.tgz#345251888655cf5619d853b1a612a226b26a2de7"
+  integrity sha512-W7XFl61h0j1T055faKwuyCDrzBcCAzt/EHTdBHrr7btqwbi79YYRq7hMMyn+ZrgwirqBdIKi12OTBUl009GbVw==
   dependencies:
     parsegraph-generateid "^1.4.8"
     parsegraph-timing "^1.4.16"
