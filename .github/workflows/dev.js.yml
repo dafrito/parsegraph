@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [14.x, 16.x, 18.x]
     steps:
     - uses: actions/checkout@v2
     - run: ls -R
@@ -25,7 +25,7 @@ jobs:
     - run: make build
     - run: make tar
     - run: ./publish.sh
-      if: ${{ matrix.node-version == '16.x' }}
+      if: ${{ matrix.node-version == '18.x' }}
       env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
     - run: git push --tags

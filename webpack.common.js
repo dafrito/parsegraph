@@ -131,6 +131,13 @@ const webpackConfig = (prod)=>{
       type: "asset/inline"
     });
   }
+  rules.push(
+      {
+        test: /\.js$/,
+        enforce: "pre",
+        use: ["source-map-loader"],
+      }
+  );
 
   return {
     externals: buildExternals(),
@@ -148,7 +155,7 @@ const webpackConfig = (prod)=>{
       modules: [relDir("src"), relDir("node_modules")]
     },
     mode: prod ? "production" : "development",
-    devtool: prod ? false : "eval-source-map",
+    devtool: "source-map"
   };
 };
 
