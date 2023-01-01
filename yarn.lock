@@ -3989,10 +3989,10 @@ parse5@^7.0.0, parse5@^7.1.1:
   dependencies:
     entities "^4.4.0"
 
-parsegraph-direction@^2.1.3:
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.1.3.tgz#f509a562ceaf451c6fec34680fde3617ae2681cf"
-  integrity sha512-V2Ko2KfoRR+grIWRRtaRMAaL+Wl7BE+0OPrADUd5+JPopJo+oRoh4lPGGonyDGVXrvLXnixpE7XSSLU90HG+8w==
+parsegraph-direction@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.1.4.tgz#e41f1602fef614b2a00304b271c7957d09eb252b"
+  integrity sha512-W4zPv5NSg9L92k2VGgbAV7vg2oIZ/apVM+YpfP8uVk40vFcNKosbQ/zy0NIhGfzMHFKYwdbKQdkup1wUDIaIhg==
   dependencies:
     parsegraph-generateid "^1.4.9"
     parsegraph-timing "^1.4.17"

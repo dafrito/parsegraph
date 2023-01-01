@@ -15,8 +15,8 @@
   },
   "homepage": "https://github.com/parsegraph/layout#readme",
   "dependencies": {
-    "parsegraph-direction": "^2.1.3",
     "jest-environment-jsdom": "^29.3.1",
+    "parsegraph-direction": "^2.1.4",
     "parsegraph-extent": "^1.4.12",
     "parsegraph-rect": "^1.5.2",
     "parsegraph-size": "^1.7.2",
