@@ -1448,4 +1448,20 @@ describe("Package", function () {
       // console.log("Proportion test finished");
     }
   });
+
+  it("Connect override test", () => {
+    let car = makeCaret(BUD);
+    car.node().value().getLayout().commitLayoutIteratively();
+    const originalRoot = car.node();
+    originalRoot.state().setId("ROOT");
+    for (let i = 0; i < 5; ++i) {
+      const subCar = makeCaret(BUD);
+      car.node().connectNode(Direction.DOWNWARD, subCar.root());
+      originalRoot.value().getLayout().commitLayoutIteratively();
+      const nextCar = makeCaret(BLOCK);
+      car.node().connectNode(Direction.DOWNWARD, nextCar.root());
+      car = nextCar;
+      originalRoot.value().getLayout().commitLayoutIteratively();
+    }
+  });
 });
