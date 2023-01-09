@@ -169,6 +169,7 @@ export default class BaseCommitLayoutData {
       this.paintGroup = this.paintGroup.paintGroup().next() as LayoutNode;
       this.root = this.paintGroup;
       this.node = this.root;
+      logLeave();
     }
     return true;
   }
@@ -226,6 +227,7 @@ export default class BaseCommitLayoutData {
       }
       this.root = this.paintGroup;
       this.node = null;
+      logLeave();
     }
     this.needsPosition = false;
     return true;
