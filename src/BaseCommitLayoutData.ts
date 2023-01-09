@@ -3,7 +3,7 @@ import LayoutNode from "./LayoutNode";
 import createException, { BAD_LAYOUT_STATE } from "./Exception";
 import Size from "parsegraph-size";
 import { elapsed } from "parsegraph-timing";
-import {log, logc, logEnterc, logLeave} from './log';
+import { log, logc, logEnterc, logLeave } from "./log";
 
 export default class BaseCommitLayoutData {
   bodySize: Size;
@@ -132,7 +132,9 @@ export default class BaseCommitLayoutData {
         logEnterc("Layout", "Continuing commit layout phase 1");
       }
       if (pastTime(this.node.id())) {
-        logLeave("Ran out of time between groups during phase 1 (Commit layout)");
+        logLeave(
+          "Ran out of time between groups during phase 1 (Commit layout)"
+        );
         return false;
       }
       if (this.root.needsCommit()) {
@@ -152,7 +154,9 @@ export default class BaseCommitLayoutData {
             this.node.setPaintGroupRoot(this.paintGroup);
           }
           if (pastTime(this.node.id())) {
-            logLeave("Ran out of time mid-group during phase 1 (Commit layout)");
+            logLeave(
+              "Ran out of time mid-group during phase 1 (Commit layout)"
+            );
             return false;
           }
         } while (this.node !== this.root);
@@ -187,9 +191,15 @@ export default class BaseCommitLayoutData {
       } else {
         logEnterc("Layout", "Continuing layout phase 2");
       }
-      log("Processing position for paint group {0}", this.paintGroup.state().id());
+      log(
+        "Processing position for paint group {0}",
+        this.paintGroup.state().id()
+      );
       if (pastTime(this.paintGroup.id())) {
-        logLeave("Ran out of time between groups during phase 2 (Commit group position). Next node is {0}", this.paintGroup.state().id());
+        logLeave(
+          "Ran out of time between groups during phase 2 (Commit group position). Next node is {0}",
+          this.paintGroup.state().id()
+        );
         return false;
       }
       if (
@@ -197,7 +207,10 @@ export default class BaseCommitLayoutData {
         this.paintGroup.value().getLayout().needsPosition() ||
         this.node
       ) {
-        log("Paint group {0} needs a position update", this.paintGroup.state().id());
+        log(
+          "Paint group {0} needs a position update",
+          this.paintGroup.state().id()
+        );
         if (!this.node) {
           this.node = this.paintGroup;
         }
@@ -209,13 +222,19 @@ export default class BaseCommitLayoutData {
           layout.commitGroupPos();
           this.node = this.node.siblings().prev() as LayoutNode;
           if (pastTime(this.node.id())) {
-            logLeave("Ran out of time mid-group during phase 2 (Commit group position). Next node is {0}", this.node.state().id());
+            logLeave(
+              "Ran out of time mid-group during phase 2 (Commit group position). Next node is {0}",
+              this.node.state().id()
+            );
             this.paintGroup.value().getLayout()._hasGroupPos = false;
             return false;
           }
         } while (this.node !== this.root);
       } else {
-        log("{0} does not need a position update.", this.paintGroup.state().id());
+        log(
+          "{0} does not need a position update.",
+          this.paintGroup.state().id()
+        );
       }
       const layout = this.paintGroup.value().getLayout();
       ++layout._absoluteVersion;

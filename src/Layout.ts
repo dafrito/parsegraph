@@ -8,7 +8,7 @@ import Extent from "parsegraph-extent";
 
 import LayoutNode from "./LayoutNode";
 
-import {log, logc, logEnterc, logLeave} from './log';
+import { log, logc, logEnterc, logLeave } from "./log";
 
 import Direction, {
   Axis,
@@ -80,10 +80,18 @@ export default class Layout {
 
   commitAbsolutePos(): void {
     if (!this.needsAbsolutePos()) {
-      logc("Layout", "{0} does not need an absolute version update, so just return.", this.owner().state().id());
+      logc(
+        "Layout",
+        "{0} does not need an absolute version update, so just return.",
+        this.owner().state().id()
+      );
       return;
     }
-    logEnterc("Layout", "{0} needs an absolute version update", this.owner().state().id());
+    logEnterc(
+      "Layout",
+      "{0} needs an absolute version update",
+      this.owner().state().id()
+    );
     this._absoluteXPos = null;
     this._absoluteYPos = null;
     this._absoluteScale = null;
@@ -157,7 +165,14 @@ export default class Layout {
     this._absoluteYPos += node.y() * parentScale;
     this._absoluteScale = scale;
     this._absoluteDirty = false;
-    logc("Layout", "{0} has absolute pos {1}, {2}. scale={3}", this.owner().state().id(), this._absoluteXPos, this._absoluteYPos, this._absoluteScale);
+    logc(
+      "Layout",
+      "{0} has absolute pos {1}, {2}. scale={3}",
+      this.owner().state().id(),
+      this._absoluteXPos,
+      this._absoluteYPos,
+      this._absoluteScale
+    );
     if (!this.owner().isRoot()) {
       this._absoluteVersion = this.owner()
         .parentNode()
@@ -216,11 +231,19 @@ export default class Layout {
 
   commitGroupPos(): void {
     if (this._hasGroupPos) {
-      logc("Layout", "{0} does not need a group position update.", this.owner().state().id());
+      logc(
+        "Layout",
+        "{0} does not need a group position update.",
+        this.owner().state().id()
+      );
       return;
     }
 
-    logEnterc("Layout", "{0} needs a group position update.", this.owner().state().id());
+    logEnterc(
+      "Layout",
+      "{0} needs a group position update.",
+      this.owner().state().id()
+    );
 
     // Retrieve a stack of nodes to determine the group position.
     let node: LayoutNode = this.owner();
@@ -242,7 +265,12 @@ export default class Layout {
         this._groupYPos = par._groupYPos;
         scale = par._groupScale * node.state().scale();
         parentScale = par._groupScale;
-        log("Using parent pos {0}, {1}. scale={2}", this._groupXPos, this._groupYPos, scale);
+        log(
+          "Using parent pos {0}, {1}. scale={2}",
+          this._groupXPos,
+          this._groupYPos,
+          scale
+        );
         break;
       }
 
@@ -268,11 +296,20 @@ export default class Layout {
       scale *= node.nodeAt(directionToChild).state().scale();
       node = node.nodeAt(directionToChild);
     }
-    logc("Scale assignments", "Assigning scale for {0} to {1}", this.owner().state().id(), scale);
+    logc(
+      "Scale assignments",
+      "Assigning scale for {0} to {1}",
+      this.owner().state().id(),
+      scale
+    );
     this._groupScale = scale;
 
     if (!this.owner().localPaintGroup()) {
-      log("Node is not a paint group root, so adding local x={0} and y={1}", node.x() * parentScale, node.y() * parentScale);
+      log(
+        "Node is not a paint group root, so adding local x={0} and y={1}",
+        node.x() * parentScale,
+        node.y() * parentScale
+      );
       this._groupXPos += node.x() * parentScale;
       this._groupYPos += node.y() * parentScale;
     }
@@ -429,19 +466,31 @@ export default class Layout {
     const ay = this.absoluteY();
     const aScale = this.absoluteScale();
     if (x < userScale * ax - (userScale * aScale * s.width()) / 2) {
-      logc("Hit tests", "Given coords are outside this node's body. (Horizontal minimum exceeds X-coord)");
+      logc(
+        "Hit tests",
+        "Given coords are outside this node's body. (Horizontal minimum exceeds X-coord)"
+      );
       return false;
     }
     if (x > userScale * ax + (userScale * aScale * s.width()) / 2) {
-      logc("Hit tests", "Given coords are outside this node's body. (X-coord exceeds horizontal maximum)");
+      logc(
+        "Hit tests",
+        "Given coords are outside this node's body. (X-coord exceeds horizontal maximum)"
+      );
       return false;
     }
     if (y < userScale * ay - (userScale * aScale * s.height()) / 2) {
-      logc("Hit tests", "Given coords are outside this node's body. (Vertical minimum exceeds Y-coord)");
+      logc(
+        "Hit tests",
+        "Given coords are outside this node's body. (Vertical minimum exceeds Y-coord)"
+      );
       return false;
     }
     if (y > userScale * ay + (userScale * aScale * s.height()) / 2) {
-      logc("Hit tests", "Given coords are outside this node's body. (Y-coord exceeds vertical maximum)");
+      logc(
+        "Hit tests",
+        "Given coords are outside this node's body. (Y-coord exceeds vertical maximum)"
+      );
       return false;
     }
     logc("Hit tests", "Within body of node {0}", this.owner().state().id());
