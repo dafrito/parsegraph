@@ -141,6 +141,7 @@ export default class BaseCommitLayoutData {
           // Loop back to the first node, from the root.
           this.node = this.node.siblings().next() as LayoutNode;
           if (this.node.needsCommit()) {
+            log("Commiting layout for node {0}", this.node.state().id());
             this.commitLayout(this.node);
             if (this.node.needsCommit()) {
               logLeave("Node had a child that needed commit; resetting layout");
