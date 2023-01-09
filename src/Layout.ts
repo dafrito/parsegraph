@@ -229,6 +229,10 @@ export default class Layout {
     this._hasGroupPos = false;
   }
 
+  invalidateAbsolutePos(): void {
+    this._absoluteDirty = true;
+  }
+
   commitGroupPos(): void {
     if (!this.needsPosition()) {
       logc(

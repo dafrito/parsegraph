@@ -146,6 +146,7 @@ export default class BaseCommitLayoutData {
             log("Commiting layout for node {0}", this.node.state().id());
             this.commitLayout(this.node);
             this.node.value().getLayout().invalidateGroupPos();
+            this.node.value().getLayout().invalidateAbsolutePos();
             if (this.node.needsCommit()) {
               logLeave("Node had a child that needed commit; resetting layout");
               this.paintGroup = null;
