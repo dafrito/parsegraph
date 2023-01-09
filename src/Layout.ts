@@ -230,7 +230,7 @@ export default class Layout {
   }
 
   commitGroupPos(): void {
-    if (this._hasGroupPos) {
+    if (!this.needsPosition()) {
       logc(
         "Layout",
         "{0} does not need a group position update.",
