@@ -210,6 +210,10 @@ export default class Layout {
     return this._absoluteScale;
   }
 
+  invalidateGroupPos(): void {
+    this._hasGroupPos = false;
+  }
+
   commitGroupPos(): void {
     if (this._hasGroupPos) {
       logc("Layout", "{0} does not need a group position update.", this.owner().state().id());
