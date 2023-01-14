@@ -42,15 +42,15 @@ const getRootPath = () => {
 };
 const root = getRootPath();
 
-async function getDemos() {
+async function getDemos(): Promise<string[]> {
   return new Promise((respond, reject) => {
-    glob("../www/*.html", {}, function (err, files) {
+    glob("../www/*.html", {}, function (err: any, files: string[]) {
       if (err) {
         reject(err);
       }
       // files is an array of filenames.
       respond(
-        files.map((file) => {
+        files.map((file: string) => {
           const m = file.match(/www\/(\w+)\.html/);
           [1];
           return m ? m[1] : null;
@@ -61,7 +61,7 @@ async function getDemos() {
 }
 
 app.get(root, async (req, res) => {
-  resp = "";
+  let resp = "";
   const write = (text) => {
     resp += text + "\n";
   };
