@@ -4,6 +4,7 @@
   "description": "parsegraph microproject server",
   "main": "demo.js",
   "scripts": {
+    "build": "npx tsc src/demo.ts --outFile ./demo.js",
     "start": "node demo.js"
   },
   "repository": {
