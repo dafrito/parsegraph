@@ -9,7 +9,7 @@ while true; do
     trap 'kill -TERM $serverpid' TERM
     trap 'kill -TERM $serverpid; exit' INT
     sleep 0.2
-    inotifywait -e modify -r demo
+    inotifywait -e modify -r demo/package.json demo/yarn.lock demo/src
     kill -TERM $serverpid
     sleep 0.2
 done

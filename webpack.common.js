@@ -83,7 +83,7 @@ const buildExternals = ()=>{
   return rv;
 };
 
-const webpackConfig = (prod)=>{
+const webpackConfig = (prod, isPeer)=>{
   const rules = [
     {
       test: /\.(js|ts|tsx?)$/,
@@ -155,7 +155,7 @@ const webpackConfig = (prod)=>{
       modules: [relDir("src"), relDir("node_modules")]
     },
     mode: prod ? "production" : "development",
-    devtool: "source-map"
+    devtool: isPeer ? "inline-source-map" : "source-map"
   };
 };
 

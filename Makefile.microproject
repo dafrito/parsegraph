@@ -45,7 +45,7 @@ build-prod: $(PROD_LIB)
 .PHONY: build-prod
 
 demo:
-	SITE_PORT=$(DEMO_PORT) cd demo && yarn install && yarn start
+	SITE_PORT=$(DEMO_PORT) cd demo && yarn install && yarn build && yarn start
 .PHONY: demo
 
 tmux:
