@@ -8,6 +8,7 @@ SCRIPT_FILES = \
 	src/BasicPositioned.ts \
 	src/autocommit.ts \
 	src/paintGroupBounds.ts \
+	src/log.ts \
 	src/LayoutCaret.ts \
 	src/LayoutNode.ts \
 	src/LayoutNodePalette.ts \
