@@ -15,11 +15,11 @@
   },
   "homepage": "https://github.com/parsegraph/layout#readme",
   "dependencies": {
-    "parsegraph-direction": "^2.2.3",
+    "parsegraph-direction": "^2.2.4",
     "parsegraph-extent": "^1.4.14",
     "parsegraph-rect": "^1.5.4",
     "parsegraph-size": "^1.7.4",
-    "parsegraph-timing": "^1.4.17"
+    "parsegraph-timing": "^1.4.19"
   },
   "devDependencies": {
     "@babel/cli": "^7.20.7",
