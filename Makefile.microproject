@@ -82,7 +82,7 @@ lint:
 .PHONY: lint
 
 doc:
-	npx typedoc src/index.ts --out ./dist/docs
+	npx typedoc --tsconfig tsconfig.browser.json src/index.ts --out ./dist/docs
 .PHONY: doc
 
 build-container:
