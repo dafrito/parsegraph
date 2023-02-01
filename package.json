@@ -1,6 +1,6 @@
 {
   "name": "parsegraph-layout",
-  "version": "1.13.17",
+  "version": "1.13.18",
   "description": "layout",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
