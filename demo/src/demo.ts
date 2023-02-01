@@ -60,7 +60,7 @@ async function getDemos(): Promise<string[]> {
   });
 }
 
-app.get(root, async (req: any , res: any) => {
+app.get(root, async (req: any, res: any) => {
   let resp = "";
   const write = (text: any) => {
     resp += text + "\n";
