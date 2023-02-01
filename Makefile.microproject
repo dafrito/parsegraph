@@ -13,7 +13,7 @@ CONFIG_FILES = \
 	Makefile.microproject \
 	yarn.lock \
 	package.json \
-	tsconfig.json \
+	tsconfig.browser.json \
 	tsconfig.prod.json \
 	.babelrc \
 	webpack.common.js \
@@ -45,7 +45,7 @@ build-prod: $(PROD_LIB)
 .PHONY: build-prod
 
 demo:
-	SITE_PORT=$(DEMO_PORT) cd demo && yarn install && yarn build && yarn start
+	SITE_PORT=$(DEMO_PORT) cd demo && yarn build && yarn start
 .PHONY: demo
 
 tmux:

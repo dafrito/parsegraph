@@ -91,7 +91,7 @@ const webpackConfig = (prod, isPeer)=>{
       use: ["babel-loader", {
         loader: "ts-loader",
         options: {
-          configFile: prod ? "tsconfig.prod.json" : "tsconfig.json",
+          configFile: prod ? "tsconfig.prod.json" : "tsconfig.browser.json",
           compilerOptions: {
             sourceMap: prod
           }
