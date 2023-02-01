@@ -44,7 +44,7 @@
     "jest-environment-jsdom": "^29.4.1",
     "jsdom": "^21.1.0",
     "jsdom-global": "^3.0.2",
-    "parsegraph-log": "^1.9.2",
+    "parsegraph-log": "^1.9.3",
     "prettier": "^2.8.3",
     "raw-loader": "^4.0.2",
     "source-map-loader": "^4.0.1",
@@ -57,6 +57,6 @@
     "webpack-cli": "^5.0.1"
   },
   "peerDependencies": {
-    "parsegraph-log": "^1.9.2"
+    "parsegraph-log": "^1.9.3"
   }
 }
