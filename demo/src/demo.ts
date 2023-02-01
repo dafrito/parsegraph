@@ -3,9 +3,9 @@ const express = require("express");
 const app = express();
 const { readFileSync, statSync } = require("fs");
 
-const { DIST_NAME } = require("../webpack.common");
+const { DIST_NAME } = require("../../webpack.common");
 
-const getPort = (port) => {
+const getPort = (port: number) => {
   if (statSync("../demo.port")) {
     try {
       port = parseInt(readFileSync("../demo.port"));
@@ -60,9 +60,9 @@ async function getDemos(): Promise<string[]> {
   });
 }
 
-app.get(root, async (req, res) => {
+app.get(root, async (req: any , res: any) => {
   let resp = "";
-  const write = (text) => {
+  const write = (text: any) => {
     resp += text + "\n";
   };
 
