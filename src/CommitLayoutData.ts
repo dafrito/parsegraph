@@ -331,8 +331,8 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
           this.layoutSingle(
             node,
             oppositeFromParent,
-            perpendicularNodes[0] !== Direction.NULL ||
-            perpendicularNodes[1] !== Direction.NULL
+            perpendicularNodes[0] === Direction.NULL &&
+              perpendicularNodes[1] === Direction.NULL
           )
         ) {
           return true;
