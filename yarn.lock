@@ -3913,10 +3913,10 @@ parse5@^7.0.0, parse5@^7.1.1:
   dependencies:
     entities "^4.4.0"
 
-parsegraph-direction@^2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.4.0.tgz#2018d1484aae6c4ebb9e3148503be1e7bec73d9e"
-  integrity sha512-Tgni0hVKV2UzjbUPnS8pq8jDVHUfV4cQAjNPjwG2RSKMxwcNg5JxU2W0B54iAOiEwo52h/LeUcQsq/bI2n2EUg==
+parsegraph-direction@^2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/parsegraph-direction/-/parsegraph-direction-2.4.1.tgz#3e8ad9a8d0a423e497736494031fc6137fa48e47"
+  integrity sha512-Uojj5RWPkPRXnYUy8QP7NLdJt/CaRZAcCdQEOAFUhAMptCmAtmoAsE3V/zoC9V6Ok1x7npirHveCcE/n+hnTIQ==
   dependencies:
     parsegraph-generateid "^1.4.12"
     parsegraph-timing "^1.4.20"
