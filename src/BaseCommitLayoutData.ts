@@ -125,7 +125,7 @@ export default class BaseCommitLayoutData {
     while (this.layoutPhase === 1) {
       if (this.paintGroup === null) {
         logEnterc("Layout", "Beginning new commit layout phase 1");
-        this.paintGroup = this.rootPaintGroup.paintGroup().next() as LayoutNode;
+        this.paintGroup = this.rootPaintGroup.paintGroup().prev() as LayoutNode;
         this.root = this.paintGroup;
         this.node = this.root as LayoutNode;
       } else {
@@ -173,7 +173,7 @@ export default class BaseCommitLayoutData {
         this.paintGroup = null;
         break;
       }
-      this.paintGroup = this.paintGroup.paintGroup().next() as LayoutNode;
+      this.paintGroup = this.paintGroup.paintGroup().prev() as LayoutNode;
       this.root = this.paintGroup;
       this.node = this.root;
       logLeave();
