@@ -1334,12 +1334,19 @@ describe("Package", function () {
   });
 
   it("Crease test", function () {
-    const node = makeNode(BLOCK);
-    const inner = makeNode(BUD);
-    inner.crease();
-    node.connectNode(Direction.INWARD, inner);
-    inner.value().getLayout().groupScale();
-    node.value().getLayout().groupScale();
+    const root = makeNode(BLOCK);
+    let node = root;
+    for (let i = 0; i < 100; ++i) {
+      const inner = makeNode(BUD);
+      if (i % 5 === 0) {
+        inner.crease();
+      }
+      node.connectNode(Direction.INWARD, inner);
+      node = inner;
+    }
+    const cont = root.value().getLayout().commitLayoutIteratively();
+    assert.isNotTrue(cont);
+    assert.isNotTrue(root.needsCommit());
   });
 
   it("Disconnect trivial test", function () {
