@@ -15,7 +15,7 @@
   },
   "homepage": "https://github.com/parsegraph/layout#readme",
   "dependencies": {
-    "parsegraph-direction": "^2.4.1",
+    "parsegraph-direction": "^2.4.2",
     "parsegraph-extent": "^1.4.16",
     "parsegraph-rect": "^1.5.5",
     "parsegraph-size": "^1.7.5",
