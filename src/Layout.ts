@@ -14,7 +14,7 @@ import Direction, {
   Axis,
   reverseDirection,
   isVerticalDirection,
-} from "parsegraph-direction";
+} from "./src";
 
 import AutocommitBehavior, { getAutocommitBehavior } from "./autocommit";
 

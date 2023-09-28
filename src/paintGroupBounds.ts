@@ -1,5 +1,5 @@
 import Size from "parsegraph-size";
-import { Direction, nameDirection } from "parsegraph-direction";
+import { Direction, nameDirection } from "./src";
 import LayoutNode from "./LayoutNode";
 
 export default function paintGroupBounds(nodeRoot: LayoutNode) {

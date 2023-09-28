@@ -1,4 +1,4 @@
-import { Direction, LayoutState } from "parsegraph-direction";
+import { Direction, LayoutState } from "./src"
 import LayoutNode from "./LayoutNode";
 import createException, { BAD_LAYOUT_STATE } from "./Exception";
 import Size from "parsegraph-size";

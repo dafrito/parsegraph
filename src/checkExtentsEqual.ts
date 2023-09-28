@@ -1,4 +1,4 @@
-import { nameDirection, Direction } from "parsegraph-direction";
+import { nameDirection, Direction } from "./src";
 import LayoutCaret from "./LayoutCaret";
 import Extent from "parsegraph-extent";
 

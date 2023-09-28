@@ -1,63 +1,87 @@
-import { LINE_THICKNESS } from ".";
+import {
+  CommitLayoutData,
+  LayoutNode,
+  BasicPositioned,
+  LINE_THICKNESS,
+} from ".";
+import { Fit, DirectionCaret, AxisOverlap } from "parsegraph-direction";
+import paintNodeLines from "./paintNodeLines";
+import paintNodeBounds from "./paintNodeBounds";
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Create canvas
+  const canvas = document.createElement("canvas");
+  canvas.width = 400;
+  canvas.height = 400;
+
+  // Add canvas to root
   const root = document.getElementById("demo");
+  if (!root) {
+    throw new Error("root not found");
+  }
   root.style.position = "relative";
+  root.appendChild(canvas);
 
-  const container = document.createElement("div");
-  container.innerHTML = `${LINE_THICKNESS}`;
-  container.style.position = "absolute";
-  container.style.left = "0px";
-  container.style.top = "0px";
-  container.style.pointerEvents = "none";
-  root.appendChild(container);
-  container.style.fontSize = "18px";
-  container.style.fontFamily = "sans";
-  const refresh = () => {
-    const rand = () => Math.floor(Math.random() * 255);
-    document.body.style.backgroundColor = `rgb(${rand()}, ${rand()}, ${rand()})`;
-    container.style.color = `rgb(${rand()}, ${rand()}, ${rand()})`;
-    container.style.left = `${Math.random() * root.clientWidth}px`;
-    container.style.top = `${Math.random() * root.clientHeight}px`;
-  };
+  // Build graph
+  const car = new DirectionCaret<BasicPositioned>();
+  car.node().setValue(new BasicPositioned(car.node()));
+  // car.node().state().setNodeFit(Fit.EXACT)
+  car.node().value().setBlockStyle({
+    minHeight: 10,
+    minWidth: 10,
+    borderThickness: 2,
+    verticalPadding: 3,
+    horizontalPadding: 3,
+    verticalSeparation: 4,
+    horizontalSeparation: 4,
+  });
 
-  const dot = document.createElement("div");
-  dot.style.position = "absolute";
-  dot.style.right = "8px";
-  dot.style.top = "8px";
-  dot.style.width = "16px";
-  dot.style.height = "16px";
-  dot.style.borderRadius = "8px";
-  dot.style.transition = "background-color 400ms";
-  dot.style.backgroundColor = "#222";
-  root.appendChild(dot);
+  const choices = ["f", "b", "d", "u"];
+  for (let i = 0; i < 10; ++i) {
+    let choice: string;
+    do {
+      choice = choices[Math.floor(Math.random() * choices.length)];
+    } while (car.has(choice));
+    car.spawnMove(choice);
+    car.node().setValue(new BasicPositioned(car.node()));
+    // car.node().state().setNodeFit(Fit.EXACT)
+    car.node().setAxisOverlap(AxisOverlap.ALLOWED);
+    car.node().value().setBlockStyle({
+      minHeight: 10,
+      minWidth: 10,
+      borderThickness: 2,
+      verticalPadding: 3,
+      horizontalPadding: 3,
+      verticalSeparation: 4,
+      horizontalSeparation: 4,
+    });
+  }
 
-  container.style.transition = "color 2s, left 2s, top 2s";
-  document.body.style.transition = "background-color 2s";
-  let timer: any = null;
-  let dotTimer: any = null;
-  let dotIndex = 0;
-  const dotState = ["#f00", "#c00"];
-  const refreshDot = () => {
-    dotIndex = (dotIndex + 1) % dotState.length;
-    dot.style.backgroundColor = dotState[dotIndex];
-  };
-  const interval = 3000;
-  const dotInterval = 500;
-  root.addEventListener("click", () => {
-    if (timer) {
-      clearInterval(timer);
-      timer = null;
-      clearInterval(dotTimer);
-      dotTimer = null;
-      dot.style.transition = "background-color 3s";
-      dot.style.backgroundColor = "#222";
-    } else {
-      refresh();
-      dot.style.transition = "background-color 400ms";
-      refreshDot();
-      timer = setInterval(refresh, interval);
-      dotTimer = setInterval(refreshDot, dotInterval);
+  // Commit the layout
+  const graph = car.root();
+  const cld = new CommitLayoutData(graph, 0);
+  cld.commitLayoutLoop(0);
+
+  requestAnimationFrame(() => {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("canvas context not available");
     }
+    ctx.fillStyle = "maroon";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+
+    ctx.fillStyle = "black";
+    graph.forEachPaintGroup((pg) => {
+      pg.forEachNode((n) => {
+        paintNodeBounds(n as LayoutNode, (x, y, w, h) => {
+          ctx.fillRect(x - w / 2, y - h / 2, w, h);
+        });
+        paintNodeLines(n as LayoutNode, 1, (x, y, w, h) => {
+          ctx.fillRect(x - w / 2, y - h / 2, w, h);
+        });
+      });
+    });
   });
 });

@@ -1,7 +1,7 @@
 import Direction, {
   DirectionNode,
   InplaceNodePalette,
-} from "parsegraph-direction";
+} from "./src";
 import BasicPositioned from "./BasicPositioned";
 import LayoutNode from "./LayoutNode";
 
