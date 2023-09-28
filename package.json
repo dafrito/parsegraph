@@ -15,7 +15,6 @@
   },
   "homepage": "https://github.com/parsegraph/layout#readme",
   "dependencies": {
-    "parsegraph-generateid": "^1.4.12",
     "parsegraph-timing": "^1.4.20"
   },
   "devDependencies": {

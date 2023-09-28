@@ -1,6 +1,6 @@
 import Direction, { readDirection, reverseDirection } from "./Direction";
 import createException, { NO_NODE_FOUND } from "./Exception";
-import generateID from "parsegraph-generateid";
+import generateID from "../generateid";
 import DirectionNode from "./DirectionNode";
 import PreferredAxis from "./PreferredAxis";
 import NodePalette, {
