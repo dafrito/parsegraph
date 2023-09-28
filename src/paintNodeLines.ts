@@ -1,9 +1,9 @@
 import Direction, {
+  DirectionNode,
   isVerticalDirection,
   directionSign,
   forEachCardinalDirection,
 } from "./direction";
-import { LayoutNode } from ".";
 
 export type LinePainter = (x: number, y: number, w: number, h: number) => void;
 
@@ -11,7 +11,7 @@ const drawLine = (
   lineThickness: number,
   painter: LinePainter,
   direction: Direction,
-  node: LayoutNode
+  node: DirectionNode
 ) => {
   if (node.parentDirection() == direction) {
     return;
@@ -64,7 +64,7 @@ const drawLine = (
 };
 
 export default function paintNodeLines(
-  node: LayoutNode,
+  node: DirectionNode,
   lineThickness: number,
   painter: LinePainter
 ) {

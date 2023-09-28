@@ -1,8 +1,7 @@
 import Size from "./size";
-import { Direction, nameDirection } from "./direction";
-import LayoutNode from "./LayoutNode";
+import Direction, { DirectionNode, nameDirection } from "./direction";
 
-export default function paintGroupBounds(nodeRoot: LayoutNode) {
+export default function paintGroupBounds(nodeRoot: DirectionNode) {
   if (!nodeRoot.isRoot() && !nodeRoot.localPaintGroup()) {
     throw new Error("Node must be a paint group");
   }
@@ -12,7 +11,7 @@ export default function paintGroupBounds(nodeRoot: LayoutNode) {
   // let numNodes = 0;
   do {
     // ++numNodes;
-    node = node.siblings().next() as LayoutNode;
+    node = node.siblings().next() as DirectionNode;
     node.value().size(parentSize);
     const parentBounds = {
       left: parentSize.width() / 2,

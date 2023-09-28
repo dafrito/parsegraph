@@ -9,7 +9,6 @@ import Direction, {
 } from "../src/direction"
 import {
   checkExtentsEqual,
-  BasicPositioned,
   Layout,
   CommitLayoutData,
 } from "../src";

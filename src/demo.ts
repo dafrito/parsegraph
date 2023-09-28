@@ -1,7 +1,5 @@
 import {
   CommitLayoutData,
-  LayoutNode,
-  BasicPositioned,
   LINE_THICKNESS,
 } from ".";
 import { Fit, DirectionCaret, AxisOverlap } from "./direction";
@@ -75,10 +73,10 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillStyle = "black";
     graph.forEachPaintGroup((pg) => {
       pg.forEachNode((n) => {
-        paintNodeBounds(n as LayoutNode, (x, y, w, h) => {
+        paintNodeBounds(n as DirectionNode, (x, y, w, h) => {
           ctx.fillRect(x - w / 2, y - h / 2, w, h);
         });
-        paintNodeLines(n as LayoutNode, 1, (x, y, w, h) => {
+        paintNodeLines(n as DirectionNode, 1, (x, y, w, h) => {
           ctx.fillRect(x - w / 2, y - h / 2, w, h);
         });
       });

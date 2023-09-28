@@ -6,8 +6,6 @@ import Rect from "./rect";
 import Size from "./size";
 import Extent from "./extent";
 
-import LayoutNode from "./LayoutNode";
-
 import { log, logc, logEnterc, logLeave } from "./log";
 
 import Direction, {
@@ -49,7 +47,7 @@ export default class Layout {
     this._groupScale = NaN;
   }
 
-  setOwner(owner: LayoutNode): void {
+  setOwner(owner: DirectionNode): void {
     this._owner = owner;
   }
 
@@ -83,7 +81,7 @@ export default class Layout {
     this._absoluteScale = NaN;
 
     // Retrieve a stack of nodes to determine the absolute position.
-    let node: LayoutNode = this.owner();
+    let node: DirectionNode = this.owner();
     const nodeList = [];
     let parentScale = 1.0;
     let scale = 1.0;
@@ -224,7 +222,7 @@ export default class Layout {
     );
 
     // Retrieve a stack of nodes to determine the group position.
-    let node: LayoutNode = this.owner();
+    let node: DirectionNode = this.owner();
     const nodeList = [];
     let parentScale = 1.0;
     let scale = 1.0;
@@ -504,16 +502,16 @@ export default class Layout {
     return true;
   }
 
-  nodeUnderCoords(x: number, y: number, userScale?: number): LayoutNode {
+  nodeUnderCoords(x: number, y: number, userScale?: number): DirectionNode {
     // console.log("nodeUnderCoords: " + x + ", " + y)
     if (userScale === undefined) {
       userScale = 1;
     }
 
     const extentSize: Size = new Size();
-    const candidates: LayoutNode[] = [this.owner()];
+    const candidates: DirectionNode[] = [this.owner()];
 
-    const addCandidate = (node: LayoutNode, direction: Direction) => {
+    const addCandidate = (node: DirectionNode, direction: Direction) => {
       if (direction !== undefined) {
         if (!node.hasChildAt(direction)) {
           return;
@@ -526,7 +524,7 @@ export default class Layout {
       candidates.push(node);
     };
 
-    const FORCE_SELECT_PRIOR: LayoutNode = null;
+    const FORCE_SELECT_PRIOR: DirectionNode = null;
     while (candidates.length > 0) {
       const candidate = candidates[candidates.length - 1];
       // console.log("Checking node " +

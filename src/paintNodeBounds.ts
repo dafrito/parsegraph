@@ -1,8 +1,8 @@
-import { LayoutNode } from ".";
+import { DirectionNode } from "./direction";
 import { LinePainter } from "./paintNodeLines";
 
 export default function paintNodeBounds(
-  node: LayoutNode,
+  node: DirectionNode,
   painter: LinePainter
 ) {
   const layout = node.value().getLayout();
