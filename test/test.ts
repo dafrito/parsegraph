@@ -116,14 +116,28 @@ const readStyle = (given?: any): BlockStyle => {
 }
 
 const layoutPainter = {
+
   size: (node: DirectionNode, size: Size) => {
     const style = readStyle(node.value())
     size.setWidth(style.minWidth + style.borderThickness * 2 + style.horizontalPadding * 2)
     size.setHeight(style.minHeight + style.borderThickness * 2 + style.verticalPadding * 2)
   },
   getSeparation: (node: DirectionNode, axis: Axis, dir: Direction, preferVertical: boolean) => {
+    const style = readStyle(node.value())
+    switch (axis) {
+      case Axis.VERTICAL:
+        return style.verticalSeparation;
+      case Axis.HORIZONTAL:
+        return style.horizontalSeparation;
+      case Axis.Z:
+        if (preferVertical) {
+          return style.verticalPadding - style.borderThickness;
+        }
+        return style.horizontalPadding - style.borderThickness;
+    }
     return 0;
   },
+
   paint: (pg: DirectionNode): boolean => {
     return false;
   }
