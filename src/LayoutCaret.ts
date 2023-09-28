@@ -1,4 +1,4 @@
-import { DirectionCaret } from "parsegraph-direction";
+import { DirectionCaret } from "./src";
 import Positioned from "./Positioned";
 
 export type LayoutCaret<Value extends Positioned = Positioned> =

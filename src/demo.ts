@@ -4,7 +4,7 @@ import {
   BasicPositioned,
   LINE_THICKNESS,
 } from ".";
-import { Fit, DirectionCaret, AxisOverlap } from "parsegraph-direction";
+import { Fit, DirectionCaret, AxisOverlap } from "./direction";
 import paintNodeLines from "./paintNodeLines";
 import paintNodeBounds from "./paintNodeBounds";
 

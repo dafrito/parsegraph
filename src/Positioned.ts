@@ -1,7 +1,7 @@
 import Layout from "./Layout";
 import Size from "parsegraph-size";
 
-import Direction, { Axis } from "parsegraph-direction";
+import Direction, { Axis } from "./src";
 
 export default interface Positioned {
   getLayout(): Layout;

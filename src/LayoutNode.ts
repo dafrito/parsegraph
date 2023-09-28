@@ -1,4 +1,4 @@
-import { DirectionNode } from "parsegraph-direction";
+import { DirectionNode } from "./src";
 
 import Positioned from "./Positioned";
 
