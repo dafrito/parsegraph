@@ -248,7 +248,6 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
   }
 
   protected override commitLayout(node: DirectionNode): boolean {
-    console.log("Committing layout");
     const laidOut = super.commitLayout(node);
 
     if (node.getLayoutState() === LayoutState.COMMITTED) {

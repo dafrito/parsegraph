@@ -123,11 +123,8 @@ export default class BaseCommitLayoutData {
       return false;
     }
 
-    console.log("p1")
-
     // Start new layout.
     if (!this.paintGroup) {
-      console.log("p1 start")
       this.paintGroup = this.rootPaintGroup.paintGroup().prev() as DirectionNode;
       this.root = this.paintGroup;
       this.node = this.root as DirectionNode;
@@ -136,7 +133,6 @@ export default class BaseCommitLayoutData {
     if (this.root?.needsCommit()) {
       this.needsPosition = true;
       do {
-        console.log("node commit")
         // Loop back to the first node, from the root.
         this.node = this.node?.siblings().next() as DirectionNode;
         if (this.node.needsCommit()) {
@@ -156,20 +152,16 @@ export default class BaseCommitLayoutData {
     if (this.paintGroup === this.rootPaintGroup) {
       ++this.layoutPhase;
       this.paintGroup = undefined;
-      console.log("next layout phase");
       return false;
     }
 
-    console.log("going to next paintgroup from pg " + this.paintGroup.state().id())
     this.paintGroup = this.paintGroup.paintGroup().prev() as DirectionNode;
     this.root = this.paintGroup;
     this.node = this.root;
-    console.log(new Error("pg id=" + this.paintGroup.state().id() + " root=" + this.rootPaintGroup.state().id()));
     return true;
   }
 
   protected commitLayoutPhaseTwo(): boolean {
-    console.log("p2")
     if (!this.needsPosition || this.layoutPhase !== 2) {
       return false;
     }

@@ -18,8 +18,6 @@ import Size from "../src/size";
 
 import { assert } from "chai";
 
-console.log("Test for layout");
-
 const BUD = "u";
 const BLOCK = "b";
 const SHRINK_SCALE = 0.85;
@@ -100,7 +98,6 @@ const EMPTY_STYLE = {
 const readStyle = (given?: any): BlockStyle => {
   if (given && typeof given === "object") {
     // Assume it is already a style.
-    console.log(given);
     return given;
   }
   if (given && !given.toUpperCase) {
@@ -155,7 +152,7 @@ const horizontalSeparation = (node: DirectionNode, dir: Direction) => {
 describe("Package", function () {
   it("Viewport - Trivial layout", function () {
     // Spawn the graph.
-    console.log("TRIV");
+    //console.log("TRIV");
     const caret = makeCaret("b");
     commitLayout(caret.node());
 
