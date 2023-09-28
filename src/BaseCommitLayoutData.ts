@@ -170,7 +170,7 @@ export default class BaseCommitLayoutData {
     if (!this.paintGroup) {
       this.paintGroup = this.rootPaintGroup;
       this.root = this.paintGroup;
-      this.node = this.root;
+      this.node = undefined;
     }
 
     if (
