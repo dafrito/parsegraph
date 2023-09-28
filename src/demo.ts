@@ -21,10 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
   root.appendChild(canvas);
 
   // Build graph
-  const car = new DirectionCaret<BasicPositioned>();
-  car.node().setValue(new BasicPositioned(car.node()));
-  // car.node().state().setNodeFit(Fit.EXACT)
-  car.node().value().setBlockStyle({
+  const car = new DirectionCaret()
+  car.node().setValue({
     minHeight: 10,
     minWidth: 10,
     borderThickness: 2,
@@ -41,10 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
       choice = choices[Math.floor(Math.random() * choices.length)];
     } while (car.has(choice));
     car.spawnMove(choice);
-    car.node().setValue(new BasicPositioned(car.node()));
     // car.node().state().setNodeFit(Fit.EXACT)
     car.node().setAxisOverlap(AxisOverlap.ALLOWED);
-    car.node().value().setBlockStyle({
+    car.node().setValue({
       minHeight: 10,
       minWidth: 10,
       borderThickness: 2,
