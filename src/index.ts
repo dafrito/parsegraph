@@ -6,18 +6,20 @@ import AutocommitBehavior, {
   getAutocommitBehavior,
 } from "./autocommit";
 import checkExtentsEqual from "./checkExtentsEqual";
-import BasicPositioned from "./BasicPositioned";
 import paintGroupBounds from "./paintGroupBounds";
+import paintNodeBounds from "./paintNodeBounds";
+import paintNodeLines from "./paintNodeLines";
 
 export {
   BaseCommitLayoutData,
   CommitLayoutData,
   LINE_THICKNESS,
   Layout,
-  BasicPositioned,
   AutocommitBehavior,
   setAutocommitBehavior,
   getAutocommitBehavior,
   checkExtentsEqual,
   paintGroupBounds,
+  paintNodeBounds,
+  paintNodeLines,
 };
