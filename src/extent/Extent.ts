@@ -1,5 +1,5 @@
 import getTimeInMillis from "parsegraph-gettimeinmillis";
-import fuzzyEquals from "parsegraph-fuzzyequals";
+import fuzzyEquals from "../fuzzyequals";
 import ExtentSeparator from "./ExtentSeparator";
 import ExtentCombiner from "./ExtentCombiner";
 
