@@ -7,7 +7,6 @@ import {
   PreferredAxis,
   namePreferredAxis,
 } from "../../src/src/index";
-import { elapsed } from "parsegraph-timing";
 
 function makeCaret() {
   return new DirectionCaret();
@@ -1303,6 +1302,9 @@ function getLayoutNodes(node: DirectionNode) {
   const list = [];
   const orig = node;
   const start = new Date();
+
+  const MAX_SIBLINGS = 100000
+  let count = 0;
   do {
     node = node.siblings().next();
     // console.log(node.id());
@@ -1313,7 +1315,8 @@ function getLayoutNodes(node: DirectionNode) {
       }
     }
     list.push(node);
-    if (elapsed(start) > 5000) {
+    ++count;
+    if (count > MAX_SIBLINGS) {
       throw new Error("Infinite loop");
     }
   } while (orig != node);

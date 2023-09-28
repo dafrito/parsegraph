@@ -18,8 +18,6 @@ import {
 import Extent from "../src/extent";
 import Size from "../src/size";
 
-import { elapsed } from "parsegraph-timing";
-
 import { assert } from "chai";
 
 const BUD = "u";
@@ -38,6 +36,8 @@ export function getLayoutNodes(node: LayoutNode) {
   const list = [];
   const orig = node;
   const start = new Date();
+  const MAX_SIBLINGS = 100000;
+  let count = 0;
   do {
     node = node._layoutNext;
     // console.log(node._id);
@@ -48,7 +48,7 @@ export function getLayoutNodes(node: LayoutNode) {
       }
     }
     list.push(node);
-    if (elapsed(start) > 5000) {
+    if (count++ > MAX_SIBLINGS) {
       throw new Error("Infinite loop");
     }
   } while (orig != node);

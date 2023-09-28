@@ -1,4 +1,3 @@
-import { elapsed } from "parsegraph-timing";
 import Direction from "./Direction";
 
 export interface SiblingNode {
@@ -18,6 +17,8 @@ export interface SiblingNode {
   isRoot(): boolean;
 }
 
+const MAX_SIBLINGS = 100000
+
 export default class DirectionNodeSiblings {
   _prev: SiblingNode;
   _next: SiblingNode;
@@ -34,11 +35,12 @@ export default class DirectionNodeSiblings {
   }
 
   verify() {
-    const e = new Date();
+    let count = 0;
     for (let n = this.next(); n !== this.node(); n = n.siblings().next()) {
-      if (elapsed(e) > 5000) {
+      if (count > MAX_SIBLINGS) {
         throw new Error();
       }
+      ++count;
     }
   }
 
