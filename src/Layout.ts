@@ -237,7 +237,7 @@ export default class Layout {
       }
 
       const par = node.nodeParent().getLayout();
-      if (par._groupXPos !== null) {
+      if (!isNaN(par._groupXPos)) {
         // Just use the parent's position to start.
         this._groupXPos = par._groupXPos;
         this._groupYPos = par._groupYPos;
