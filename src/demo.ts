@@ -1,12 +1,70 @@
-import {
-  CommitLayoutData,
-  LINE_THICKNESS,
-} from ".";
-import { Fit, DirectionCaret, AxisOverlap } from "./direction";
+import { CommitLayoutData, LINE_THICKNESS } from ".";
+import Direction, {
+  Fit,
+  DirectionCaret,
+  AxisOverlap,
+  DirectionNode,
+} from "./direction";
 import paintNodeLines from "./paintNodeLines";
 import paintNodeBounds from "./paintNodeBounds";
+import Axis from "./direction/Axis";
+import Size from "./size";
+import { BlockStyle, readStyle } from "./demoutils";
+import buildGraph from './demograph';
+import { BasicGLProvider } from 'parsegraph-compileprogram';
+import { WebGLBlockPainter } from 'parsegraph-blockpainter';
+
+const layoutPainter = {
+  size: (node: DirectionNode, size: Size) => {
+    const style = readStyle(node.value());
+    size.setWidth(
+      style.minWidth + style.borderThickness * 2 + style.horizontalPadding * 2
+    );
+    size.setHeight(
+      style.minHeight + style.borderThickness * 2 + style.verticalPadding * 2
+    );
+  },
+  getSeparation: (
+    node: DirectionNode,
+    axis: Axis,
+    dir: Direction,
+    preferVertical: boolean
+  ) => {
+    const style = readStyle(node.value());
+    switch (axis) {
+      case Axis.VERTICAL:
+        return style.verticalSeparation;
+      case Axis.HORIZONTAL:
+        return style.horizontalSeparation;
+      case Axis.Z:
+        if (preferVertical) {
+          return style.verticalPadding - style.borderThickness;
+        }
+        return style.horizontalPadding - style.borderThickness;
+    }
+    return 0;
+  },
+
+  paint: (pg: DirectionNode): boolean => {
+    return false;
+  },
+};
+
+const commitLayout = (node: DirectionNode) => {
+  const cld = new CommitLayoutData(node, layoutPainter);
+
+  const count = 0;
+  while (cld.crank()) {
+    if (count > 100) {
+      throw new Error("Commit layout is looping forever");
+    }
+  }
+};
 
 document.addEventListener("DOMContentLoaded", () => {
+  const graph = buildGraph();
+  commitLayout(graph);
+
   // Create canvas
   const canvas = document.createElement("canvas");
   canvas.width = 400;
@@ -19,43 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   root.style.position = "relative";
   root.appendChild(canvas);
-
-  // Build graph
-  const car = new DirectionCaret()
-  car.node().setValue({
-    minHeight: 10,
-    minWidth: 10,
-    borderThickness: 2,
-    verticalPadding: 3,
-    horizontalPadding: 3,
-    verticalSeparation: 4,
-    horizontalSeparation: 4,
-  });
-
-  const choices = ["f", "b", "d", "u"];
-  for (let i = 0; i < 10; ++i) {
-    let choice: string;
-    do {
-      choice = choices[Math.floor(Math.random() * choices.length)];
-    } while (car.has(choice));
-    car.spawnMove(choice);
-    // car.node().state().setNodeFit(Fit.EXACT)
-    car.node().setAxisOverlap(AxisOverlap.ALLOWED);
-    car.node().setValue({
-      minHeight: 10,
-      minWidth: 10,
-      borderThickness: 2,
-      verticalPadding: 3,
-      horizontalPadding: 3,
-      verticalSeparation: 4,
-      horizontalSeparation: 4,
-    });
-  }
-
-  // Commit the layout
-  const graph = car.root();
-  const cld = new CommitLayoutData(graph, 0);
-  cld.commitLayoutLoop(0);
 
   requestAnimationFrame(() => {
     const ctx = canvas.getContext("2d");

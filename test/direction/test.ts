@@ -1303,7 +1303,7 @@ function getLayoutNodes(node: DirectionNode) {
   const orig = node;
   const start = new Date();
 
-  const MAX_SIBLINGS = 100000
+  const MAX_SIBLINGS = 100000;
   let count = 0;
   do {
     node = node.siblings().next();

@@ -6,12 +6,8 @@ import Direction, {
   BACKWARD,
   DirectionCaret,
   DirectionNode,
-} from "../src/direction"
-import {
-  checkExtentsEqual,
-  Layout,
-  CommitLayoutData,
-} from "../src";
+} from "../src/direction";
+import { checkExtentsEqual, Layout, CommitLayoutData } from "../src";
 import Extent from "../src/extent";
 import Size from "../src/size";
 
@@ -25,7 +21,7 @@ const makeNode = (value?: any) => {
   const n = new DirectionNode();
   n.setValue(value);
   return n;
-}
+};
 
 const expect = function (expected: any, actual: any) {
   const diff = expected - actual;
@@ -70,7 +66,7 @@ interface BlockStyle {
   horizontalPadding: number;
   verticalSeparation: number;
   horizontalSeparation: number;
-};
+}
 
 const BLOCK_STYLE = {
   minWidth: 200,
@@ -79,8 +75,8 @@ const BLOCK_STYLE = {
   verticalPadding: 2,
   horizontalPadding: 4,
   horizontalSeparation: 10,
-  verticalSeparation: 10
-}
+  verticalSeparation: 10,
+};
 
 const BUD_STYLE = {
   minWidth: 30,
@@ -89,8 +85,8 @@ const BUD_STYLE = {
   verticalPadding: 4,
   horizontalPadding: 4,
   horizontalSeparation: 10,
-  verticalSeparation: 10
-}
+  verticalSeparation: 10,
+};
 
 const EMPTY_STYLE = {
   minWidth: 100,
@@ -99,8 +95,8 @@ const EMPTY_STYLE = {
   verticalPadding: 0,
   horizontalPadding: 0,
   horizontalSeparation: 10,
-  verticalSeparation: 10
-}
+  verticalSeparation: 10,
+};
 
 const readStyle = (given?: any): BlockStyle => {
   if (given && typeof given === "object") {
@@ -108,7 +104,7 @@ const readStyle = (given?: any): BlockStyle => {
     return given;
   }
   if (given && !given.toUpperCase) {
-    throw new Error("Not a string" + given + " " + (JSON.stringify(given)))
+    throw new Error("Not a string" + given + " " + JSON.stringify(given));
   }
   switch (given?.toUpperCase()) {
     case "B":
@@ -121,17 +117,25 @@ const readStyle = (given?: any): BlockStyle => {
     default:
       return EMPTY_STYLE;
   }
-}
+};
 
 const layoutPainter = {
-
   size: (node: DirectionNode, size: Size) => {
-    const style = readStyle(node.value())
-    size.setWidth(style.minWidth + style.borderThickness * 2 + style.horizontalPadding * 2)
-    size.setHeight(style.minHeight + style.borderThickness * 2 + style.verticalPadding * 2)
+    const style = readStyle(node.value());
+    size.setWidth(
+      style.minWidth + style.borderThickness * 2 + style.horizontalPadding * 2
+    );
+    size.setHeight(
+      style.minHeight + style.borderThickness * 2 + style.verticalPadding * 2
+    );
   },
-  getSeparation: (node: DirectionNode, axis: Axis, dir: Direction, preferVertical: boolean) => {
-    const style = readStyle(node.value())
+  getSeparation: (
+    node: DirectionNode,
+    axis: Axis,
+    dir: Direction,
+    preferVertical: boolean
+  ) => {
+    const style = readStyle(node.value());
     switch (axis) {
       case Axis.VERTICAL:
         return style.verticalSeparation;
@@ -148,32 +152,32 @@ const layoutPainter = {
 
   paint: (pg: DirectionNode): boolean => {
     return false;
-  }
-}
+  },
+};
 
 const commitLayout = (node: DirectionNode) => {
-  const cld = new CommitLayoutData(node, layoutPainter)
+  const cld = new CommitLayoutData(node, layoutPainter);
 
-  let count = 0;
+  const count = 0;
   while (cld.crank()) {
     if (count > 100) {
       throw new Error("Commit layout is looping forever");
     }
   }
-}
+};
 
 const verticalSeparation = (node: DirectionNode, dir: Direction) => {
-  return layoutPainter.getSeparation(node, Axis.VERTICAL, dir, true)
-}
+  return layoutPainter.getSeparation(node, Axis.VERTICAL, dir, true);
+};
 
 const horizontalSeparation = (node: DirectionNode, dir: Direction) => {
-  return layoutPainter.getSeparation(node, Axis.HORIZONTAL, dir, false)
-}
+  return layoutPainter.getSeparation(node, Axis.HORIZONTAL, dir, false);
+};
 
 describe("Package", function () {
   it("Viewport - Trivial layout", function () {
     // Spawn the graph.
-    //console.log("TRIV");
+    // console.log("TRIV");
     const caret = makeCaret("b");
     commitLayout(caret.node());
 
@@ -190,7 +194,8 @@ describe("Package", function () {
       console.log("half height=", style.minHeight / 2);
       console.log("border thickness=", style.borderThickness);
       console.log("vertical padding=", style.verticalPadding);
-      console.log("computed forward extent offset=",
+      console.log(
+        "computed forward extent offset=",
         style.minHeight / 2 + style.borderThickness + style.verticalPadding
       );
       throw new Error("Forward extent offset for block must match.");
@@ -472,7 +477,7 @@ describe("Package", function () {
       readStyle("b").verticalPadding * 2 +
       readStyle("b").borderThickness * 2 +
       readStyle("b").minHeight +
-      verticalSeparation(caret.node().nodeAt(UPWARD), UPWARD)
+      verticalSeparation(caret.node().nodeAt(UPWARD), UPWARD);
 
     let diff = expect(
       computedBlockSize * (depth - 1) +
@@ -1068,13 +1073,7 @@ describe("Package", function () {
           readStyle("bu").minWidth / 2)
     );
 
-    if (
-      !caret
-        .node()
-        .getLayout()
-        .extentsAt(DOWNWARD)
-        .equals(downwardExtent)
-    ) {
+    if (!caret.node().getLayout().extentsAt(DOWNWARD).equals(downwardExtent)) {
       console.log(downwardExtent.dump(""));
       caret.node().getLayout().extentsAt(DOWNWARD).dump("");
       throw new Error("Downward extent differs");
@@ -1135,8 +1134,14 @@ describe("Package", function () {
     if (
       !caret.node().getLayout().extentsAt(FORWARD).equals(forwardExtent, 1e-3)
     ) {
-      console.log(forwardExtent.dump("Expected forward extents"))
-      console.log(caret.node().getLayout().extentsAt(FORWARD).dump("Given forward extents"))
+      console.log(forwardExtent.dump("Expected forward extents"));
+      console.log(
+        caret
+          .node()
+          .getLayout()
+          .extentsAt(FORWARD)
+          .dump("Given forward extents")
+      );
       throw new Error("Forward extent differs");
       /* graph._nodePainter.enableExtentRendering();
       resultDom.appendChild(graph._container);
@@ -1182,7 +1187,7 @@ describe("Package", function () {
             readStyle("bu").borderThickness +
             readStyle("bu").minHeight / 2) +
         SHRINK_SCALE *
-            verticalSeparation(caret.node().nodeAt(DOWNWARD), DOWNWARD) +
+          verticalSeparation(caret.node().nodeAt(DOWNWARD), DOWNWARD) +
         SHRINK_SCALE *
           (readStyle("b").minHeight +
             readStyle("b").verticalPadding * 2 +
@@ -1302,7 +1307,7 @@ describe("Package", function () {
     car.spawnMove("f", "bu");
     car.spawnMove("d", "bu");
 
-    commitLayout(car.root())
+    commitLayout(car.root());
 
     // const sep = car.root().separationAt(DOWNWARD);
     // console.log("Bud size: " +
@@ -1335,7 +1340,7 @@ describe("Package", function () {
 
     const anode = car.spawnMove("f", "u");
     const mnode = car.spawn("d", "b");
-    commitLayout(car.root())
+    commitLayout(car.root());
     const ax = anode.getLayout().groupX();
     assert.isNotNaN(ax);
 
@@ -1347,7 +1352,7 @@ describe("Package", function () {
     ns.minWidth += increase;
     bnode.setValue(ns);
     bnode.layoutChanged();
-    commitLayout(car.root())
+    commitLayout(car.root());
     if (ax === anode.getLayout().groupX()) {
       // simpleGraph(out, car);
       throw new Error(
@@ -1374,14 +1379,14 @@ describe("Package", function () {
     const car = makeCaret(BLOCK);
     const bnode = car.spawnMove("f", "b");
     car.spawnMove("f", "b");
-    commitLayout(car.root())
+    commitLayout(car.root());
     car.crease();
     // console.log("bnode", bnode.absoluteX(), bnode.absoluteY());
     // console.log("bnode", bnode.groupX(), bnode.groupY(), bnode.groupScale());
     const bstyle = { ...readStyle("b") };
     bstyle.minWidth += 100;
     bnode.setValue(bstyle);
-    commitLayout(car.root())
+    commitLayout(car.root());
     // console.log("bnode", bnode.groupX(), bnode.groupY(), bnode.groupScale());
     // console.log("bnode", bnode.absoluteX(), bnode.absoluteY());
   });
@@ -1408,7 +1413,7 @@ describe("Package", function () {
     // console.log(getLayoutNodes(a));
     root.connectNode(FORWARD, a);
 
-    commitLayout(root)
+    commitLayout(root);
   });
 
   it("Right-to-left test", function () {
@@ -1427,7 +1432,7 @@ describe("Package", function () {
       node.connectNode(Direction.INWARD, inner);
       node = inner;
     }
-    commitLayout(root)
+    commitLayout(root);
     assert.isNotTrue(root.needsCommit());
   });
 
@@ -1475,10 +1480,7 @@ describe("Package", function () {
       creased?.getLayout().absoluteScale() !== null,
       "Scale must not be null"
     );
-    assert(
-      creased?.getLayout().absoluteScale() === 0.5,
-      "Scale must be 0.5"
-    );
+    assert(creased?.getLayout().absoluteScale() === 0.5, "Scale must be 0.5");
   });
 
   it("Proportion pull test", function () {

@@ -10,7 +10,7 @@ import createException, {
   NOT_PAINT_GROUP,
 } from "./Exception";
 
-import Layout from '../Layout';
+import Layout from "../Layout";
 
 import Axis, {
   getNegativeDirection,
@@ -660,9 +660,9 @@ export default class DirectionNode<Value = any> implements PaintGroupNode {
     );
 
     if (closestPaintGroup.comesBefore(inserted)) {
-      //console.log("closest pg ", closestPaintGroup.id(), "comes before ", inserted.id(), "so insert at end");
+      // console.log("closest pg ", closestPaintGroup.id(), "comes before ", inserted.id(), "so insert at end");
       const endOfPaintGroup = closestPaintGroup.getLastPaintGroup();
-      //console.log("end of pg", endOfPaintGroup.id());
+      // console.log("end of pg", endOfPaintGroup.id());
       return [endOfPaintGroup, endOfPaintGroup.paintGroup().next()];
     }
     // console.log("closest pg ", closestPaintGroup.id(), "comes after ", inserted.id());

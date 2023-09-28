@@ -5,7 +5,7 @@ export default function paintNodeBounds(
   node: DirectionNode,
   painter: LinePainter
 ) {
-  const layout = node.value().getLayout();
+  const layout = node.getLayout();
   const size = layout.groupSize();
   const x = layout.groupX();
   const y = layout.groupY();

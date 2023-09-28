@@ -15,9 +15,7 @@ export default class DirectionCaret<Value> {
   _nodes: DirectionNode<Value>[];
   _savedNodes: { [key: string]: DirectionNode<Value> };
 
-  constructor(
-    given: any = null
-  ) {
+  constructor(given: any = null) {
     // A mapping of nodes to their saved names.
     this._savedNodes = null;
 

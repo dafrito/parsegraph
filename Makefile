@@ -13,6 +13,7 @@ SCRIPT_FILES = \
 	src/BaseCommitLayoutData.ts \
 	src/checkExtentsEqual.ts \
 	src/demo.ts \
+	src/demo3d.ts \
 	src/rect/index.ts \
 	src/size/index.ts \
 	src/generateid/index.ts \

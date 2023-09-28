@@ -17,7 +17,7 @@ export interface SiblingNode {
   isRoot(): boolean;
 }
 
-const MAX_SIBLINGS = 100000
+const MAX_SIBLINGS = 100000;
 
 export default class DirectionNodeSiblings {
   _prev: SiblingNode;

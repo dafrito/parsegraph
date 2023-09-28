@@ -15,7 +15,7 @@ describe("DirectionNode", function () {
 
   it("can be constructed with a layout", () => {
     const n = new DirectionNode<string>();
-    assert.isNotNull(n.getLayout())
+    assert.isNotNull(n.getLayout());
   });
 
   it("can handle paint group array creasing", () => {

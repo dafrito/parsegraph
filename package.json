@@ -15,6 +15,9 @@
   },
   "homepage": "https://github.com/parsegraph/layout#readme",
   "dependencies": {
+    "parsegraph-blockpainter": "^1.8.0",
+    "parsegraph-camera": "^1.4.24",
+    "parsegraph-checkglerror": "^1.5.8",
     "parsegraph-timing": "^1.4.20"
   },
   "devDependencies": {

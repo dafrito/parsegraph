@@ -29,6 +29,7 @@ export default class Layout {
   _groupYPos: number;
   _groupScale: number;
   _owner: DirectionNode;
+  _size: Size;
 
   constructor(owner: DirectionNode) {
     this._owner = owner;
@@ -45,6 +46,8 @@ export default class Layout {
     this._groupXPos = NaN;
     this._groupYPos = NaN;
     this._groupScale = NaN;
+
+    this._size = new Size();
   }
 
   setOwner(owner: DirectionNode): void {
@@ -173,8 +176,7 @@ export default class Layout {
     }
     return (
       this._absoluteVersion !==
-      this.owner().parentNode().findPaintGroup().getLayout()
-        ._absoluteVersion
+      this.owner().parentNode().findPaintGroup().getLayout()._absoluteVersion
     );
   }
 
@@ -384,7 +386,14 @@ export default class Layout {
   }
 
   size(bodySize?: Size): Size {
-    return this.owner().size(bodySize);
+    if (bodySize) {
+      bodySize.setSize(this._size.width(), this._size.height());
+    }
+    return this._size;
+  }
+
+  setSize(bodySize: Size) {
+    this._size.setSize(bodySize.width(), bodySize.height());
   }
 
   absoluteSize(bodySize?: Size): Size {
@@ -535,9 +544,7 @@ export default class Layout {
         return candidates.pop();
       }
 
-      if (
-        candidate.getLayout().inNodeBody(x, y, userScale, extentSize)
-      ) {
+      if (candidate.getLayout().inNodeBody(x, y, userScale, extentSize)) {
         // console.log("Click is in node body");
         if (candidate.hasNode(Direction.INWARD)) {
           if (
@@ -563,11 +570,7 @@ export default class Layout {
       candidates.pop();
 
       // Test if the click is within any child.
-      if (
-        !candidate
-          .getLayout()
-          .inNodeExtents(x, y, userScale, extentSize)
-      ) {
+      if (!candidate.getLayout().inNodeExtents(x, y, userScale, extentSize)) {
         // Nope, so continue the search.
         // console.log("Click is not in node extents.");
         continue;

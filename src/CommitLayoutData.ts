@@ -24,7 +24,7 @@ import createException, {
 } from "./Exception";
 import Size from "./size";
 import BaseCommitLayoutData from "./BaseCommitLayoutData";
-import LayoutPainter from './LayoutPainter';
+import LayoutPainter from "./LayoutPainter";
 import { log, logc, logEnterc, logLeave } from "./log";
 
 /**
@@ -403,9 +403,7 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
       node.setLayoutState(LayoutState.NEEDS_COMMIT);
       return true;
     }
-    const nestedSize: Size = nestedNode
-      .getLayout()
-      .extentSize(this.firstSize);
+    const nestedSize: Size = nestedNode.getLayout().extentSize(this.firstSize);
     if (
       node.nodeAlignmentMode(Direction.INWARD) === Alignment.INWARD_VERTICAL
     ) {
@@ -415,7 +413,8 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
           (nestedNode.getLayout().extentOffsetAt(Direction.DOWNWARD) -
             nestedSize.width() / 2),
         this.bodySize.height() / 2 -
-          this.painter().getSeparation(node, Axis.Z, Direction.INWARD, true) / 2 +
+          this.painter().getSeparation(node, Axis.Z, Direction.INWARD, true) /
+            2 +
           nestedNode.state().scale() *
             (-nestedSize.height() +
               nestedNode.getLayout().extentOffsetAt(Direction.FORWARD))
@@ -425,12 +424,11 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
       node.setPosAt(
         Direction.INWARD,
         this.bodySize.width() / 2 -
-          this.painter().getSeparation(node, Axis.Z, Direction.INWARD, false) / 2 +
+          this.painter().getSeparation(node, Axis.Z, Direction.INWARD, false) /
+            2 +
           nestedNode.state().scale() *
             (-nestedSize.width() +
-              nestedNode
-                .getLayout()
-                .extentOffsetAt(Direction.DOWNWARD)),
+              nestedNode.getLayout().extentOffsetAt(Direction.DOWNWARD)),
         nestedNode.state().scale() *
           (nestedNode.getLayout().extentOffsetAt(Direction.FORWARD) -
             nestedSize.height() / 2)
@@ -494,8 +492,7 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
         .getLayout()
         .setExtentOffsetAt(
           direction,
-          node.getLayout().extentOffsetAt(direction) +
-            Math.abs(lengthOffset)
+          node.getLayout().extentOffsetAt(direction) + Math.abs(lengthOffset)
         );
     }
 
@@ -997,8 +994,12 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
           this.bodySize.height() / 2
       );
       separationFromFirst +=
-        this.painter().getSeparation(node, Axis.VERTICAL, firstDirection, true) *
-        node.nodeAt(firstDirection).state().scale();
+        this.painter().getSeparation(
+          node,
+          Axis.VERTICAL,
+          firstDirection,
+          true
+        ) * node.nodeAt(firstDirection).state().scale();
 
       separationFromSecond = Math.max(
         separationFromSecond,
@@ -1007,8 +1008,12 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
           this.bodySize.height() / 2
       );
       separationFromSecond +=
-        this.painter().getSeparation(node, Axis.VERTICAL, secondDirection, true) *
-        node.nodeAt(secondDirection).state().scale();
+        this.painter().getSeparation(
+          node,
+          Axis.VERTICAL,
+          secondDirection,
+          true
+        ) * node.nodeAt(secondDirection).state().scale();
     } else {
       separationFromFirst = Math.max(
         separationFromFirst,
@@ -1017,8 +1022,12 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
           this.bodySize.width() / 2
       );
       separationFromFirst +=
-        this.painter().getSeparation(node, Axis.HORIZONTAL, firstDirection, false) *
-        node.nodeAt(firstDirection).state().scale();
+        this.painter().getSeparation(
+          node,
+          Axis.HORIZONTAL,
+          firstDirection,
+          false
+        ) * node.nodeAt(firstDirection).state().scale();
 
       separationFromSecond = Math.max(
         separationFromSecond,
@@ -1027,8 +1036,12 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
           this.bodySize.width() / 2
       );
       separationFromSecond +=
-        this.painter().getSeparation(node, Axis.HORIZONTAL, secondDirection, false) *
-        node.nodeAt(secondDirection).state().scale();
+        this.painter().getSeparation(
+          node,
+          Axis.HORIZONTAL,
+          secondDirection,
+          false
+        ) * node.nodeAt(secondDirection).state().scale();
     }
 
     // Set the positions of the nodes.

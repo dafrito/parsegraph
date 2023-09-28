@@ -22,9 +22,9 @@ const drawLine = (
   }
   const directionData = node.neighborAt(direction);
 
-  const layout = node.value().getLayout();
+  const layout = node.getLayout();
   const parentScale = layout.groupScale();
-  const scale = directionData.getNode().value().getLayout().groupScale();
+  const scale = directionData.getNode().getLayout().groupScale();
   if (typeof scale !== "number" || isNaN(scale)) {
     console.log(directionData.node);
     throw new Error(
@@ -35,7 +35,7 @@ const drawLine = (
   const thickness = lineThickness * scale;
   const x = layout.groupX();
   const y = layout.groupY();
-  const size = node.value().size();
+  const size = layout.size();
   const length =
     directionSign(direction) *
     parentScale *

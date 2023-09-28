@@ -23,8 +23,7 @@ export default function checkExtentsEqual(
     );
     resultDom.appendChild(
       document.createTextNode(
-        "Extent offset = " +
-          caret.node().getLayout().extentOffsetAt(direction)
+        "Extent offset = " + caret.node().getLayout().extentOffsetAt(direction)
       )
     );
   }

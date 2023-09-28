@@ -1,9 +1,9 @@
-import { Direction, DirectionNode, LayoutState } from "./direction"
+import { Direction, DirectionNode, LayoutState } from "./direction";
 import createException, { BAD_LAYOUT_STATE } from "./Exception";
 import Size from "./size";
 import { elapsed } from "parsegraph-timing";
 import { log, logc, logEnterc, logLeave } from "./log";
-import LayoutPainter from './LayoutPainter';
+import LayoutPainter from "./LayoutPainter";
 
 export default class BaseCommitLayoutData {
   bodySize: Size;
@@ -59,8 +59,10 @@ export default class BaseCommitLayoutData {
     // Begin the layout.
     node.setLayoutState(LayoutState.IN_COMMIT);
 
-    const bodySize = this.bodySize
+    const bodySize = this.bodySize;
     this.painter().size(node, bodySize);
+
+    node.getLayout().setSize(bodySize);
 
     // This node's horizontal bottom, used with downward nodes.
     this.initExtent(
@@ -125,7 +127,9 @@ export default class BaseCommitLayoutData {
 
     // Start new layout.
     if (!this.paintGroup) {
-      this.paintGroup = this.rootPaintGroup.paintGroup().prev() as DirectionNode;
+      this.paintGroup = this.rootPaintGroup
+        .paintGroup()
+        .prev() as DirectionNode;
       this.root = this.paintGroup;
       this.node = this.root as DirectionNode;
     }
@@ -195,11 +199,15 @@ export default class BaseCommitLayoutData {
       layout._absoluteDirty = true;
       layout.commitAbsolutePos();
     }
+
+    if (this.painter().paint(this.paintGroup)) {
+      return true;
+    }
     this.paintGroup = this.paintGroup?.paintGroup().next() as DirectionNode;
     if (this.paintGroup === this.rootPaintGroup) {
       ++this.layoutPhase;
       this.needsPosition = false;
-      return false
+      return false;
     }
 
     this.root = this.paintGroup;
@@ -216,7 +224,7 @@ export default class BaseCommitLayoutData {
    */
   crank(): boolean {
     if (this._count++ > 10000) {
-      throw new Error("Overflow")
+      throw new Error("Overflow");
     }
     return this.commitLayoutPhaseOne() || this.commitLayoutPhaseTwo();
   }
