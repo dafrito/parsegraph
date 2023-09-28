@@ -728,6 +728,14 @@ that is still a descendent of this node.
     this._layoutState = state;
   }
 
+  getLayoutState(): LayoutState {
+    return this._layoutState;
+  }
+
+  needsCommit(): boolean {
+    return this.getLayoutState() === LayoutState.NEEDS_COMMIT;
+  }
+
   layoutChanged(changeDirection?: Direction): void {
     // console.log("layoutChanged(" +
     //   (changeDirection != null ? nameDirection(
@@ -946,14 +954,6 @@ that is still a descendent of this node.
 
   setValue(value: Value) {
     this.state().setValue(value);
-  }
-
-  getLayoutState(): LayoutState {
-    return this._layoutState;
-  }
-
-  needsCommit(): boolean {
-    return this.getLayoutState() === LayoutState.NEEDS_COMMIT;
   }
 
   nodeAlignmentMode(inDirection: Direction): Alignment {
