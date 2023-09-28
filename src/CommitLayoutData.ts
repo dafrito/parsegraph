@@ -22,7 +22,7 @@ import createException, {
   BAD_NODE_DIRECTION,
   BAD_NODE_ALIGNMENT,
 } from "./Exception";
-import Size from "parsegraph-size";
+import Size from "./size";
 import BaseCommitLayoutData from "./BaseCommitLayoutData";
 import { log, logc, logEnterc, logLeave } from "./log";
 

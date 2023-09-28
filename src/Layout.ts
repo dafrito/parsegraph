@@ -3,7 +3,7 @@ import createException, { BAD_NODE_DIRECTION, NODE_DIRTY } from "./Exception";
 import CommitLayoutData from "./CommitLayoutData";
 
 import Rect from "./rect";
-import Size from "parsegraph-size";
+import Size from "./size";
 import Extent from "./extent";
 
 import LayoutNode from "./LayoutNode";

@@ -1,5 +1,5 @@
 import Direction, { Axis } from "./src";
-import Size from "parsegraph-size";
+import Size from "./size";
 import Layout from "./Layout";
 import LayoutNode from "./LayoutNode";
 import Positioned from "./Positioned";

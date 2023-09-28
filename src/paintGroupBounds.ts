@@ -1,4 +1,4 @@
-import Size from "parsegraph-size";
+import Size from "./size";
 import { Direction, nameDirection } from "./src";
 import LayoutNode from "./LayoutNode";
 

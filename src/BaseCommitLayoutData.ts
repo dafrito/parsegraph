@@ -1,7 +1,7 @@
 import { Direction, LayoutState } from "./src"
 import LayoutNode from "./LayoutNode";
 import createException, { BAD_LAYOUT_STATE } from "./Exception";
-import Size from "parsegraph-size";
+import Size from "./size";
 import { elapsed } from "parsegraph-timing";
 import { log, logc, logEnterc, logLeave } from "./log";
 

@@ -17,7 +17,6 @@
   "dependencies": {
     "parsegraph-fuzzyequals": "^1.4.13",
     "parsegraph-generateid": "^1.4.12",
-    "parsegraph-size": "^1.7.5",
     "parsegraph-timing": "^1.4.20"
   },
   "devDependencies": {

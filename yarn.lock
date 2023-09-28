@@ -3938,11 +3938,6 @@ parsegraph-method@^1.4.25:
   resolved "https://registry.yarnpkg.com/parsegraph-method/-/parsegraph-method-1.4.25.tgz#1ec5ebe3724424a91161f3e7270667603a14ac16"
   integrity sha512-OAH4Vxz/+krd83mdDgKdKJdoT/+Coad4APVyIbGp+tfQgkrckFSpnW25XvfFrdAUXk9lfjzCDgdLV5otE7yxXA==
 
-parsegraph-size@^1.7.5:
-  version "1.7.5"
-  resolved "https://registry.yarnpkg.com/parsegraph-size/-/parsegraph-size-1.7.5.tgz#cd9bb2849b162e4eac084ff7e315373ce8ac5524"
-  integrity sha512-ueTmIMWk0K5CkHSuJeyUNrCI0llK8+bmu106aGyhh3UYSiGu66unSmZT/guyByAb6fmSR6B/wp3fatlUheYaAg==
-
 parsegraph-timing@^1.4.20:
   version "1.4.20"
   resolved "https://registry.yarnpkg.com/parsegraph-timing/-/parsegraph-timing-1.4.20.tgz#440081555f6038e58120982afef9ad76b9296c5c"
