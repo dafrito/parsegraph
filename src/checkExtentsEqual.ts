@@ -1,4 +1,4 @@
-import { nameDirection, Direction } from "./src";
+import { nameDirection, Direction } from "./direction";
 import LayoutCaret from "./LayoutCaret";
 import Extent from "./extent";
 

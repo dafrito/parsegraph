@@ -6,7 +6,7 @@ import {
   DirectionCaret,
   PreferredAxis,
   namePreferredAxis,
-} from "../../src/src/index";
+} from "../../src/direction";
 
 function makeCaret() {
   return new DirectionCaret();

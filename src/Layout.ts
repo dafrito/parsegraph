@@ -14,7 +14,7 @@ import Direction, {
   Axis,
   reverseDirection,
   isVerticalDirection,
-} from "./src";
+} from "./direction";
 
 import AutocommitBehavior, { getAutocommitBehavior } from "./autocommit";
 

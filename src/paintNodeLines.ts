@@ -2,7 +2,7 @@ import Direction, {
   isVerticalDirection,
   directionSign,
   forEachCardinalDirection,
-} from "./src";
+} from "./direction";
 import { LayoutNode } from ".";
 
 export type LinePainter = (x: number, y: number, w: number, h: number) => void;

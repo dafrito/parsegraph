@@ -1,7 +1,7 @@
 import Direction, {
   DirectionNode,
   InplaceNodePalette,
-} from "./src";
+} from "./direction";
 import BasicPositioned from "./BasicPositioned";
 import LayoutNode from "./LayoutNode";
 

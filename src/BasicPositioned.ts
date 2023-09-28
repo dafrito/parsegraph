@@ -1,4 +1,4 @@
-import Direction, { Axis } from "./src";
+import Direction, { Axis } from "./direction";
 import Size from "./size";
 import Layout from "./Layout";
 import LayoutNode from "./LayoutNode";

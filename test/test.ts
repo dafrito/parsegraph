@@ -5,7 +5,7 @@ import Direction, {
   BACKWARD,
   DirectionCaret,
   DirectionNode,
-} from "../src/src"
+} from "../src/direction"
 import {
   LayoutNodePalette,
   style as readStyle,
@@ -14,7 +14,7 @@ import {
   BasicPositioned,
   Layout,
   Positioned,
-} from "../src/index";
+} from "../src";
 import Extent from "../src/extent";
 import Size from "../src/size";
 

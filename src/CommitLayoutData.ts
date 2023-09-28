@@ -16,7 +16,7 @@ import {
   Fit,
   Alignment,
   AxisOverlap,
-} from "./src";
+} from "./direction";
 import LayoutNode from "./LayoutNode";
 import createException, {
   BAD_NODE_DIRECTION,

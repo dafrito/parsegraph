@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import Direction, { PreferredAxis, DirectionNode } from "../../src/src/index";
+import Direction, { PreferredAxis, DirectionNode } from "../../src/direction";
 
 describe("DirectionNode", function () {
   it("can be constructed without a Type param", () => {

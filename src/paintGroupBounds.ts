@@ -1,5 +1,5 @@
 import Size from "./size";
-import { Direction, nameDirection } from "./src";
+import { Direction, nameDirection } from "./direction";
 import LayoutNode from "./LayoutNode";
 
 export default function paintGroupBounds(nodeRoot: LayoutNode) {

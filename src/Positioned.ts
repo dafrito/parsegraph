@@ -1,7 +1,7 @@
 import Layout from "./Layout";
 import Size from "./size";
 
-import Direction, { Axis } from "./src";
+import Direction, { Axis } from "./direction";
 
 export default interface Positioned {
   getLayout(): Layout;

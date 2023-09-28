@@ -1,4 +1,4 @@
-import { DirectionNode } from "./src";
+import { DirectionNode } from "./direction";
 
 import Positioned from "./Positioned";
 
