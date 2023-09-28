@@ -85,16 +85,18 @@ doc:
 	npx typedoc --tsconfig tsconfig.browser.json src/index.ts --out ./dist/docs
 .PHONY: doc
 
+DOCKER=docker
+
 build-container:
-	podman build . -t parsegraph-$(DIST_NAME)
+	$(DOCKER) build . -t parsegraph-$(DIST_NAME)
 .PHONY: build-container
 
 run-container: build-container stop-container
-	podman run -e SITE_ROOT=$(DEMO_ROOT) -w /usr/src/ --name parsegraph-$(DIST_NAME) -it -p$(DEMO_PORT):3000 localhost/parsegraph-$(DIST_NAME):latest make demo
+	$(DOCKER) run -e SITE_ROOT=$(DEMO_ROOT) -w /usr/src/ --name parsegraph-$(DIST_NAME) -it -p$(DEMO_PORT):3000 localhost/parsegraph-$(DIST_NAME):latest make demo
 .PHONY: run-container
 
 stop-container:
-	podman stop parsegraph-$(DIST_NAME); podman rm parsegraph-$(DIST_NAME); true
+	$(DOCKER) stop parsegraph-$(DIST_NAME); podman rm parsegraph-$(DIST_NAME); true
 .PHONY: stop-container
 
 tar: parsegraph-$(DIST_NAME)-dev.tgz

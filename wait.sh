@@ -15,4 +15,4 @@ if test -d node_modules; then
     done
 fi
 echo $files $linked
-inotifywait -e modify -r $files $linked
+fswatch --event=Updated -1 -r src demo

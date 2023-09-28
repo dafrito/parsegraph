@@ -5,7 +5,7 @@ import Direction, {
   BACKWARD,
   DirectionCaret,
   DirectionNode,
-} from "parsegraph-direction";
+} from "../src/src"
 import {
   LayoutNodePalette,
   style as readStyle,
