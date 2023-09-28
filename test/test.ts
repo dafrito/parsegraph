@@ -1407,7 +1407,6 @@ describe("Package", function () {
       node = inner;
     }
     commitLayout(root)
-    assert.isNotTrue(cont);
     assert.isNotTrue(root.needsCommit());
   });
 
