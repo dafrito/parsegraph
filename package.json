@@ -15,7 +15,7 @@
   },
   "homepage": "https://github.com/parsegraph/layout#readme",
   "dependencies": {
-    "parsegraph-extent": "^1.4.16",
+    "parsegraph-fuzzyequals": "^1.4.13",
     "parsegraph-generateid": "^1.4.12",
     "parsegraph-rect": "^1.5.5",
     "parsegraph-size": "^1.7.5",

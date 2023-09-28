@@ -1,4 +1,4 @@
-import Extent from "parsegraph-extent";
+import Extent from "./extent";
 import {
   Direction,
   Axis,

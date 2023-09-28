@@ -1,6 +1,6 @@
 import { nameDirection, Direction } from "./src";
 import LayoutCaret from "./LayoutCaret";
-import Extent from "parsegraph-extent";
+import Extent from "./extent";
 
 export default function checkExtentsEqual(
   caret: LayoutCaret,

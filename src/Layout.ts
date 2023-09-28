@@ -4,7 +4,7 @@ import CommitLayoutData from "./CommitLayoutData";
 
 import Rect from "parsegraph-rect";
 import Size from "parsegraph-size";
-import Extent from "parsegraph-extent";
+import Extent from "./extent";
 
 import LayoutNode from "./LayoutNode";
 

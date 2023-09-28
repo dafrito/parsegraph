@@ -15,7 +15,7 @@ import {
   Layout,
   Positioned,
 } from "../src/index";
-import Extent from "parsegraph-extent";
+import Extent from "../src/extent";
 import Size from "parsegraph-size";
 
 import { elapsed } from "parsegraph-timing";
