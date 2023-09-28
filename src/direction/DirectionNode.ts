@@ -10,6 +10,8 @@ import createException, {
   NOT_PAINT_GROUP,
 } from "./Exception";
 
+import Layout from '../Layout';
+
 import Axis, {
   getNegativeDirection,
   getPositiveDirection,
@@ -44,6 +46,7 @@ import { makeLimit } from "./utils";
 export default class DirectionNode<Value = any> implements PaintGroupNode {
   _layoutPreference: PreferredAxis;
   _layoutState: LayoutState;
+  _layout?: Layout;
 
   _state: DirectionNodeState<Value, DirectionNode<Value>>;
 
@@ -66,6 +69,7 @@ export default class DirectionNode<Value = any> implements PaintGroupNode {
     this._siblings = new DirectionNodeSiblings(this);
     this._paintGroupRoot = this;
     this._paintGroup = new DirectionNodePaintGroup(this, false);
+    this._layout = undefined;
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -719,6 +723,13 @@ that is still a descendent of this node.
   // Layout state
   //
   // ///////////////////////////////////////////////////////////////////////////
+
+  getLayout(): Layout {
+    if (!this._layout) {
+      this._layout = new Layout(this);
+    }
+    return this._layout;
+  }
 
   protected invalidateLayout(): void {
     this.setLayoutState(LayoutState.NEEDS_COMMIT);

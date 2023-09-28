@@ -8,11 +8,6 @@ import DirectionNodeState from "./DirectionNodeState";
 
 import DirectionCaret, { SHRINK_SCALE } from "./DirectionCaret";
 
-import NodePalette, {
-  InplaceNodePalette,
-  BasicNodePalette,
-} from "./NodePalette";
-
 import LayoutState, { nameLayoutState } from "./LayoutState";
 
 import PreferredAxis, {
@@ -154,9 +149,6 @@ export {
   isNegativeDirection,
   directionSign,
   alternateDirection,
-  NodePalette,
-  InplaceNodePalette,
-  BasicNodePalette,
   Alignment,
   nameAlignment,
   readAlignment,

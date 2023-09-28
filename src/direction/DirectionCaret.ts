@@ -3,10 +3,6 @@ import createException, { NO_NODE_FOUND } from "./Exception";
 import generateID from "../generateid";
 import DirectionNode from "./DirectionNode";
 import PreferredAxis from "./PreferredAxis";
-import NodePalette, {
-  BasicNodePalette,
-  InplaceNodePalette,
-} from "./NodePalette";
 import Fit from "./Fit";
 import AxisOverlap, { readAxisOverlap } from "./AxisOverlap";
 import Alignment, { readAlignment } from "./Alignment";
@@ -18,16 +14,12 @@ export default class DirectionCaret<Value> {
   _nodeRoot: DirectionNode<Value>;
   _nodes: DirectionNode<Value>[];
   _savedNodes: { [key: string]: DirectionNode<Value> };
-  _palette: InplaceNodePalette<Value>;
 
   constructor(
-    given: any = null,
-    palette: InplaceNodePalette<Value> | NodePalette<Value> = null
+    given: any = null
   ) {
     // A mapping of nodes to their saved names.
     this._savedNodes = null;
-
-    this.setPalette(palette);
 
     this._nodeRoot = this.doSpawn(given) as DirectionNode<Value>;
 
@@ -35,22 +27,7 @@ export default class DirectionCaret<Value> {
     this._nodes = [this._nodeRoot];
   }
 
-  setPalette(palette: InplaceNodePalette<Value> | NodePalette<Value> = null) {
-    if (typeof palette === "function") {
-      this._palette = new BasicNodePalette(palette);
-    } else {
-      this._palette = palette as InplaceNodePalette<Value>;
-    }
-  }
-
-  palette(): InplaceNodePalette<Value> {
-    return this._palette;
-  }
-
   doSpawn(given?: any): DirectionNode<Value> {
-    if (this.palette()) {
-      return this.palette().spawn(given);
-    }
     if (given instanceof DirectionNode) {
       return given as DirectionNode<Value>;
     }
@@ -60,10 +37,6 @@ export default class DirectionCaret<Value> {
   }
 
   doReplace(node: DirectionNode<Value>, given?: any): void {
-    if (this.palette()) {
-      this.palette().replace(node, given);
-      return;
-    }
     node.setValue(
       given instanceof DirectionNode
         ? (given as DirectionNode<Value>).value()
@@ -72,7 +45,7 @@ export default class DirectionCaret<Value> {
   }
 
   clone(): DirectionCaret<Value> {
-    return new DirectionCaret<Value>(this.node(), this.palette());
+    return new DirectionCaret<Value>(this.node());
   }
 
   node(): DirectionNode<Value> {

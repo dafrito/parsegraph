@@ -11,6 +11,7 @@ import LayoutNode from "./LayoutNode";
 import { log, logc, logEnterc, logLeave } from "./log";
 
 import Direction, {
+  DirectionNode,
   Axis,
   reverseDirection,
   isVerticalDirection,
@@ -29,9 +30,9 @@ export default class Layout {
   _groupXPos: number;
   _groupYPos: number;
   _groupScale: number;
-  _owner: LayoutNode;
+  _owner: DirectionNode;
 
-  constructor(owner: LayoutNode) {
+  constructor(owner: DirectionNode) {
     this._owner = owner;
 
     // Layout
@@ -56,26 +57,11 @@ export default class Layout {
     return this._owner;
   }
 
-  horizontalSeparation(dir: Direction): number {
-    return this.owner().value().getSeparation(Axis.HORIZONTAL, dir, false);
-  }
-
-  verticalSeparation(dir: Direction): number {
-    return this.owner().value().getSeparation(Axis.VERTICAL, dir, false);
-  }
-
   autocommitAbsolutePos(): void {
     if (getAutocommitBehavior() === AutocommitBehavior.THROW) {
       throw createException(NODE_DIRTY);
     }
     this.commitAbsolutePos();
-  }
-
-  autocommitLayoutIteratively(): void {
-    if (getAutocommitBehavior() === AutocommitBehavior.THROW) {
-      throw createException(NODE_DIRTY);
-    }
-    this.commitLayoutIteratively();
   }
 
   commitAbsolutePos(): void {
@@ -92,9 +78,9 @@ export default class Layout {
       "{0} needs an absolute version update",
       this.owner().state().id()
     );
-    this._absoluteXPos = null;
-    this._absoluteYPos = null;
-    this._absoluteScale = null;
+    this._absoluteXPos = NaN;
+    this._absoluteYPos = NaN;
+    this._absoluteScale = NaN;
 
     // Retrieve a stack of nodes to determine the absolute position.
     let node: LayoutNode = this.owner();
@@ -106,7 +92,6 @@ export default class Layout {
       neededVersion = node
         .parentNode()
         .findPaintGroup()
-        .value()
         .getLayout()._absoluteVersion;
     }
     while (true) {
@@ -116,7 +101,7 @@ export default class Layout {
         break;
       }
 
-      const par: Layout = node.nodeParent().value().getLayout();
+      const par: Layout = node.nodeParent().getLayout();
       if (!par._absoluteDirty && par._absoluteVersion === neededVersion) {
         // Just use the parent's absolute position to start.
         this._absoluteXPos = par._absoluteXPos;
@@ -143,7 +128,7 @@ export default class Layout {
       this._absoluteYPos += node.y() * parentScale;
 
       parentScale = scale;
-      const layout = node.value().getLayout();
+      const layout = node.getLayout();
       if (layout._absoluteDirty) {
         layout._absoluteXPos = this._absoluteXPos;
         layout._absoluteYPos = this._absoluteYPos;
@@ -153,7 +138,6 @@ export default class Layout {
           layout._absoluteVersion = node
             .parentNode()
             .findPaintGroup()
-            .value()
             .getLayout()._absoluteVersion;
         }
       }
@@ -177,7 +161,6 @@ export default class Layout {
       this._absoluteVersion = this.owner()
         .parentNode()
         .findPaintGroup()
-        .value()
         .getLayout()._absoluteVersion;
     }
     logLeave();
@@ -192,7 +175,7 @@ export default class Layout {
     }
     return (
       this._absoluteVersion !==
-      this.owner().parentNode().findPaintGroup().value().getLayout()
+      this.owner().parentNode().findPaintGroup().getLayout()
         ._absoluteVersion
     );
   }
@@ -202,25 +185,16 @@ export default class Layout {
   }
 
   absoluteX(): number {
-    if (this.owner().findPaintGroup().value().getLayout().needsPosition()) {
-      this.autocommitLayoutIteratively();
-    }
     this.autocommitAbsolutePos();
     return this._absoluteXPos;
   }
 
   absoluteY(): number {
-    if (this.owner().findPaintGroup().value().getLayout().needsPosition()) {
-      this.autocommitLayoutIteratively();
-    }
     this.autocommitAbsolutePos();
     return this._absoluteYPos;
   }
 
   absoluteScale(): number {
-    if (this.owner().findPaintGroup().value().getLayout().needsPosition()) {
-      this.autocommitLayoutIteratively();
-    }
     this.autocommitAbsolutePos();
     return this._absoluteScale;
   }
@@ -262,7 +236,7 @@ export default class Layout {
         break;
       }
 
-      const par = node.nodeParent().value().getLayout();
+      const par = node.nodeParent().getLayout();
       if (par._groupXPos !== null) {
         // Just use the parent's position to start.
         this._groupXPos = par._groupXPos;
@@ -333,40 +307,15 @@ export default class Layout {
   }
 
   groupX(): number {
-    if (this.owner().findPaintGroup().value().getLayout().needsPosition()) {
-      this.autocommitLayoutIteratively();
-    }
-    if (this._groupXPos === null || isNaN(this._groupXPos)) {
-      throw new Error("Group X position must not be " + this._groupXPos);
-    }
     return this._groupXPos;
   }
 
   groupY(): number {
-    if (this.owner().findPaintGroup().value().getLayout().needsPosition()) {
-      this.autocommitLayoutIteratively();
-    }
     return this._groupYPos;
   }
 
   groupScale(): number {
-    if (this.owner().findPaintGroup().value().getLayout().needsPosition()) {
-      this.autocommitLayoutIteratively();
-    }
     return this._groupScale;
-  }
-
-  commitLayoutIteratively(timeout?: number): Function {
-    if (!this.owner().isRoot()) {
-      return this.owner()
-        .root()
-        .value()
-        .getLayout()
-        .commitLayoutIteratively(timeout);
-    }
-
-    const cld = new CommitLayoutData(this.owner(), timeout);
-    return cld.commitLayoutLoop(timeout);
   }
 
   extentsAt(atDirection: Direction): Extent {
@@ -400,15 +349,6 @@ export default class Layout {
     // console.log("Extent Size = " + outPos.width() + " " + outPos.height());
 
     return outPos;
-  }
-
-  sizeIn(direction: Direction, bodySize?: Size): number {
-    const rv = this.size(bodySize);
-    if (isVerticalDirection(direction)) {
-      return rv.height() / 2;
-    } else {
-      return rv.width() / 2;
-    }
   }
 
   groupSizeRect(rect?: Rect): Rect {
@@ -446,7 +386,7 @@ export default class Layout {
   }
 
   size(bodySize?: Size): Size {
-    return this.owner().value().size(bodySize);
+    return this.owner().size(bodySize);
   }
 
   absoluteSize(bodySize?: Size): Size {
@@ -598,14 +538,13 @@ export default class Layout {
       }
 
       if (
-        candidate.value().getLayout().inNodeBody(x, y, userScale, extentSize)
+        candidate.getLayout().inNodeBody(x, y, userScale, extentSize)
       ) {
         // console.log("Click is in node body");
         if (candidate.hasNode(Direction.INWARD)) {
           if (
             candidate
               .nodeAt(Direction.INWARD)
-              .value()
               .getLayout()
               .inNodeExtents(x, y, userScale, extentSize)
           ) {
@@ -628,7 +567,6 @@ export default class Layout {
       // Test if the click is within any child.
       if (
         !candidate
-          .value()
           .getLayout()
           .inNodeExtents(x, y, userScale, extentSize)
       ) {
@@ -639,7 +577,7 @@ export default class Layout {
       // console.log("Click is in node extent");
 
       // It is potentially within some child, so search the children.
-      const layout = candidate.value().getLayout();
+      const layout = candidate.getLayout();
       if (
         Math.abs(y - userScale * layout.absoluteY()) >
         Math.abs(x - userScale * layout.absoluteX())

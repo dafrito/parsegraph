@@ -1,9 +1,11 @@
+import Layout from "../Layout";
 import { reverseDirection } from "./Direction";
 import { SiblingNode } from "./DirectionNodeSiblings";
 import { makeLimit } from "./utils";
 
 export interface PaintGroupNode extends SiblingNode {
   paintGroup(): DirectionNodePaintGroup;
+  getLayout(): Layout;
   layoutChanged(): void;
   _paintGroup: DirectionNodePaintGroup;
   getLastPaintGroup(): PaintGroupNode;

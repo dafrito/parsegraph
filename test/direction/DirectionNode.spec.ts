@@ -13,6 +13,11 @@ describe("DirectionNode", function () {
     assert.equal("Hey", n.value());
   });
 
+  it("can be constructed with a layout", () => {
+    const n = new DirectionNode<string>();
+    assert.isNotNull(n.getLayout())
+  });
+
   it("can handle paint group array creasing", () => {
     const root = new DirectionNode<string>().setId("root");
 

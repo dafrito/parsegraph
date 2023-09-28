@@ -1,14 +1,13 @@
-import { nameDirection, Direction } from "./direction";
-import LayoutCaret from "./LayoutCaret";
+import { nameDirection, Direction, DirectionCaret } from "./direction";
 import Extent from "./extent";
 
 export default function checkExtentsEqual(
-  caret: LayoutCaret,
+  caret: DirectionCaret<any>,
   direction: Direction,
   expected: Extent,
   resultDom?: HTMLElement
 ): boolean {
-  if (caret.node().value().getLayout().extentsAt(direction).equals(expected)) {
+  if (caret.node().getLayout().extentsAt(direction).equals(expected)) {
     return true;
   }
   if (resultDom) {
@@ -18,7 +17,6 @@ export default function checkExtentsEqual(
     resultDom.appendChild(
       caret
         .node()
-        .value()
         .getLayout()
         .extentsAt(direction)
         .toDom("Actual " + nameDirection(direction) + " extent")
@@ -26,7 +24,7 @@ export default function checkExtentsEqual(
     resultDom.appendChild(
       document.createTextNode(
         "Extent offset = " +
-          caret.node().value().getLayout().extentOffsetAt(direction)
+          caret.node().getLayout().extentOffsetAt(direction)
       )
     );
   }
