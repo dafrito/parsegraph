@@ -1,8 +1,11 @@
 #!/bin/sh
 
-BUILD=$1
+BUILD=parsegraph
 
-EXTRA_FILES=$*
+EXTRA_FILES = \
+	LICENSE \
+	README.md \
+	package.json
 
 mkdir -p $(BUILD)
 cp -r -t $(BUILD) $(EXTRA_FILES) dist/

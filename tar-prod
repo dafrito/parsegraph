@@ -1,5 +1,12 @@
 #!/bin/sh
 
+BUILD=parsegraph
+
+EXTRA_FILES = \
+	LICENSE \
+	README.md \
+	package.json
+
 mkdir $(BUILD)
 cp -r -t $(BUILD) $(EXTRA_FILES)
 cp -r dist-prod/ $(BUILD)/dist
