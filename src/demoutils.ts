@@ -1,3 +1,5 @@
+import Color from "parsegraph-color";
+
 interface BlockStyle {
   minWidth: number;
   minHeight: number;
@@ -6,26 +8,35 @@ interface BlockStyle {
   horizontalPadding: number;
   verticalSeparation: number;
   horizontalSeparation: number;
+  borderRoundedness: number;
+  borderColor: Color;
+  backgroundColor: Color;
 }
 
 const BLOCK_STYLE = {
   minWidth: 200,
   minHeight: 100,
-  borderThickness: 4,
+  borderThickness: 16,
   verticalPadding: 2,
   horizontalPadding: 4,
-  horizontalSeparation: 10,
-  verticalSeparation: 10,
+  horizontalSeparation: 30,
+  verticalSeparation: 30,
+  borderRoundedness: 16,
+  backgroundColor: new Color(0.5, 0.5, 0.5, 1),
+  borderColor: new Color(1, 1, 1, 1),
 };
 
 const BUD_STYLE = {
   minWidth: 30,
   minHeight: 30,
-  borderThickness: 4,
-  verticalPadding: 4,
-  horizontalPadding: 4,
-  horizontalSeparation: 10,
-  verticalSeparation: 10,
+  borderThickness: 30,
+  verticalPadding: 0,
+  horizontalPadding: 0,
+  horizontalSeparation: 30,
+  verticalSeparation: 30,
+  borderRoundedness: 90,
+  borderColor: new Color(0.5, 0.5, 0.5, 1),
+  backgroundColor: new Color(1, 1, 1, 1),
 };
 
 const EMPTY_STYLE = {
@@ -36,6 +47,9 @@ const EMPTY_STYLE = {
   horizontalPadding: 0,
   horizontalSeparation: 10,
   verticalSeparation: 10,
+  borderRoundedness: 0,
+  borderColor: new Color(0, 0, 0, 0),
+  backgroundColor: new Color(0, 0, 0, 0),
 };
 
 const readStyle = (given?: any): BlockStyle => {
@@ -59,7 +73,4 @@ const readStyle = (given?: any): BlockStyle => {
   }
 };
 
-export {
-  readStyle,
-  BlockStyle
-}
+export { readStyle, BlockStyle };

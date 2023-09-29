@@ -346,7 +346,7 @@ export default class DirectionCaret<Value> {
 
   spawnMove(
     inDirection: Direction | string,
-    newType?: DirectionNode<Value> | string,
+    newType?: DirectionNode<Value> | Value,
     newAlignmentMode?: Alignment | string
   ): DirectionNode<Value> {
     const created = this.spawn(inDirection, newType, newAlignmentMode);

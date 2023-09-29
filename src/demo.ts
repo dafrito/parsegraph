@@ -10,9 +10,9 @@ import paintNodeBounds from "./paintNodeBounds";
 import Axis from "./direction/Axis";
 import Size from "./size";
 import { BlockStyle, readStyle } from "./demoutils";
-import buildGraph from './demograph';
-import { BasicGLProvider } from 'parsegraph-compileprogram';
-import { WebGLBlockPainter } from 'parsegraph-blockpainter';
+import buildGraph from "./demograph";
+import { BasicGLProvider } from "parsegraph-compileprogram";
+import { WebGLBlockPainter } from "parsegraph-blockpainter";
 
 const layoutPainter = {
   size: (node: DirectionNode, size: Size) => {

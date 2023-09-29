@@ -17,12 +17,9 @@ export default class BaseCommitLayoutData {
   _painter: LayoutPainter;
 
   constructor(node: DirectionNode, painter: LayoutPainter) {
-    this._count = 0;
     this._painter = painter;
-    this.layoutPhase = 1;
-    this.rootPaintGroup = node.root();
     this.bodySize = new Size();
-    this.needsPosition = false;
+    this.reset(node);
   }
 
   protected initExtent(
@@ -37,6 +34,20 @@ export default class BaseCommitLayoutData {
     extent.appendLS(length, size);
     node.getLayout().setExtentOffsetAt(inDirection, offset);
     // console.log(new Error("OFFSET = " + offset));
+  }
+
+  reset(node: DirectionNode): void {
+    this.rootPaintGroup = node.root();
+    this.layoutPhase = 1;
+    this.needsPosition = false;
+    this.root = undefined;
+    this.node = undefined;
+    this.paintGroup = undefined;
+    this.bodySize.setSize(0, 0);
+  }
+
+  startingNode(): DirectionNode {
+    return this.rootPaintGroup
   }
 
   painter(): LayoutPainter {
@@ -132,6 +143,7 @@ export default class BaseCommitLayoutData {
         .prev() as DirectionNode;
       this.root = this.paintGroup;
       this.node = this.root as DirectionNode;
+      this.needsPosition = false;
     }
 
     if (this.root?.needsCommit()) {
@@ -151,6 +163,21 @@ export default class BaseCommitLayoutData {
       this.needsPosition = Boolean(
         this.needsPosition || this.root?.getLayout().needsPosition()
       );
+
+      do {
+        if (!this.node) {
+          throw new Error("Node must not be undefined");
+        }
+        const layout = this.node.getLayout();
+        layout._absoluteDirty = true;
+        layout._hasGroupPos = false;
+        layout.commitGroupPos();
+        this.node = this.node.siblings().prev() as DirectionNode;
+      } while (this.node !== this.root);
+    }
+
+    if (this.painter().paint(this.paintGroup)) {
+      return true;
     }
 
     if (this.paintGroup === this.rootPaintGroup) {
@@ -193,20 +220,11 @@ export default class BaseCommitLayoutData {
       return true;
     }
 
-    const layout = this.paintGroup?.getLayout();
-    if (layout) {
-      ++layout._absoluteVersion;
-      layout._absoluteDirty = true;
-      layout.commitAbsolutePos();
-    }
-
-    if (this.painter().paint(this.paintGroup)) {
-      return true;
-    }
     this.paintGroup = this.paintGroup?.paintGroup().next() as DirectionNode;
     if (this.paintGroup === this.rootPaintGroup) {
       ++this.layoutPhase;
       this.needsPosition = false;
+      this.paintGroup = undefined;
       return false;
     }
 
@@ -215,7 +233,31 @@ export default class BaseCommitLayoutData {
     return true;
   }
 
-  _count: number;
+  protected commitLayoutPhaseThree(): boolean {
+    if (this.layoutPhase !== 3) {
+      return false;
+    }
+
+    if (!this.paintGroup) {
+      this.paintGroup = this.rootPaintGroup;
+    }
+
+    const layout = this.paintGroup?.getLayout();
+    if (layout) {
+      ++layout._absoluteVersion;
+      layout._absoluteDirty = true;
+      layout.commitAbsolutePos();
+    }
+
+    this.paintGroup = this.paintGroup?.paintGroup().next() as DirectionNode;
+    if (this.paintGroup === this.rootPaintGroup) {
+      ++this.layoutPhase;
+      this.needsPosition = false;
+      return false;
+    }
+
+    return true;
+  }
 
   /**
    * Traverse the graph depth-first, committing each node's layout in turn.
@@ -223,9 +265,10 @@ export default class BaseCommitLayoutData {
    * @return {Function} A function to resume layout where stopped, if applicable. Otherwise null
    */
   crank(): boolean {
-    if (this._count++ > 10000) {
-      throw new Error("Overflow");
-    }
-    return this.commitLayoutPhaseOne() || this.commitLayoutPhaseTwo();
+    return (
+      this.commitLayoutPhaseOne() ||
+      this.commitLayoutPhaseTwo() ||
+      this.commitLayoutPhaseThree()
+    );
   }
 }

@@ -38,7 +38,8 @@ SCRIPT_FILES = \
 	src/direction/turn.ts \
 	src/direction/utils.ts \
 	src/direction/index.ts \
-	test/test.ts
+	test/test.ts \
+	src/primes.ts
 
 EXTRA_SCRIPTS =
 

@@ -10,46 +10,26 @@ import paintNodeBounds from "./paintNodeBounds";
 import Axis from "./direction/Axis";
 import Size from "./size";
 import Camera from "parsegraph-camera";
-import { readStyle } from "./demoutils";
 import { BasicGLProvider } from "parsegraph-compileprogram";
-import { BlockType, WebGLBlockPainter } from "parsegraph-blockpainter";
+import { BlockType, CanvasBlockPainter, WebGLBlockPainter } from "parsegraph-blockpainter";
 import Color from "parsegraph-color";
-import buildGraph from "./demograph";
 import {
+  matrixIdentity3x3,
   matrixMultiply3x3,
   makeTranslation3x3,
   makeScale3x3,
 } from "parsegraph-matrix";
+import PrimesWidget from "./primes/PrimesWidget";
+
+const BORDER_THICKNESS = 1/2;
 
 const layoutPainter = {
   size: (node: DirectionNode, size: Size) => {
-    const style = readStyle(node.value());
-    size.setWidth(
-      style.minWidth + style.borderThickness * 2 + style.horizontalPadding * 2
-    );
-    size.setHeight(
-      style.minHeight + style.borderThickness * 2 + style.verticalPadding * 2
-    );
+    size.setWidth(10);
+    size.setHeight(10);
   },
-  getSeparation: (
-    node: DirectionNode,
-    axis: Axis,
-    dir: Direction,
-    preferVertical: boolean
-  ) => {
-    const style = readStyle(node.value());
-    switch (axis) {
-      case Axis.VERTICAL:
-        return style.verticalSeparation;
-      case Axis.HORIZONTAL:
-        return style.horizontalSeparation;
-      case Axis.Z:
-        if (preferVertical) {
-          return style.verticalPadding - style.borderThickness;
-        }
-        return style.horizontalPadding - style.borderThickness;
-    }
-    return 0;
+  getSeparation: () => {
+    return BORDER_THICKNESS/10;
   },
 };
 
@@ -58,13 +38,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const painters = new WeakMap<DirectionNode, WebGLBlockPainter>();
 
-  const graph = buildGraph();
-  const cld = new CommitLayoutData(graph, {
+  const widget = new PrimesWidget();
+  const cld = new CommitLayoutData(widget.node(), {
     ...layoutPainter,
     paint: (pg: DirectionNode): boolean => {
-      console.log("Painting", pg);
+      //console.log("Painting", pg);
       if (!painters.get(pg)) {
-        painters.set(pg, new WebGLBlockPainter(glProvider));
+        painters.set(pg, new WebGLBlockPainter(glProvider, BlockType.SIMPLE));
       }
 
       // Count the blocks for each node.
@@ -82,24 +62,28 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!painter) {
         throw new Error("Impossible");
       }
+      painter.clear();
       painter.initBuffer(numBlocks);
 
-      painter.setBackgroundColor(new Color(0.5, 0.5, 0.5));
-      painter.setBorderColor(new Color(1, 1, 1));
+      const grey = new Color(1, 1, 1);
+      const greyblue = new Color(0.8, 0.8, 1);
+      const white = new Color(.2, .2, .2);
 
       pg.forEachNode((n) => {
-        const style = readStyle((n as DirectionNode).value());
+        if (typeof (n as DirectionNode).value() !== "number") {
+          painter.setBackgroundColor(greyblue);
+          painter.setBorderColor(white);
+        } else {
+          painter.setBackgroundColor(grey);
+          painter.setBorderColor(white);
+        }
         paintNodeBounds(n as DirectionNode, (x, y, w, h) => {
-          painter.drawBlock(
-            x,
-            y,
-            w,
-            h,
-            style.borderRoundedness,
-            style.borderThickness
-          );
+          painter.drawBlock(x, y, w, h, 0, 0);
         });
-        paintNodeLines(n as DirectionNode, 4, (x, y, w, h) => {
+
+        painter.setBackgroundColor(grey);
+        painter.setBorderColor(white);
+        paintNodeLines(n as DirectionNode, BORDER_THICKNESS/2, (x, y, w, h) => {
           painter.drawBlock(x, y, w, h, 0, 0);
         });
       });
@@ -123,25 +107,56 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.style.width = "100%";
   canvas.style.height = "100%";
 
+  const overlay = document.createElement("canvas");
+  overlay.style.position = 'absolute';
+  overlay.style.pointerEvents = "none";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100%";
+  overlay.style.height = "100%";
+
   glProvider.container().style.width = "100%";
   glProvider.container().style.height = "100%";
 
   root.appendChild(glProvider.container());
+  root.appendChild(overlay);
 
   const cam = new Camera();
 
-  const count = 0;
-  while (cld.crank()) {
-    if (count > 1000) {
-      throw new Error("Commit layout is looping forever");
-    }
-  }
-
   const reticlePainter = new WebGLBlockPainter(glProvider, BlockType.SQUARE);
   let selectedNode: DirectionNode;
+  const needsRepaint = true;
 
   const loop = () => {
     cam.setSize(glProvider.width(), glProvider.height());
+    overlay.width = glProvider.width();
+    overlay.height = glProvider.height();
+    const ctx = overlay.getContext('2d');
+    if (!ctx) {
+      throw new Error("No 2d context");
+    }
+    ctx?.clearRect(0, 0, overlay.width, overlay.height);
+    ctx.textBaseline = "top";
+    ctx.fillStyle = "white";
+    ctx.font = "24px sans";
+
+    const count = 0;
+    const startTime = Date.now();
+    while (cld.crank()) {
+      if (Date.now() > startTime + (1000/60)) {
+        requestAnimationFrame(loop);
+        ctx.fillText("commit layout", 0, 0);
+        return;
+      }
+    }
+
+    if (origCld) {
+      const bx = origCld.getLayout().absoluteX();
+      const by = origCld.getLayout().absoluteY();
+      console.log("cam.adjustOrigin", bx, by);
+      cam.adjustOrigin(-bx, -by);
+      origCld = cld.startingNode();
+    }
 
     if (glProvider.canProject()) {
       const world = cam.project();
@@ -157,10 +172,11 @@ document.addEventListener("DOMContentLoaded", () => {
       gl.enable(gl.BLEND);
       gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
 
-      graph.forEachPaintGroup((pg) => {
+      let needsUpdate = false;
+      widget.node().forEachPaintGroup((pg) => {
         const painter = painters.get(pg as DirectionNode);
         if (!painter) {
-          console.log("No paint group for pg " + pg);
+          needsUpdate = true;
           return;
         }
 
@@ -183,24 +199,53 @@ document.addEventListener("DOMContentLoaded", () => {
         reticlePainter.setBorderColor(new Color(1, 1, 0, 1));
         reticlePainter.initBuffer(1);
         const layout = selectedNode.getLayout();
-        const style = readStyle(selectedNode.value());
         reticlePainter.drawBlock(
           layout.absoluteX(),
           layout.absoluteY(),
           layout.absoluteSize().width(),
           layout.absoluteSize().height(),
-          style.borderRoundedness,
-          style.borderThickness
+          2,
+          2
         );
         reticlePainter.render(world, 1.0);
+      }
+
+      console.log("drawing overlay");
+      const canvasBlockPainter = new CanvasBlockPainter(ctx);
+      canvasBlockPainter.initBuffer(1);
+      canvasBlockPainter.setBackgroundColor(new Color(1, 0, 0, 1))
+      canvasBlockPainter.setBorderColor(new Color(1, 1, 1, 1))
+      ctx.save();
+      const metrics = ctx.measureText("test");
+      const overlayHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
+      ctx.translate(overlay.width/2, overlay.height-overlayHeight);
+      canvasBlockPainter.drawBlock(0, 0, metrics.width, metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent, 0, 0)
+      canvasBlockPainter.render(matrixIdentity3x3())
+      ctx.fillStyle = "white";
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+      ctx.fillText("test", 0, 0)
+      ctx.restore();
+      
+      if (needsUpdate) {
+        requestAnimationFrame(loop);
+      } else if (isDown && widget.position < 1000) {
+        origCld = cld.startingNode();
+        widget.step();
+        cld.reset(widget.node());
+        requestAnimationFrame(loop);
       }
     } else {
       requestAnimationFrame(loop);
     }
+    ctx.fillText("painted", 0, 0);
   };
+
+  let origCld: DirectionNode;
 
   let isDown: Date | undefined;
   glProvider.container().addEventListener("mousedown", (e) => {
+    requestAnimationFrame(loop);
     isDown = new Date();
   });
 
@@ -212,9 +257,9 @@ document.addEventListener("DOMContentLoaded", () => {
       // Treat as click.
       console.log("click", e);
       const [x, y] = cam.transform(e.offsetX, e.offsetY);
-      const selected = graph.getLayout().nodeUnderCoords(x, y, 1.0);
+      const selected = widget.node().getLayout().nodeUnderCoords(x, y, 1.0);
       if (selected) {
-        alert(selected.state().id());
+        alert(selected.state().id() + " " + selected.state().value());
       }
     }
     isDown = undefined;
@@ -228,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     const [x, y] = cam.transform(e.offsetX, e.offsetY);
-    selectedNode = graph.getLayout().nodeUnderCoords(x, y, 1.0);
+    selectedNode = widget.node().getLayout().nodeUnderCoords(x, y, 1.0);
     if (selectedNode) {
       console.log(selectedNode);
     }

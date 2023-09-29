@@ -1471,6 +1471,7 @@ describe("Package", function () {
     commitLayout(root);
 
     root.forEachPaintGroup((pg) => {
+      console.log("ABS", pg.getLayout().needsAbsolutePos());
       assert(!pg.getLayout().needsAbsolutePos());
     });
     assert(!root.getLayout().needsAbsolutePos());
