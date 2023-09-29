@@ -59,9 +59,9 @@
     "test:cov": "yarn test --coverage --coverageDirectory=dist/coverage",
     "prettier": "prettier --write src test",
     "lint": "yarn prettier && npx eslint --fix 'src/**' 'test/**'",
-    "doc": "typedoc --tsconfig tsconfig.browser.json src/index.ts --out ./dist/docs",
-    "clean": "rm -rf dist dist-prod parsegraph-dev.tgz parsegraph.tgz",
-    "tar": "./tar-dev parsegraph",
-    "tar:prod": "./tar-prod parsegraph"
+    "doc": "typedoc --tsconfig config/tsconfig.browser.json src/index.ts --out ./dist/docs",
+    "clean": "./scripts/clean",
+    "tar": "./scripts/tar-dev parsegraph",
+    "tar:prod": "./scripts/tar-prod parsegraph"
   }
 }
