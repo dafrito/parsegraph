@@ -83,7 +83,7 @@ const buildExternals = ()=>{
   return rv;
 };
 
-const webpackConfig = (prod, isPeer)=>{
+const webpackConfig = (prod)=>{
   const rules = [
     {
       test: /\.(js|ts|tsx?)$/,
@@ -144,7 +144,7 @@ const webpackConfig = (prod, isPeer)=>{
     output: {
       path: relDir(prod ? "dist-prod" : "dist", "src"),
       globalObject: "this",
-      library: `parsegraph_${DIST_NAME}`,
+      library: 'parsegraph',
       libraryTarget: "umd",
     },
     module: {
@@ -154,8 +154,7 @@ const webpackConfig = (prod, isPeer)=>{
       extensions,
       modules: [relDir("src"), relDir("node_modules")]
     },
-    mode: prod ? "production" : "development",
-    devtool: isPeer ? "inline-source-map" : "source-map"
+    devtool: "source-map"
   };
 };
 

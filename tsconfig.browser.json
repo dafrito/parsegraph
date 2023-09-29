@@ -16,8 +16,6 @@
     "src"
   ],
   "exclude": [
-    "node_modules",
-    "demo",
-    "test"
+    "node_modules"
   ]
 }
