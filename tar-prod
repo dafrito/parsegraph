@@ -2,13 +2,12 @@
 
 BUILD=parsegraph
 
-EXTRA_FILES = \
-	LICENSE \
-	README.md \
-	package.json
+EXTRA_FILES="LICENSE README.md package.json"
 
-mkdir $BUILD
-cp -r -t $BUILD $EXTRA_FILES
-cp -r dist-prod/ $BUILD/dist
-tar cvzf $@ $BUILD/
-rm -rf $BUILD
+rm -rf ./$BUILD
+mkdir ./$BUILD
+cp -r $EXTRA_FILES ./$BUILD
+rm -rf ./$BUILD/dist/coverage
+cp -r dist-prod/ ./$BUILD/dist
+tar cvzf parsegraph.tgz ./$BUILD/
+rm -rf ./$BUILD
