@@ -1,1 +1,0 @@
-../node_modules/parsegraph-checkglerror/dist/src/index.js

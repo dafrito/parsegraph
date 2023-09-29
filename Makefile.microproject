@@ -22,14 +22,6 @@ CONFIG_FILES = \
 
 all: build lint test coverage doc
 
-show-runs:
-	xdg-open https://github.com/parsegraph/$(DIST_NAME)/actions
-.PHONY: show-runs
-
-show-npm:
-	xdg-open https://npmjs.com/parsegraph-$(DIST_NAME)
-.PHONY: show-npm
-
 build: $(DEST_LIB)
 .PHONY: build
 
@@ -37,24 +29,12 @@ autobuild:
 	npx webpack --watch --config webpack.config.js
 .PHONY: autobuild
 
-install-deps:
-	./install-deps.sh
-.PHONY: install-deps
-
 build-prod: $(PROD_LIB)
 .PHONY: build-prod
 
 demo:
 	SITE_PORT=$(DEMO_PORT) cd demo && yarn build && yarn start
 .PHONY: demo
-
-tmux:
-	tmuxify restart $(DEMO_PORT)
-.PHONY: tmux
-
-stop-tmux:
-	tmuxify stop
-.PHONY: stop-tmux
 
 RUN_TEST=npx jest --env=jsdom --no-cache
 
@@ -85,20 +65,6 @@ doc:
 	npx typedoc --tsconfig tsconfig.browser.json src/index.ts --out ./dist/docs
 .PHONY: doc
 
-DOCKER=docker
-
-build-container:
-	$(DOCKER) build . -t parsegraph-$(DIST_NAME)
-.PHONY: build-container
-
-run-container: build-container stop-container
-	$(DOCKER) run -e SITE_ROOT=$(DEMO_ROOT) -w /usr/src/ --name parsegraph-$(DIST_NAME) -it -p$(DEMO_PORT):3000 localhost/parsegraph-$(DIST_NAME):latest make demo
-.PHONY: run-container
-
-stop-container:
-	$(DOCKER) stop parsegraph-$(DIST_NAME); podman rm parsegraph-$(DIST_NAME); true
-.PHONY: stop-container
-
 tar: parsegraph-$(DIST_NAME)-dev.tgz
 .PHONY: tar
 
@@ -127,17 +93,7 @@ $(PROD_LIB): $(EXTRA_FILES) $(SCRIPT_FILES) $(EXTRA_SCRIPTS)
 BUILD=parsegraph-$(DIST_NAME)
 
 parsegraph-$(DIST_NAME)-dev.tgz: $(DEST_LIB)
-	mkdir $(BUILD)
-	cp -r -t $(BUILD) $(EXTRA_FILES) dist/
-	rm -rf $(BUILD)/dist/coverage
-	rm -rf $(BUILD)/dist/docs
-	sed -E -i 's/("version"\s*:\s*")([0-9.]+)("\s*,\s*)$$/\1\2-dev\3/g' $(BUILD)/package.json
-	tar cvzf $@ $(BUILD)/
-	rm -rf $(BUILD)
+  ./build-dev $BUILD $EXTRA_FILES
 
 parsegraph-$(DIST_NAME)-prod.tgz: $(PROD_LIB)
-	mkdir $(BUILD)
-	cp -r -t $(BUILD) $(EXTRA_FILES)
-	cp -r dist-prod/ $(BUILD)/dist
-	tar cvzf $@ $(BUILD)/
-	rm -rf $(BUILD)
+  ./build-prod $BUILD $EXTRA_FILES

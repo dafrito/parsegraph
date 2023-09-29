@@ -1,0 +1,13 @@
+#!/bin/sh
+
+BUILD=$1
+
+EXTRA_FILES=$*
+
+mkdir -p $(BUILD)
+cp -r -t $(BUILD) $(EXTRA_FILES) dist/
+rm -rf $(BUILD)/dist/coverage
+rm -rf $(BUILD)/dist/docs
+sed -E -i 's/("version"\s*:\s*")([0-9.]+)("\s*,\s*)$$/\1\2-dev\3/g' $(BUILD)/package.json
+tar cvzf $@ $(BUILD)/
+rm -rf $(BUILD)
