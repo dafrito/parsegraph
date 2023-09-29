@@ -62,6 +62,8 @@
     "doc": "typedoc --tsconfig config/tsconfig.browser.json src/index.ts --out ./dist/docs",
     "clean": "./scripts/clean",
     "tar": "./scripts/tar-dev parsegraph",
-    "tar:prod": "./scripts/tar-prod parsegraph"
+    "tar:prod": "./scripts/tar-prod parsegraph",
+    "publish": "./scripts/publish",
+    "publish:prod": "./scripts/publish-prod"
   }
 }
