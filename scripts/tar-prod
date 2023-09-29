@@ -7,7 +7,4 @@ EXTRA_FILES="LICENSE README.md package.json"
 rm -rf ./$BUILD
 mkdir ./$BUILD
 cp -r $EXTRA_FILES ./$BUILD
-rm -rf ./$BUILD/dist/coverage
-cp -r dist-prod/ ./$BUILD/dist
-tar cvzf parsegraph.tgz ./$BUILD/
-rm -rf ./$BUILD
+cp dist-prod ./$BUILD/dist

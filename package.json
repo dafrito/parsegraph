@@ -1,6 +1,6 @@
 {
   "name": "parsegraph",
-  "version": "2.0.7",
+  "version": "2.0.22",
   "description": "DirectionNode and CommitLayoutData",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -63,6 +63,7 @@
     "clean": "./scripts/clean",
     "tar": "./scripts/tar-dev parsegraph",
     "tar:prod": "./scripts/tar-prod parsegraph",
-    "publish:prod": "./scripts/publish-prod"
+    "deploy": "./scripts/deploy",
+    "deploy:prod": "./scripts/deploy-prod"
   }
 }
