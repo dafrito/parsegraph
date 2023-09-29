@@ -1,25 +1,19 @@
 {
-  "name": "parsegraph-layout",
-  "version": "1.16.3",
-  "description": "layout",
+  "name": "parsegraph",
+  "version": "2.0.0",
+  "description": "DirectionNode and CommitLayoutData",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/parsegraph/layout.git"
+    "url": "git+ssh://git@github.com/dafrito/parsegraph.git"
   },
-  "author": "Rainback, Inc.",
+  "author": "Aaron Faanes",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/parsegraph/layout/issues"
+    "url": "https://github.com/dafrito/parsegraph/issues"
   },
-  "homepage": "https://github.com/parsegraph/layout#readme",
-  "dependencies": {
-    "parsegraph-blockpainter": "^1.8.0",
-    "parsegraph-camera": "^1.4.24",
-    "parsegraph-checkglerror": "^1.5.8",
-    "parsegraph-timing": "^1.4.20"
-  },
+  "homepage": "https://github.com/dafrito/parsegraph#readme",
   "devDependencies": {
     "@babel/cli": "^7.20.7",
     "@babel/core": "^7.20.12",
@@ -43,7 +37,6 @@
     "jest-environment-jsdom": "^29.4.1",
     "jsdom": "^21.1.0",
     "jsdom-global": "^3.0.2",
-    "parsegraph-log": "^1.9.3",
     "prettier": "^2.8.3",
     "raw-loader": "^4.0.2",
     "source-map-loader": "^4.0.1",
@@ -54,8 +47,5 @@
     "typescript": "^4.9.5",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1"
-  },
-  "peerDependencies": {
-    "parsegraph-log": "^1.9.3"
   }
 }
