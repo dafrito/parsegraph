@@ -1,3 +1,6 @@
+# Build directory
+parsegraph/
+
 # Logs
 logs
 *.log

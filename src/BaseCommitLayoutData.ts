@@ -1,8 +1,6 @@
 import { Direction, DirectionNode, LayoutState } from "./direction";
 import createException, { BAD_LAYOUT_STATE } from "./Exception";
 import Size from "./size";
-import { elapsed } from "parsegraph-timing";
-import { log, logc, logEnterc, logLeave } from "./log";
 import LayoutPainter from "./LayoutPainter";
 
 export default class BaseCommitLayoutData {
@@ -47,7 +45,7 @@ export default class BaseCommitLayoutData {
   }
 
   startingNode(): DirectionNode {
-    return this.rootPaintGroup
+    return this.rootPaintGroup;
   }
 
   painter(): LayoutPainter {

@@ -1,18 +1,12 @@
 import createException, { BAD_NODE_DIRECTION, NODE_DIRTY } from "./Exception";
 
-import CommitLayoutData from "./CommitLayoutData";
-
 import Rect from "./rect";
 import Size from "./size";
 import Extent from "./extent";
 
-import { log, logc, logEnterc, logLeave } from "./log";
-
 import Direction, {
   DirectionNode,
-  Axis,
   reverseDirection,
-  isVerticalDirection,
 } from "./direction";
 
 import AutocommitBehavior, { getAutocommitBehavior } from "./autocommit";
@@ -67,18 +61,8 @@ export default class Layout {
 
   commitAbsolutePos(): void {
     if (!this.needsAbsolutePos()) {
-      logc(
-        "Layout",
-        "{0} does not need an absolute version update, so just return.",
-        this.owner().state().id()
-      );
       return;
     }
-    logEnterc(
-      "Layout",
-      "{0} needs an absolute version update",
-      this.owner().state().id()
-    );
     this._absoluteXPos = NaN;
     this._absoluteYPos = NaN;
     this._absoluteScale = NaN;
@@ -150,21 +134,12 @@ export default class Layout {
     this._absoluteYPos += node.y() * parentScale;
     this._absoluteScale = scale;
     this._absoluteDirty = false;
-    logc(
-      "Layout",
-      "{0} has absolute pos {1}, {2}. scale={3}",
-      this.owner().state().id(),
-      this._absoluteXPos,
-      this._absoluteYPos,
-      this._absoluteScale
-    );
     if (!this.owner().isRoot()) {
       this._absoluteVersion = this.owner()
         .parentNode()
         .findPaintGroup()
         .getLayout()._absoluteVersion;
     }
-    logLeave();
   }
 
   needsAbsolutePos(): boolean {
@@ -209,19 +184,8 @@ export default class Layout {
 
   commitGroupPos(): void {
     if (!this.needsPosition()) {
-      logc(
-        "Layout",
-        "{0} does not need a group position update.",
-        this.owner().state().id()
-      );
       return;
     }
-
-    logEnterc(
-      "Layout",
-      "{0} needs a group position update.",
-      this.owner().state().id()
-    );
 
     // Retrieve a stack of nodes to determine the group position.
     let node: DirectionNode = this.owner();
@@ -230,7 +194,6 @@ export default class Layout {
     let scale = 1.0;
     while (true) {
       if (node.isRoot() || node.localPaintGroup()) {
-        log(node.isRoot() ? "Node is root" : "Node is a paint group root");
         this._groupXPos = 0;
         this._groupYPos = 0;
         break;
@@ -243,12 +206,6 @@ export default class Layout {
         this._groupYPos = par._groupYPos;
         scale = par._groupScale * node.state().scale();
         parentScale = par._groupScale;
-        log(
-          "Using parent pos {0}, {1}. scale={2}",
-          this._groupXPos,
-          this._groupYPos,
-          scale
-        );
         break;
       }
 
@@ -274,20 +231,9 @@ export default class Layout {
       scale *= node.nodeAt(directionToChild).state().scale();
       node = node.nodeAt(directionToChild);
     }
-    logc(
-      "Scale assignments",
-      "Assigning scale for {0} to {1}",
-      this.owner().state().id(),
-      scale
-    );
     this._groupScale = scale;
 
     if (!this.owner().localPaintGroup()) {
-      log(
-        "Node is not a paint group root, so adding local x={0} and y={1}",
-        node.x() * parentScale,
-        node.y() * parentScale
-      );
       this._groupXPos += node.x() * parentScale;
       this._groupYPos += node.y() * parentScale;
     }
@@ -303,7 +249,6 @@ export default class Layout {
     }
 
     this._hasGroupPos = true;
-    logLeave();
   }
 
   groupX(): number {
@@ -345,8 +290,6 @@ export default class Layout {
 
     // The vertical extents have length in the vertical direction.
     outPos.setWidth(this.extentsAt(Direction.DOWNWARD).boundingValues()[0]);
-
-    // console.log("Extent Size = " + outPos.width() + " " + outPos.height());
 
     return outPos;
   }
@@ -417,34 +360,17 @@ export default class Layout {
     const ay = this.absoluteY();
     const aScale = this.absoluteScale();
     if (x < userScale * ax - (userScale * aScale * s.width()) / 2) {
-      logc(
-        "Hit tests",
-        "Given coords are outside this node's body. (Horizontal minimum exceeds X-coord)"
-      );
       return false;
     }
     if (x > userScale * ax + (userScale * aScale * s.width()) / 2) {
-      logc(
-        "Hit tests",
-        "Given coords are outside this node's body. (X-coord exceeds horizontal maximum)"
-      );
       return false;
     }
     if (y < userScale * ay - (userScale * aScale * s.height()) / 2) {
-      logc(
-        "Hit tests",
-        "Given coords are outside this node's body. (Vertical minimum exceeds Y-coord)"
-      );
       return false;
     }
     if (y > userScale * ay + (userScale * aScale * s.height()) / 2) {
-      logc(
-        "Hit tests",
-        "Given coords are outside this node's body. (Y-coord exceeds vertical maximum)"
-      );
       return false;
     }
-    logc("Hit tests", "Within body of node {0}", this.owner().state().id());
     return true;
   }
 
@@ -459,43 +385,23 @@ export default class Layout {
     const aScale = this.absoluteScale();
     extentSize = this.extentSize(extentSize);
 
-    // console.log("Checking node extent of size (" + extentSize[0] + ", " +
-    //   extentSize[1] + ") at absolute X, Y origin of " + ax + ", " + ay");
-    if (aScale != 1) {
-      // console.log("Node absolute scale is " + aScale);
-    }
-    if (userScale != 1) {
-      // console.log("User scale is " + userScale);
-    }
-    // console.log("Position to test is (" + x + ", " + y + ")");
-
-    // this.dump();
     const forwardMin =
       userScale * ax -
       userScale * aScale * this.extentOffsetAt(Direction.DOWNWARD);
     if (x < forwardMin) {
-      // console.log("Test X value of " + x +
-      //   " is behind horizontal node minimum of " + forwardMin + ".");
       return false;
     }
     const forwardMax =
       userScale * ax -
       userScale * aScale * this.extentOffsetAt(Direction.DOWNWARD) +
       userScale * aScale * extentSize.width();
-    // console.log("ForwardMax = " + forwardMax + " = ax=" +
-    //   this.absoluteX() + " - offset=" + this.extentOffsetAt(DOWNWARD) +
-    //   " + width=" + extentSize.width());
     if (x > forwardMax) {
-      // console.log("Test X value of " + x +
-      //   " is ahead of horizontal node maximum of " + forwardMax + ".");
       return false;
     }
     const vertMin =
       userScale * ay -
       userScale * aScale * this.extentOffsetAt(Direction.FORWARD);
     if (y < vertMin) {
-      // console.log("Test Y value of " + y +
-      //   " is above node vertical minimum of " + vertMin + ".");
       return false;
     }
     const vertMax =
@@ -503,16 +409,12 @@ export default class Layout {
       userScale * aScale * this.extentOffsetAt(Direction.FORWARD) +
       userScale * aScale * extentSize.height();
     if (y > vertMax) {
-      // console.log("Test Y value of " + y +
-      //   " is beneath node vertical maximum of " + vertMax + ".");
       return false;
     }
-    // console.log("Test value is in within node extent.");
     return true;
   }
 
   nodeUnderCoords(x: number, y: number, userScale?: number): DirectionNode {
-    // console.log("nodeUnderCoords: " + x + ", " + y)
     if (userScale === undefined) {
       userScale = 1;
     }
@@ -536,8 +438,6 @@ export default class Layout {
     const FORCE_SELECT_PRIOR: DirectionNode = null;
     while (candidates.length > 0) {
       const candidate = candidates[candidates.length - 1];
-      // console.log("Checking node " +
-      //   candidate._id + " = " + candidate.label());
 
       if (candidate === FORCE_SELECT_PRIOR) {
         candidates.pop();
@@ -545,7 +445,6 @@ export default class Layout {
       }
 
       if (candidate.getLayout().inNodeBody(x, y, userScale, extentSize)) {
-        // console.log("Click is in node body");
         if (candidate.hasNode(Direction.INWARD)) {
           if (
             candidate
@@ -553,17 +452,13 @@ export default class Layout {
               .getLayout()
               .inNodeExtents(x, y, userScale, extentSize)
           ) {
-            // console.log("Testing inward node");
             candidates.push(FORCE_SELECT_PRIOR);
             candidates.push(candidate.nodeAt(Direction.INWARD));
             continue;
-          } else {
-            // console.log("Click not in inward extents");
           }
         }
 
         // Found the node.
-        // console.log("Mouse under node " + candidate._id);
         return candidate;
       }
       // Not within this node, so remove it as a candidate.
@@ -572,10 +467,8 @@ export default class Layout {
       // Test if the click is within any child.
       if (!candidate.getLayout().inNodeExtents(x, y, userScale, extentSize)) {
         // Nope, so continue the search.
-        // console.log("Click is not in node extents.");
         continue;
       }
-      // console.log("Click is in node extent");
 
       // It is potentially within some child, so search the children.
       const layout = candidate.getLayout();
@@ -617,7 +510,6 @@ export default class Layout {
       }
     }
 
-    // console.log("Found nothing.");
     return null;
   }
 
@@ -642,20 +534,5 @@ export default class Layout {
     this.extentsAt(Direction.UPWARD).dump(
       "Upward extent (center at " + upwardOffset + ")"
     );
-
-    /*
-        let backwardValues:[number, number, number] =
-          this.extentsAt(Direction.BACKWARD).boundingValues();
-        let forwardValues:[number, number, number] =
-          this.extentsAt(Direction.FORWARD).boundingValues();
-        let downwardValues:[number, number, number] =
-          this.extentsAt(Direction.DOWNWARD).boundingValues();
-        let upwardValues:[number, number, number] =
-          this.extentsAt(Direction.UPWARD).boundingValues();
-        log("Backward values: " + backwardValues);
-        log("Forward values: " + forwardValues);
-        log("Upward values: " + upwardValues);
-        log("Downward values: " + downwardValues);
-        */
   }
 }

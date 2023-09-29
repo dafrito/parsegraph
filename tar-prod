@@ -7,8 +7,8 @@ EXTRA_FILES = \
 	README.md \
 	package.json
 
-mkdir $(BUILD)
-cp -r -t $(BUILD) $(EXTRA_FILES)
-cp -r dist-prod/ $(BUILD)/dist
-tar cvzf $@ $(BUILD)/
-rm -rf $(BUILD)
+mkdir $BUILD
+cp -r -t $BUILD $EXTRA_FILES
+cp -r dist-prod/ $BUILD/dist
+tar cvzf $@ $BUILD/
+rm -rf $BUILD

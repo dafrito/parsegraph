@@ -25,7 +25,6 @@ import createException, {
 import Size from "./size";
 import BaseCommitLayoutData from "./BaseCommitLayoutData";
 import LayoutPainter from "./LayoutPainter";
-import { log, logc, logEnterc, logLeave } from "./log";
 
 /**
  * The thickness (diameter) of the line.
@@ -102,12 +101,6 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
     let rv;
 
     const alignmentMode = node.nodeAlignmentMode(childDirection);
-    logEnterc(
-      "Alignment",
-      "Calculating alignment for node {0}. Alignment={1}",
-      node.state().id(),
-      alignmentMode
-    );
     switch (alignmentMode) {
       case Alignment.NULL:
         throw createException(BAD_NODE_ALIGNMENT);
@@ -146,7 +139,6 @@ export default class CommitLayoutData extends BaseCommitLayoutData {
         rv = -this.findConsecutiveLength(child, getPositiveDirection(axis));
         break;
     }
-    logLeave("Found unscaled alignment of {0}", rv);
     return rv * node.nodeAt(childDirection).state().scale();
   }
 

@@ -1,11 +1,10 @@
-import getTimeInMillis from "parsegraph-gettimeinmillis";
 import fuzzyEquals from "../fuzzyequals";
 import ExtentSeparator from "./ExtentSeparator";
 import ExtentCombiner from "./ExtentCombiner";
 
 const DEFAULT_EXTENT_BOUNDS = 1;
 const NUM_EXTENT_BOUND_COMPONENTS = 2;
-const SEPARATION_TIMEOUT_MS = 10000;
+const SEPARATION_TIMEOUT = 100000;
 
 export default class Extent {
   _offset: number;
@@ -520,9 +519,9 @@ export default class Extent {
     if (!allowAxisOverlap) {
       // Calculate the separation between the remaining bounds of given and
       // the separation boundary.
-      const startTime = getTimeInMillis();
+      let count = 0;
       while (!separator.givenAtEnd()) {
-        if (getTimeInMillis() - startTime > SEPARATION_TIMEOUT_MS) {
+        if (count++ > SEPARATION_TIMEOUT) {
           throw new Error("Extent separation timed out");
         }
 
