@@ -2,7 +2,7 @@ import Fit from "./Fit";
 
 let nodeCount: number = 0;
 
-interface StateNode {
+export interface StateNode {
   layoutChanged(): void;
 }
 

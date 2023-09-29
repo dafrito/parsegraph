@@ -1010,7 +1010,7 @@ describe("DirectionCaret", function () {
 
   it("double-nested array addition", function () {
     const car = makeCaret();
-    const root = car.root().setId("root");
+    car.root().setId("root");
     car.pull("f");
 
     car.spawn("u", "u");
@@ -1301,16 +1301,13 @@ describe("DirectionCaret", function () {
 function getLayoutNodes(node: DirectionNode) {
   const list = [];
   const orig = node;
-  const start = new Date();
 
   const MAX_SIBLINGS = 100000;
   let count = 0;
   do {
     node = node.siblings().next();
-    // console.log(node.id());
     for (let i = 0; i < list.length; ++i) {
       if (list[i] == node) {
-        console.log(list);
         throw new Error("Layout list has loop");
       }
     }

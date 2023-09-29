@@ -26,7 +26,6 @@ describe("DirectionNode", function () {
     const beforeBud = new DirectionNode().setId(`before-bud`);
     root.connectNode(Direction.INWARD, beforeBud);
 
-    let last = root;
     let next = root;
 
     const blocks = [];
@@ -36,7 +35,6 @@ describe("DirectionNode", function () {
       const afterBud = new DirectionNode().setId(`${i}-after-bud`);
       b.connectNode(Direction.FORWARD, afterBud);
       next.connectNode(Direction.FORWARD, b);
-      last = next;
       next = afterBud;
     }
 

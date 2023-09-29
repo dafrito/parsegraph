@@ -4,10 +4,7 @@ import Rect from "./rect";
 import Size from "./size";
 import Extent from "./extent";
 
-import Direction, {
-  DirectionNode,
-  reverseDirection,
-} from "./direction";
+import Direction, { DirectionNode, reverseDirection } from "./direction";
 
 import AutocommitBehavior, { getAutocommitBehavior } from "./autocommit";
 

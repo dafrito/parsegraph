@@ -7,7 +7,7 @@ import Direction, {
   DirectionCaret,
   DirectionNode,
 } from "../src/direction";
-import { checkExtentsEqual, Layout, CommitLayoutData } from "../src";
+import { checkExtentsEqual, CommitLayoutData } from "../src";
 import Extent from "../src/extent";
 import Size from "../src/size";
 
@@ -34,15 +34,12 @@ const expect = function (expected: any, actual: any) {
 export function getLayoutNodes(node: DirectionNode) {
   const list = [];
   const orig = node;
-  const start = new Date();
   const MAX_SIBLINGS = 100000;
   let count = 0;
   do {
     node = node._layoutNext;
-    // console.log(node._id);
     for (let i = 0; i < list.length; ++i) {
       if (list[i] == node) {
-        console.log(list);
         throw new Error("Layout list has loop");
       }
     }
@@ -150,7 +147,7 @@ const layoutPainter = {
     return 0;
   },
 
-  paint: (pg: DirectionNode): boolean => {
+  paint: (_: DirectionNode): boolean => {
     return false;
   },
 };
@@ -181,7 +178,6 @@ describe("Package", function () {
     const caret = makeCaret("b");
     commitLayout(caret.node());
 
-    const value = caret.node().value();
     const layout = caret.node().getLayout();
     const style = readStyle(BLOCK);
 
@@ -241,7 +237,6 @@ describe("Package", function () {
     caret.spawn(FORWARD, BUD);
     commitLayout(caret.node());
 
-    const value = caret.node().value();
     const layout = caret.node().getLayout();
     const style = readStyle(BLOCK);
 
@@ -351,7 +346,6 @@ describe("Package", function () {
     commitLayout(caret.node());
     caret.moveToRoot();
 
-    const value = caret.node().value();
     const layout = caret.node().getLayout();
 
     // Run the comparison tests.
@@ -404,7 +398,6 @@ describe("Package", function () {
     caret.moveToRoot();
     commitLayout(caret.node());
 
-    const value = caret.node().value();
     const layout = caret.node().getLayout();
 
     // Run the comparison tests.
@@ -1033,7 +1026,6 @@ describe("Package", function () {
 
     // Run comparison tests.
     const rootNode = caret.node();
-    const layout = caret.node().getLayout();
     const expectedSeparation =
       readStyle("b").minWidth / 2 +
       readStyle("b").horizontalPadding +
@@ -1170,7 +1162,6 @@ describe("Package", function () {
 
     // Run comparison tests.
     const rootNode = caret.node();
-    const layout = caret.node().getLayout();
     const downwardExtent = new Extent();
     downwardExtent.appendLS(
       SHRINK_SCALE *

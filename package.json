@@ -49,10 +49,10 @@
     "webpack-cli": "^5.0.1"
   },
   "scripts": {
-    "all": "yarn lint && yarn test:coverage && yarn build && yarn doc",
-    "build": "webpack --mode development --config webpack.config.js",
+    "all": "yarn lint && yarn test:cov && yarn build && yarn doc",
+    "build": "webpack --mode development --config config/webpack.config.js",
     "build:watch": "yarn build --watch",
-    "build:prod": "NODE_ENV=production webpack --mode production --config webpack.prod.js",
+    "build:prod": "NODE_ENV=production webpack --mode production --config config/webpack.prod.js",
     "build:prod:watch": "NODE_ENV=production yarn build:prod --watch",
     "test": "jest --env=jsdom --no-cache",
     "test:watch": "yarn test --watch",
