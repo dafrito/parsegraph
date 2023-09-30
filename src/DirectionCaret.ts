@@ -190,7 +190,7 @@ export class DirectionCaret<Value> {
     if (loadedNode == null) {
       throw createException(NO_NODE_FOUND);
     }
-    this._nodes[this._nodes.length - 1] = loadedNode;
+    this.setNode(loadedNode);
   }
 
   moveTo(id: string): void {
