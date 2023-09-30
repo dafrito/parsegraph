@@ -16,10 +16,14 @@ export const SHRINK_SCALE = 0.85;
 
 let nextID = 0;
 
+/**
+ * DirectionCaret lets you build graphs rapidly, without needing to manually
+ * instantiate one node.
+ */
 export class DirectionCaret<Value> {
-  _nodeRoot: DirectionNode<Value>;
-  _nodes: DirectionNode<Value>[];
-  _savedNodes: { [key: string]: DirectionNode<Value> } | undefined;
+  private _nodeRoot: DirectionNode<Value>;
+  private _nodes: DirectionNode<Value>[];
+  private _savedNodes: { [key: string]: DirectionNode<Value> } | undefined;
 
   constructor(given: any = null) {
     // A mapping of nodes to their saved names.
@@ -31,7 +35,7 @@ export class DirectionCaret<Value> {
     this._nodes = [this._nodeRoot];
   }
 
-  doSpawn(given?: any): DirectionNode<Value> {
+  protected doSpawn(given?: any): DirectionNode<Value> {
     if (given instanceof DirectionNode) {
       return given as DirectionNode<Value>;
     }
@@ -40,8 +44,8 @@ export class DirectionCaret<Value> {
     return rv;
   }
 
-  doReplace(node: DirectionNode<Value>, given?: any): void {
-    node.setValue(
+  protected doReplace(node: DirectionNode<Value>, given?: Value) {
+    return node.setValue(
       given instanceof DirectionNode
         ? (given as DirectionNode<Value>).value()
         : given
