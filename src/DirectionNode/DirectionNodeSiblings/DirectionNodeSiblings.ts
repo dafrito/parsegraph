@@ -140,7 +140,7 @@ export class DirectionNodeSiblings {
       const dirs = deeplyLinked.siblings().layoutOrder();
       for (let i = 0; i < dirs.length; ++i) {
         const dir = dirs[i];
-        const candidate = deeplyLinked.nodeAt(dir);
+        const candidate = deeplyLinked.hasNode(dir) ? deeplyLinked.nodeAt(dir) : undefined;
         if (
           candidate &&
           candidate != excludeThisNode &&

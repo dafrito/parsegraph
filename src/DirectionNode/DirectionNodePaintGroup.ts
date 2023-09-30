@@ -143,8 +143,6 @@ export default class DirectionNodePaintGroup {
   disconnect() {
     const paintGroupLast = this.node().getLastPaintGroup();
 
-    // console.log("Disconnecting paintgroups ", this.node().id(), "to", paintGroupLast.id(), "from layout");
-
     this.connect(
       this.node().paintGroup().prev(),
       paintGroupLast.paintGroup().next()

@@ -153,9 +153,9 @@ describe("DirectionNode", function () {
     caret.spawnMove(Direction.FORWARD);
     creased.uncrease();
 
-    expect(creased.localPaintGroup()).to.equal(null);
-    expect(creased.localPaintGroup()).to.equal(null);
-    expect(root.localPaintGroup()).to.not.equal(null);
+    expect(creased.localPaintGroup()).to.equal(undefined);
+    expect(creased.localPaintGroup()).to.equal(undefined);
+    expect(root.localPaintGroup()).to.not.equal(undefined);
     expect(root.localPaintGroup()?.next()).to.equal(root);
     expect(root.localPaintGroup()?.prev()).to.equal(root);
   });
@@ -166,15 +166,15 @@ describe("DirectionNode", function () {
     const root = caret.root();
     const child = caret.spawnMove(Direction.FORWARD);
     caret.spawnMove(Direction.FORWARD);
-    expect(child.localPaintGroup()).to.equal(null);
+    expect(child.localPaintGroup()).to.equal(undefined);
     expect(root.localPaintGroup()?.next()).to.not.equal(child);
     expect(root.localPaintGroup()?.next()).to.equal(root);
 
     child.disconnectNode();
-    expect(child.localPaintGroup()).to.not.equal(null);
+    expect(child.localPaintGroup()).to.not.equal(undefined);
     expect(child.localPaintGroup()).to.equal(child.paintGroup());
 
-    expect(root.localPaintGroup()).to.not.equal(null);
+    expect(root.localPaintGroup()).to.not.equal(undefined);
     expect(
       root.localPaintGroup()?.next(),
       "Root's paint group should not be child"
@@ -200,19 +200,19 @@ describe("DirectionCaret", function () {
       caret.has(Direction.UPWARD) ||
       caret.has(Direction.DOWNWARD)
     ) {
-      return "Graph roots must begin as leaves.";
+      throw new Error("Graph roots must begin as leaves.");
     }
 
     caret.spawn(Direction.FORWARD);
     if (!caret.has(Direction.FORWARD)) {
-      return "Graph must add nodes in the specified direction.";
+      throw new Error("Graph must add nodes in the specified direction.");
     }
     if (
       caret.has(Direction.DOWNWARD) ||
       caret.has(Direction.BACKWARD) ||
       caret.has(Direction.UPWARD)
     ) {
-      return "Graph must not add nodes in incorrect directions.";
+      throw new Error("Graph must not add nodes in incorrect directions.");
     }
 
     caret.erase(Direction.FORWARD);
@@ -222,7 +222,7 @@ describe("DirectionCaret", function () {
       caret.has(Direction.UPWARD) ||
       caret.has(Direction.DOWNWARD)
     ) {
-      return "Erase must remove the specified node.";
+      throw new Error("Erase must remove the specified node.");
     }
   });
 
@@ -365,7 +365,7 @@ describe("DirectionCaret", function () {
     //   namePreferredAxis(a._layoutPreference));
     const r = getLayoutNodes(root)[0];
     if (r !== c) {
-      throw new Error("Expected c, got " + r.id());
+      throw new Error("Expected c, got " + r.state().id());
     }
 
     root.disconnectNode(Direction.FORWARD);
@@ -377,7 +377,7 @@ describe("DirectionCaret", function () {
     }
   });
 
-  it("Node Morris world threading connected", function () {
+  it("Node Morris world threading connected", () => {
     const n = new DirectionNode();
     if (n.siblings().next() != n) {
       throw new Error("Previous sanity");
@@ -399,13 +399,13 @@ describe("DirectionCaret", function () {
       throw new Error("Next connected sanity");
     }
     if (b.siblings().prev() != n) {
-      return false;
+      throw new Error();
     }
     if (n.siblings().next() != b) {
-      return false;
+      throw new Error();
     }
     if (b.siblings().next() != n) {
-      return false;
+      throw new Error();
     }
   });
 
@@ -460,7 +460,7 @@ describe("DirectionCaret", function () {
   it(
     "Node Morris world threading connected with" +
       " multiple siblings and disconnected",
-    function () {
+    () => {
       const n = new DirectionNode();
       n.setId("n");
       const b = new DirectionNode();
@@ -469,10 +469,10 @@ describe("DirectionCaret", function () {
       const inner = b.connectNode(Direction.INWARD, new DirectionNode());
       inner.setId("inner");
       if (b.siblings().prev() != inner) {
-        return "B layoutBefore isn't inner";
+        throw new Error("B layoutBefore isn't inner");
       }
       if (inner.siblings().prev() != b) {
-        return "Inner layoutBefore isn't B";
+        throw new Error("Inner layoutBefore isn't B");
       }
 
       n.connectNode(Direction.FORWARD, b);
@@ -568,7 +568,7 @@ describe("DirectionCaret", function () {
     testLayoutNodes([c, b, n], "deeply conn 3");
     const d = b.connectNode(Direction.FORWARD, new DirectionNode());
     d.setId("d");
-    b.setLayoutPreference(PreferredAxis.VERTICAL);
+    b.siblings().setLayoutPreference(PreferredAxis.VERTICAL);
     testLayoutNodes([c, d, b, n], "deeply conn 4");
 
     if (n.siblings().next() !== c) {
@@ -1210,7 +1210,7 @@ describe("DirectionCaret", function () {
     const car = makeCaret();
     car.spawnMove("f", "b");
 
-    let n: DirectionNode;
+    let n: DirectionNode | undefined = undefined;
     for (let i = 0; i < 5; ++i) {
       const ccar = makeCaret();
       ccar.spawnMove("f", "b");
@@ -1225,7 +1225,7 @@ describe("DirectionCaret", function () {
         .paintGroup()
         .dump()
         .map((n) => n.id()),
-      [car.root().id(), n.id()]
+      [car.root().id(), n?.id()]
     );
   });
 
@@ -1305,13 +1305,13 @@ describe("DirectionCaret", function () {
 });
 
 function getLayoutNodes(node: DirectionNode) {
-  const list = [];
+  const list: DirectionNode[] = [];
   const orig = node;
 
   const MAX_SIBLINGS = 100000;
   let count = 0;
   do {
-    node = node.siblings().next();
+    node = node.siblings().next() as DirectionNode;
     for (let i = 0; i < list.length; ++i) {
       if (list[i] == node) {
         throw new Error("Layout list has loop");

@@ -19,6 +19,7 @@ import {
   NUM_DIRECTIONS,
   reverseDirection,
   forEachDirection,
+  nameDirection
 } from "../Direction";
 
 import { Layout } from "./Layout";
@@ -39,7 +40,6 @@ import { DirectionNodeState } from "./DirectionNodeState";
 import makeLimit from "./makeLimit";
 
 export class DirectionNode<Value = any> implements PaintGroupNode {
-  _layoutPreference: PreferredAxis;
   _layout?: Layout;
 
   _state: DirectionNodeState<Value, DirectionNode<Value>>;
@@ -66,7 +66,6 @@ export class DirectionNode<Value = any> implements PaintGroupNode {
   layoutChanged(): void {
     let node: DirectionNode = this;
     while (node !== null) {
-      // console.log("Node " + node + " has layout changed");
       const oldLayoutPhase = node.layout().phase();
 
       // Set the needs layout flag.
@@ -141,7 +140,7 @@ export class DirectionNode<Value = any> implements PaintGroupNode {
       this._parentNeighbor = null;
       return;
     }
-    if (parentDirection) {
+    if (parentDirection !== undefined) {
       this._parentNeighbor = fromNode.neighborAt(parentDirection);
     }
     if (!this._parentNeighbor) {
@@ -331,23 +330,12 @@ export class DirectionNode<Value = any> implements PaintGroupNode {
           break;
         }
         if (node.paintGroupRoot()) {
-          /* console.log(
-            "Setting " +
-              this.id() +
-              " paint group to " +
-              node.currentPaintGroup().id()
-          );*/
           this.setPaintGroupRoot(node.paintGroupRoot());
           return this.paintGroupRoot();
         }
         node = node.parentNode();
       }
       this.setPaintGroupRoot(node);
-    } else {
-      // console.log("Returning cached paint group " +
-      //   this.currentPaintGroup().id() +
-      //   " for node " +
-      //   this.id());
     }
     return this.paintGroupRoot();
   }
@@ -403,11 +391,7 @@ export class DirectionNode<Value = any> implements PaintGroupNode {
       return false;
     }
 
-    // console.log("node path", nodePath.map(n=>n.id()));
-    // console.log("other path", otherPath.map(n=>n.id()));
-    // console.log("numCommon", numCommon);
     const lastCommonParent = nodePath[numCommon];
-    // console.log("last common parent", lastCommonParent?.id());
     if (lastCommonParent === this) {
       return true;
     }
@@ -424,8 +408,6 @@ export class DirectionNode<Value = any> implements PaintGroupNode {
     };
     const nodePaintIndex = findPaintIndex(nodePath);
     const otherPaintIndex = findPaintIndex(otherPath);
-
-    // console.log("Node index: ", nodePaintIndex, "Other index:", otherPaintIndex);
 
     return nodePaintIndex < otherPaintIndex;
   }
@@ -457,12 +439,10 @@ export class DirectionNode<Value = any> implements PaintGroupNode {
     }
 
     if (numCommon === 0) {
-      // console.log("Nothing in common");
       return Infinity;
     }
 
     const rv = nodePath.length - numCommon + (otherPath.length - numCommon);
-    // console.log("Distance from ", this.id(), "to", other.id(), ":", rv);
     return rv;
   }
 
@@ -477,19 +457,14 @@ export class DirectionNode<Value = any> implements PaintGroupNode {
 
     const closestPaintGroupIndex = paintGroupDistances.reduce(
       (lowestDistanceIndex, candDistance, index) => {
-        // const node = paintGroupCandidates[index];
-        // console.log("Testing", node.id());
         if (lowestDistanceIndex === -1) {
-          // console.log(node.id(), "is first");
           return index;
         }
 
         if (candDistance <= paintGroupDistances[lowestDistanceIndex]) {
-          // console.log(node.id(), "is closer or equidistant");
           return index;
         }
 
-        // console.log(node.id(), "is not closer than ", paintGroupCandidates[lowestDistanceIndex].id());
         return lowestDistanceIndex;
       },
       -1
@@ -504,8 +479,6 @@ export class DirectionNode<Value = any> implements PaintGroupNode {
     if (!this.localPaintGroup()) {
       return this.paintGroup().node().findPaintGroupInsert(inserted);
     }
-    // console.log("Finding insert point for ", inserted.id());
-    // console.log("Found last paint group of", paintGroupFirst.id(), ": ", paintGroupLast.id());
 
     // Gather possible insertion points; exclude this node.
     const paintGroupCandidates: PaintGroupNode[] = [];
@@ -524,12 +497,9 @@ export class DirectionNode<Value = any> implements PaintGroupNode {
     );
 
     if (closestPaintGroup.comesBefore(inserted)) {
-      // console.log("closest pg ", closestPaintGroup.id(), "comes before ", inserted.id(), "so insert at end");
       const endOfPaintGroup = closestPaintGroup.getLastPaintGroup();
-      // console.log("end of pg", endOfPaintGroup.id());
       return [endOfPaintGroup, endOfPaintGroup.paintGroup().next()];
     }
-    // console.log("closest pg ", closestPaintGroup.id(), "comes after ", inserted.id());
     return [closestPaintGroup.paintGroup().prev(), closestPaintGroup];
   }
 
@@ -543,12 +513,10 @@ that is still a descendent of this node.
     let candidate: PaintGroupNode = this.localPaintGroup()
       ? this.paintGroup().next()
       : this;
-    // console.log("getLastPaintGroup starting with", candidate.id(), "prev", candidate.paintGroup().prev().id());
     const lim = makeLimit();
     while (candidate !== this) {
       if (!candidate.hasAncestor(this)) {
         const rv = candidate.paintGroup().prev();
-        // console.log(candidate.id(), "is not ancestor of", this.id(), "so returning", rv.id());
         return rv;
       }
       candidate = candidate.paintGroup().next();
@@ -605,9 +573,6 @@ that is still a descendent of this node.
     inDirection: Direction,
     node: DirectionNode<T>
   ): DirectionNode<T> {
-    // console.log("Connecting " + node + " to " + this + " in the " +
-    //   nameDirection(inDirection) + " direction.");
-
     // Ensure the node can be connected in the given direction.
     if (inDirection == Direction.OUTWARD) {
       throw createException(NO_OUTWARD_CONNECT);
@@ -639,7 +604,6 @@ that is still a descendent of this node.
 
     if (node.paintGroup().explicit()) {
       const pg = this.findPaintGroup();
-      // console.log("Connecting local paint group ", node.id(), "to", pg.id());
       pg.paintGroup().append(node);
     } else {
       this.siblings().insertIntoLayout(inDirection);
@@ -678,7 +642,7 @@ that is still a descendent of this node.
   }
 
   disconnectNode(inDirection?: Direction): DirectionNode | undefined {
-    if (arguments.length === 0 || !inDirection) {
+    if (arguments.length === 0 || inDirection === undefined) {
       if (this.isRoot()) {
         return this;
       }
@@ -697,13 +661,11 @@ that is still a descendent of this node.
       );
     }
     // Disconnect the node.
-    // console.log("Disconnecting ", disconnected.id(), " from ", this.id());
     const neighbor = this.neighborAt(inDirection);
     const disconnected = neighbor.node as this;
 
     const clearExplicit = !disconnected.localPaintGroup();
     if (!disconnected.localPaintGroup()) {
-      // console.log("Creasing for disconnect");
       disconnected.crease();
     }
     neighbor.node = undefined;
@@ -718,18 +680,18 @@ that is still a descendent of this node.
       disconnected.siblings().getLayoutPreference() === PreferredAxis.PARENT
     ) {
       if (Axis.VERTICAL === getDirectionAxis(inDirection)) {
-        disconnected._layoutPreference = PreferredAxis.VERTICAL;
+        disconnected.siblings()._layoutPreference = PreferredAxis.VERTICAL;
       } else {
-        disconnected._layoutPreference = PreferredAxis.HORIZONTAL;
+        disconnected.siblings()._layoutPreference = PreferredAxis.HORIZONTAL;
       }
     } else if (
       disconnected.siblings().getLayoutPreference() ===
       PreferredAxis.PERPENDICULAR
     ) {
       if (Axis.VERTICAL === getDirectionAxis(inDirection)) {
-        disconnected._layoutPreference = PreferredAxis.HORIZONTAL;
+        disconnected.siblings()._layoutPreference = PreferredAxis.HORIZONTAL;
       } else {
-        disconnected._layoutPreference = PreferredAxis.VERTICAL;
+        disconnected.siblings()._layoutPreference = PreferredAxis.VERTICAL;
       }
     }
     this.layoutChanged();
@@ -811,7 +773,6 @@ that is still a descendent of this node.
     }
     this.ensureNeighbor(inDirection as Direction).alignmentMode =
       newAlignmentMode;
-    // console.log(nameNodeAlignment(newAlignmentMode));
     this.layoutChanged();
   }
 

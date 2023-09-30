@@ -76,7 +76,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
       scale *= node.nodeAt(inDirection).state().scale();
       let thisNode: DirectionNode = node.nodeAt(inDirection);
       let nextNode: DirectionNode = thisNode.nodeAt(inDirection);
-      while (nextNode !== null) {
+      while (nextNode) {
         total += thisNode.separationAt(inDirection) * scale;
         scale *= thisNode.nodeAt(inDirection).state().scale();
 
@@ -252,7 +252,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
 
     if (
       node.state().nodeFit() === Fit.NAIVE &&
-      (node.isRoot() || node.x() !== null)
+      (node.isRoot() || !isNaN(node.x()))
     ) {
       node.layout().setPhase(LayoutPhase.COMMITTED);
       return false;
