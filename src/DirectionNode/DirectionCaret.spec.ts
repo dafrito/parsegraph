@@ -8,4 +8,11 @@ describe("Caret", function () {
     car.spawnMove("f", "b");
     assert.equal("b", car.node().value());
   });
+
+  it("moveToParent", () => {
+    const car = new DirectionCaret("root");
+    car.spawnMove("f", "b");
+    car.moveToParent();
+    assert.equal(car.value(), "root");
+  });
 });
