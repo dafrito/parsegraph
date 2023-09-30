@@ -353,9 +353,8 @@ export class DirectionCaret<Value> {
   }
 
   at(inDirection: Direction | string): DirectionNode<Value> {
-    inDirection = readDirection(inDirection);
-    if (this.node().hasNode(inDirection)) {
-      return this.node().nodeAt(inDirection);
+    if (this.node().hasNode(readDirection(inDirection))) {
+      return this.node().nodeAt(readDirection(inDirection));
     }
     throw new Error("No node at direction");
   }
