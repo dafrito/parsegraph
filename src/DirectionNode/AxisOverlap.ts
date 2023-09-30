@@ -8,6 +8,12 @@ export enum AxisOverlap {
 }
 export default AxisOverlap;
 
+/**
+ * Returns a string representing the given AxisOverlap.
+ *
+ * @param given the AxisOverlap to name
+ * @returns a string representing the given AxisOverlap
+ */
 export function nameAxisOverlap(given: AxisOverlap): string {
   switch (given) {
     case AxisOverlap.NULL:
