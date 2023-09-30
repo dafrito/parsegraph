@@ -220,8 +220,7 @@ export class DirectionCaret<Value> {
   }
 
   pull(given: Direction | string): void {
-    given = readDirection(given);
-    this.node().siblings().pull(given);
+    this.node().siblings().pull(readDirection(given));
   }
 
   /*
@@ -235,10 +234,7 @@ export class DirectionCaret<Value> {
     inDirection: Direction | string,
     newAlignmentMode: Alignment | string
   ): void {
-    inDirection = readDirection(inDirection);
-    newAlignmentMode = readAlignment(newAlignmentMode);
-
-    this.node().setNodeAlignmentMode(inDirection, newAlignmentMode);
+    this.node().setNodeAlignmentMode(readDirection(inDirection), readAlignment(newAlignmentMode));
     if (newAlignmentMode != Alignment.NONE) {
       this.node().state().setNodeFit(Fit.EXACT);
     }
