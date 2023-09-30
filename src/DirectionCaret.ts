@@ -194,7 +194,11 @@ export class DirectionCaret<Value> {
   }
 
   moveToRoot(): void {
-    this._nodes[this._nodes.length - 1] = this._nodeRoot;
+    this.setNode(this._nodeRoot);
+  }
+
+  protected setNode(node: DirectionNode): void {
+    this._nodes[this._nodes.length - 1] = node;
   }
 
   moveToParent(): void {
