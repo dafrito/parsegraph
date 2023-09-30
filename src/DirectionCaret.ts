@@ -17,15 +17,22 @@ export const SHRINK_SCALE = 0.85;
 let nextID = 0;
 
 /**
- * DirectionCaret lets you build graphs rapidly, without needing to manually
- * instantiate one node.
+ * A builder of {@link DirectionNode} graphs.
+ *
+ * <ul>
+ * <li>connect/disconnect</li>
+ * <li>spawn/erase</li>
+ * <li>move, moveToParent, moveToRoot</li>
+ * <li>save/restore</li>
+ * <li>push/pop</li>
+ * </ul>
  */
 export class DirectionCaret<Value> {
   private _nodeRoot: DirectionNode<Value>;
   private _nodes: DirectionNode<Value>[];
   private _savedNodes: { [key: string]: DirectionNode<Value> } | undefined;
 
-  constructor(given: any = null) {
+  constructor(given?: Value | DirectionNode<Value>) {
     // A mapping of nodes to their saved names.
     this._savedNodes = undefined;
 
@@ -35,7 +42,7 @@ export class DirectionCaret<Value> {
     this._nodes = [this._nodeRoot];
   }
 
-  protected doSpawn(given?: any): DirectionNode<Value> {
+  protected doSpawn(given?: Value | DirectionNode<Value>): DirectionNode<Value> {
     if (given instanceof DirectionNode) {
       return given as DirectionNode<Value>;
     }
@@ -44,8 +51,8 @@ export class DirectionCaret<Value> {
     return rv;
   }
 
-  protected doReplace(node: DirectionNode<Value>, given?: Value) {
-    return node.setValue(
+  protected doReplace(node: DirectionNode<Value>, given?: Value): void {
+    node.setValue(
       given instanceof DirectionNode
         ? (given as DirectionNode<Value>).value()
         : given
@@ -64,18 +71,14 @@ export class DirectionCaret<Value> {
   }
 
   has(inDirection: Direction | string): boolean {
-    inDirection = readDirection(inDirection);
-    return this.node().hasNode(inDirection);
+    return this.node().neighbors().hasNode(readDirection(inDirection));
   }
 
   connect(
     inDirection: Direction | string,
     node: DirectionNode<Value>
   ): DirectionNode<Value> {
-    // Interpret the given direction for ease-of-use.
-    inDirection = readDirection(inDirection);
-
-    this.node().connectNode(inDirection, node);
+    this.node().connectNode(readDirection(inDirection), node);
 
     return node;
   }
@@ -97,11 +100,10 @@ export class DirectionCaret<Value> {
   ): DirectionNode<Value> | undefined {
     if (inDirection) {
       // Interpret the given direction for ease-of-use.
-      inDirection = readDirection(inDirection);
-      return this.node().disconnectNode(inDirection);
+      return this.node().disconnectNode(readDirection(inDirection));
     }
 
-    if (this.node().isRoot()) {
+    if (this.node().neighbors().isRoot()) {
       return this.node();
     }
 
@@ -113,7 +115,7 @@ export class DirectionCaret<Value> {
   crease(inDirection?: Direction | string): void {
     let node: DirectionNode<Value> = this.node();
     if (inDirection) {
-      node = this.node().nodeAt(readDirection(inDirection));
+      node = this.node().neighbors().nodeAt(readDirection(inDirection));
     }
 
     // Create a new paint group for the connection.
@@ -123,7 +125,7 @@ export class DirectionCaret<Value> {
   uncrease(inDirection?: Direction | string) {
     let node: DirectionNode<Value> = this.node();
     if (inDirection) {
-      node = this.node().nodeAt(readDirection(inDirection));
+      node = this.node().neighbors().nodeAt(readDirection(inDirection));
     }
 
     // Remove the paint group.
@@ -133,7 +135,7 @@ export class DirectionCaret<Value> {
   isCreased(inDirection?: Direction | string): boolean {
     let node: DirectionNode<Value> = this.node();
     if (inDirection) {
-      node = this.node().nodeAt(readDirection(inDirection));
+      node = this.node().neighbors().nodeAt(readDirection(inDirection));
     }
 
     return !!node.localPaintGroup();
@@ -144,23 +146,34 @@ export class DirectionCaret<Value> {
   }
 
   erase(inDirection: Direction | string): void {
-    inDirection = readDirection(inDirection);
-    this.node().eraseNode(inDirection);
+    this.node().eraseNode(readDirection(inDirection));
   }
 
   move(toDirection: Direction | string): void {
-    toDirection = readDirection(toDirection);
-    const dest: DirectionNode<Value> = this.node().nodeAt(toDirection);
+    const dest: DirectionNode<Value> = this.node().neighbors().nodeAt(readDirection(toDirection));
     if (!dest) {
       throw createException(NO_NODE_FOUND);
     }
-    this._nodes[this._nodes.length - 1] = dest;
+    this.setNode(dest);
   }
 
+  /**
+   * Saves the current node in the caret's stack of DirectionNodes.
+   *
+   * @see {@link pop} to return to this node.
+   */
   push(): void {
     this._nodes.push(this.node());
   }
 
+  /**
+   * Saves the current node in the caret's map of DirectionNodes using the given key.
+   *
+   * @param {string | undefined } id - the key for the current node. If undefined, a new key will be created.
+   * @return {string} the key used to save the current node
+   *
+   * @see {@link restore}
+   */
   save(id?: string): string {
     if (id === undefined) {
       id = ++nextID + "";
@@ -182,6 +195,13 @@ export class DirectionCaret<Value> {
     delete this._savedNodes[id];
   }
 
+  /**
+   * Moves the caret to the saved node named by the given id.
+   *
+   * @param { string } id - the name of the saved node.
+   *
+   * @see {@link save}
+   */
   restore(id: string): void {
     if (!this._savedNodes) {
       throw createException(NO_NODE_FOUND);
@@ -193,10 +213,18 @@ export class DirectionCaret<Value> {
     this.setNode(loadedNode);
   }
 
+  /**
+   * Alias for {@link restore}.
+   *
+   * @param {string} id - the name of the saved node to which to move the caret.
+   */
   moveTo(id: string): void {
     this.restore(id);
   }
 
+  /**
+   * Returns to this caret's original node.
+   */
   moveToRoot(): void {
     this.setNode(this._nodeRoot);
   }
@@ -206,12 +234,18 @@ export class DirectionCaret<Value> {
   }
 
   moveToParent(): void {
-    if (this.node().isRoot()) {
-      throw new Error("cannot move to parent of root");
+    if (this.node().neighbors().isRoot()) {
+      throw new Error("cannot move to parent of root (node is " + this.node().id() + ")");
     }
     this.setNode(this.node().parentNode());
   }
 
+  /**
+   * Moves the caret to the most recently pushed node and removes it
+   * from the caret's stack.
+   *
+   * @see {@link push}
+   */
   pop(): void {
     if (this._nodes.length <= 1) {
       throw createException(NO_NODE_FOUND);
@@ -219,6 +253,13 @@ export class DirectionCaret<Value> {
     this._nodes.pop();
   }
 
+  /**
+   * Sets the current node's {@link PreferredAxis} to the given direction.
+   *
+   * @param {Direction | string} given - the direction of the neighbor to pull closer to this node
+   *
+   * @see {@link readDirection}
+   */
   pull(given: Direction | string): void {
     this.node().siblings().pull(readDirection(given));
   }
@@ -234,7 +275,10 @@ export class DirectionCaret<Value> {
     inDirection: Direction | string,
     newAlignmentMode: Alignment | string
   ): void {
-    this.node().setNodeAlignmentMode(readDirection(inDirection), readAlignment(newAlignmentMode));
+    this.node().setNodeAlignmentMode(
+      readDirection(inDirection),
+      readAlignment(newAlignmentMode)
+    );
     if (newAlignmentMode != Alignment.NONE) {
       this.node().state().setNodeFit(Fit.EXACT);
     }
@@ -261,7 +305,7 @@ export class DirectionCaret<Value> {
   shrink(inDirection?: Direction | string): void {
     let node = this.node();
     if (inDirection) {
-      node = node.nodeAt(readDirection(inDirection));
+      node = node.neighbors().nodeAt(readDirection(inDirection));
     }
     if (node) {
       node.state().setScale(SHRINK_SCALE);
@@ -271,7 +315,7 @@ export class DirectionCaret<Value> {
   grow(inDirection?: Direction | string): void {
     let node = this.node();
     if (inDirection) {
-      node = node.nodeAt(readDirection(inDirection));
+      node = node.neighbors().nodeAt(readDirection(inDirection));
     }
     if (node) {
       node.state().setScale(1.0);
@@ -281,7 +325,7 @@ export class DirectionCaret<Value> {
   fitExact(inDirection?: Direction | string): void {
     let node = this.node();
     if (inDirection) {
-      node = node.nodeAt(readDirection(inDirection));
+      node = node.neighbors().nodeAt(readDirection(inDirection));
     }
     node.state().setNodeFit(Fit.EXACT);
   }
@@ -289,7 +333,7 @@ export class DirectionCaret<Value> {
   fitLoose(inDirection?: Direction | string): void {
     let node = this.node();
     if (inDirection) {
-      node = node.nodeAt(readDirection(inDirection));
+      node = node.neighbors().nodeAt(readDirection(inDirection));
     }
     node.state().setNodeFit(Fit.LOOSE);
   }
@@ -297,7 +341,7 @@ export class DirectionCaret<Value> {
   fitNaive(inDirection?: Direction | string): void {
     let node = this.node();
     if (inDirection) {
-      node = node.nodeAt(readDirection(inDirection));
+      node = node.neighbors().nodeAt(readDirection(inDirection));
     }
     node.state().setNodeFit(Fit.NAIVE);
   }
@@ -313,19 +357,16 @@ export class DirectionCaret<Value> {
     newType?: any,
     newAlignmentMode?: Alignment | string
   ): DirectionNode<Value> {
-    // Interpret the given direction and type for ease-of-use.
-    inDirection = readDirection(inDirection);
-
     // Spawn a node in the given direction.
     const created = this.doSpawn(newType);
-    this.node().connectNode(inDirection, created);
+    this.node().connectNode(readDirection(inDirection), created);
     created.siblings().setLayoutPreference(PreferredAxis.PERPENDICULAR);
     created.state().setNodeFit(this.node().state().nodeFit());
 
     // Use the given alignment mode.
     if (newAlignmentMode !== undefined) {
       newAlignmentMode = readAlignment(newAlignmentMode);
-      this.align(inDirection, newAlignmentMode);
+      this.align(readDirection(inDirection), newAlignmentMode);
       if (newAlignmentMode !== Alignment.NONE) {
         this.node().state().setNodeFit(Fit.EXACT);
       }
@@ -334,8 +375,16 @@ export class DirectionCaret<Value> {
     return created;
   }
 
-  replace(value?: Value) {
-    return this.doReplace(this.node(), value);
+  /**
+   * Replaces the current node's value with the given value.
+   *
+   * @param { Value | undefined } value - the new value. If undefined, then the value is removed.
+   * @return { Value | undefined } the original value.
+   */
+  replace(value?: Value): Value | undefined {
+    const oldVal = this.value();
+    this.doReplace(this.node(), value);
+    return oldVal;
   }
 
   value() {
@@ -353,8 +402,8 @@ export class DirectionCaret<Value> {
   }
 
   at(inDirection: Direction | string): DirectionNode<Value> {
-    if (this.node().hasNode(readDirection(inDirection))) {
-      return this.node().nodeAt(readDirection(inDirection));
+    if (this.node().neighbors().hasNode(readDirection(inDirection))) {
+      return this.node().neighbors().nodeAt(readDirection(inDirection));
     }
     throw new Error("No node at direction");
   }

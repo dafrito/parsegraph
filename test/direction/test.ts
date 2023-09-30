@@ -23,13 +23,13 @@ describe("DirectionNode", function () {
   it("works", () => {
     const node = new DirectionNode();
     expect(node).to.be.instanceof(DirectionNode);
-    assert(node.isRoot());
+    assert(node.neighbors().isRoot());
   });
 
   it("can be made directly", () => {
     const node = new DirectionNode();
     expect(node).to.be.instanceof(DirectionNode);
-    assert(node.isRoot());
+    assert(node.neighbors().isRoot());
   });
 
   it("can have its value set", () => {
@@ -226,7 +226,7 @@ describe("DirectionCaret", function () {
     const caret = makeCaret();
     caret.spawn(Direction.DOWNWARD);
     caret.move("d");
-    if (caret.node().nodeAt(Direction.UPWARD) === null) {
+    if (caret.node().neighbors().nodeAt(Direction.UPWARD) === null) {
       throw new Error("nodeAt must return parent if possible");
     }
     caret.move("u");
@@ -289,7 +289,7 @@ describe("DirectionCaret", function () {
     let n = caret.node();
     while (n) {
       n.crease();
-      n = n.nodeAt(Direction.DOWNWARD);
+      n = n.neighbors().nodeAt(Direction.DOWNWARD);
     }
     second.uncrease();
     caret.moveToRoot();
@@ -691,7 +691,7 @@ describe("DirectionCaret", function () {
     car.spawnMove("f", "b");
     const newNode = makeCaret().node();
     originalRoot.connectNode(Direction.FORWARD, newNode);
-    if (originalRoot.nodeAt(Direction.FORWARD) !== newNode) {
+    if (originalRoot.neighbors().nodeAt(Direction.FORWARD) !== newNode) {
       throw new Error("Unexpected node");
     }
   });
@@ -702,7 +702,7 @@ describe("DirectionCaret", function () {
     car.spawnMove("i", "b");
     const newNode = makeCaret().node();
     originalRoot.connectNode(Direction.INWARD, newNode);
-    if (originalRoot.nodeAt(Direction.INWARD) !== newNode) {
+    if (originalRoot.neighbors().nodeAt(Direction.INWARD) !== newNode) {
       throw new Error("Unexpected node");
     }
   });
@@ -749,7 +749,7 @@ describe("DirectionCaret", function () {
     car.spawnMove("i", "b");
     const newNode = makeCaret().spawnMove("i", "b");
     originalRoot.connectNode(Direction.INWARD, newNode);
-    if (originalRoot.nodeAt(Direction.INWARD) !== newNode) {
+    if (originalRoot.neighbors().nodeAt(Direction.INWARD) !== newNode) {
       throw new Error("Unexpected node");
     }
   });
@@ -764,7 +764,7 @@ describe("DirectionCaret", function () {
     const newNode = makeCaret().spawnMove("i", "b");
     newNode.crease();
     originalRoot.connectNode(Direction.INWARD, newNode);
-    if (originalRoot.nodeAt(Direction.INWARD) !== newNode) {
+    if (originalRoot.neighbors().nodeAt(Direction.INWARD) !== newNode) {
       throw new Error("Unexpected node");
     }
     pgs = originalRoot.paintGroup().dump();
@@ -821,8 +821,8 @@ describe("DirectionCaret", function () {
     const newNode = makeCaret().spawnMove("i", "b");
     newNode.setId("newNode");
     newNode.crease();
-    newNode.root().setId("newNode-root");
-    midRoot.connectNode(Direction.INWARD, newNode.root());
+    newNode.neighbors().root().setId("newNode-root");
+    midRoot.connectNode(Direction.INWARD, newNode.neighbors().root());
     pgs = originalRoot.paintGroup().dump();
     assert.deepEqual(
       pgs.map((n) => n.id()),
@@ -842,9 +842,9 @@ describe("DirectionCaret", function () {
       const newNode = makeCaret().spawnMove("i", "b");
       newNode.setId("newNode-" + i);
       newNode.crease();
-      newNode.root().setId("newNode-root-" + i);
+      newNode.neighbors().root().setId("newNode-root-" + i);
       expected.push(newNode.id());
-      car.connect("f", newNode.root());
+      car.connect("f", newNode.neighbors().root());
     }
     const pgs = originalRoot.paintGroup().dump();
     assert.deepEqual(
@@ -927,7 +927,7 @@ describe("DirectionCaret", function () {
       [containerBlock, containerBlock],
       containerBlock.findPaintGroupInsert(icar.node())
     );
-    assert.deepEqual(icar.node().root().id(), containerBlock.id());
+    assert.deepEqual(icar.node().neighbors().root().id(), containerBlock.id());
 
     // connect containerBlock to objectNode
     // connect objectNode to containerBlock

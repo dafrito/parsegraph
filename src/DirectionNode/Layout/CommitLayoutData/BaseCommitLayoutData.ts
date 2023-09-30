@@ -37,7 +37,7 @@ export class BaseCommitLayoutData {
   }
 
   reset(node: DirectionNode): void {
-    this.rootPaintGroup = node.root();
+    this.rootPaintGroup = node.neighbors().root();
     this.layoutPhase = 1;
     this.needsPosition = false;
     this.root = undefined;

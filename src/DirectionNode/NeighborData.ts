@@ -1,12 +1,12 @@
-import { Direction } from "../Direction";
+import { Direction, reverseDirection } from "../Direction";
 
 import Alignment from "./Alignment";
 import AxisOverlap from "./AxisOverlap";
 
 export class NeighborData<T> {
-  owner: T;
-  direction: Direction;
-  node: T | undefined;
+  private _node: T;
+  private _direction: Direction;
+  private _neighbor: T | undefined;
   alignmentMode: Alignment;
   allowAxisOverlap: AxisOverlap;
   alignmentOffset: number;
@@ -15,10 +15,10 @@ export class NeighborData<T> {
   xPos: number;
   yPos: number;
 
-  constructor(owner: T, dir: Direction) {
-    this.owner = owner;
-    this.direction = dir;
-    this.node = undefined;
+  constructor(node: T, dir: Direction) {
+    this._node = node;
+    this._direction = dir;
+    this._neighbor = undefined;
     this.alignmentMode = Alignment.NULL;
     this.alignmentOffset = 0;
     this.allowAxisOverlap = AxisOverlap.DEFAULT;
@@ -28,15 +28,27 @@ export class NeighborData<T> {
     this.yPos = NaN;
   }
 
-  setNode(node: T) {
-    this.node = node;
+  direction(): Direction {
+    return this._direction;
   }
 
-  getNode(): T | undefined {
-    return this.node;
+  reverseDirection(): Direction {
+    return reverseDirection(this._direction);
   }
 
-  getOwner(): T {
-    return this.owner;
+  meet(newNeighbor: T) {
+    this._neighbor = newNeighbor;
+  }
+
+  leave() {
+    this._neighbor = undefined;
+  }
+
+  neighbor(): T | undefined {
+    return this._neighbor;
+  }
+
+  node(): T {
+    return this._node;
   }
 }

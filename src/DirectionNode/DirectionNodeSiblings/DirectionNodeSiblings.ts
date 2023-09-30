@@ -3,45 +3,59 @@ import {
   isVerticalDirection,
   getDirectionAxis,
   Axis,
-  HORIZONTAL_ORDER,
-  VERTICAL_ORDER,
 } from "../../Direction";
 import { PreferredAxis } from "./PreferredAxis";
 import createException, {
   NODE_IS_ROOT,
   BAD_LAYOUT_PREFERENCE,
 } from "../../Exception";
+import { NeighborNode } from "../Neighbors";
+import { StateNode } from "../..";
 
-export interface SiblingNode {
-  id(): string | number | undefined;
-  siblings(): DirectionNodeSiblings;
-  forEachNode(cb: (n: SiblingNode) => void): void;
-  nodeAt(inDirection: Direction): SiblingNode;
-  parentNode(): SiblingNode;
-  parentDirection(): Direction;
-  findPaintGroup(): SiblingNode;
+export interface SiblingNode<T extends SiblingNode<T>> extends NeighborNode<T>, StateNode {
+  siblings(): DirectionNodeSiblings<T>;
   localPaintGroup(): any;
-  paintGroup(): any;
-  hasNode(inDirection: Direction): boolean;
-  setPaintGroupRoot(n: SiblingNode): void;
-  hasAncestor(n: SiblingNode): boolean;
-  isRoot(): boolean;
-  layoutChanged(): void;
 }
 
 const MAX_SIBLINGS = 100000;
 
-export class DirectionNodeSiblings {
-  _prev: SiblingNode;
-  _next: SiblingNode;
-  _node: SiblingNode;
+const HORIZONTAL_ORDER: Direction[] = [
+  Direction.INWARD,
+  Direction.BACKWARD,
+  Direction.FORWARD,
+  Direction.DOWNWARD,
+  Direction.UPWARD,
+  Direction.OUTWARD,
+];
+
+const VERTICAL_ORDER: Direction[] = [
+  Direction.INWARD,
+  Direction.DOWNWARD,
+  Direction.UPWARD,
+  Direction.BACKWARD,
+  Direction.FORWARD,
+  Direction.OUTWARD,
+];
+
+export class DirectionNodeSiblings<T extends SiblingNode<T>> {
+  _prev: T;
+  _next: T;
+  _node: T;
   _layoutPreference: PreferredAxis;
 
-  constructor(node: SiblingNode) {
+  constructor(node: T) {
     this._node = node;
     this._prev = this._node;
     this._next = this._node;
     this._layoutPreference = PreferredAxis.HORIZONTAL;
+  }
+
+  forEachNode(func: (node: T) => void): void {
+    let node: T = this.node();
+    do {
+      func(node);
+      node = node.siblings().prev();
+    } while (node !== this.node());
   }
 
   node() {
@@ -59,14 +73,14 @@ export class DirectionNodeSiblings {
   }
 
   removeFromLayout(inDirection: Direction): void {
-    const disconnected: SiblingNode = this.node().nodeAt(inDirection);
+    const disconnected: T = this.node().neighbors().nodeAt(inDirection);
     if (!disconnected) {
       return;
     }
-    const layoutBefore: SiblingNode = this.node()
+    const layoutBefore: T = this.node()
       .siblings()
       .earlier(inDirection);
-    const earliestDisc: SiblingNode = disconnected
+    const earliestDisc: T = disconnected
       .siblings()
       .head(disconnected);
 
@@ -83,26 +97,26 @@ export class DirectionNodeSiblings {
     disconnected.siblings().verify();
   }
 
-  private connect(a: SiblingNode, b: SiblingNode): void {
+  private connect(a: T, b: T): void {
     // console.log("connecting " +  a.id() + " to " + b.id());
     a.siblings()._next = b;
     b.siblings()._prev = a;
   }
 
   insertIntoLayout(inDirection: Direction): void {
-    const node: SiblingNode = this.node().nodeAt(inDirection);
+    const node: T = this.node().neighbors().nodeAt(inDirection);
     if (!node) {
       return;
     }
 
-    const nodeHead: SiblingNode = node.siblings().head();
+    const nodeHead: T = node.siblings().head();
 
-    const layoutAfter: SiblingNode = this.node().siblings().later(inDirection);
-    const layoutBefore: SiblingNode = this.node()
+    const layoutAfter: T = this.node().siblings().later(inDirection);
+    const layoutBefore: T = this.node()
       .siblings()
       .earlier(inDirection);
 
-    const nodeTail: SiblingNode = node;
+    const nodeTail: T = node;
     // console.log(this + ".connectNode(" + nameDirection(inDirection) +
     //   ", " + node + ") layoutBefore=" +
     //   layoutBefore + " layoutAfter=" +
@@ -124,29 +138,29 @@ export class DirectionNodeSiblings {
     this.verify();
   }
 
-  next(): SiblingNode {
+  next(): T {
     return this._next;
   }
 
-  prev(): SiblingNode {
+  prev(): T {
     return this._prev;
   }
 
-  head(excludeThisNode?: SiblingNode): SiblingNode {
-    let deeplyLinked: SiblingNode = this.node();
+  head(excludeThisNode?: T): T {
+    let deeplyLinked: T = this.node();
     let foundOne;
     while (true) {
       foundOne = false;
       const dirs = deeplyLinked.siblings().layoutOrder();
       for (let i = 0; i < dirs.length; ++i) {
         const dir = dirs[i];
-        const candidate = deeplyLinked.hasNode(dir)
-          ? deeplyLinked.nodeAt(dir)
+        const candidate = deeplyLinked.neighbors().hasNode(dir)
+          ? deeplyLinked.neighbors().nodeAt(dir)
           : undefined;
         if (
           candidate &&
           candidate != excludeThisNode &&
-          deeplyLinked.parentDirection() !== dir &&
+          deeplyLinked.neighbors().parent()?.reverseDirection() !== dir &&
           !candidate.localPaintGroup()
         ) {
           deeplyLinked = candidate;
@@ -161,7 +175,7 @@ export class DirectionNodeSiblings {
     return deeplyLinked;
   }
 
-  earlier(inDirection: Direction): SiblingNode {
+  earlier(inDirection: Direction): T {
     let layoutBefore;
     const dirs = this.node().siblings().layoutOrder();
     let pastDir = false;
@@ -174,11 +188,11 @@ export class DirectionNodeSiblings {
       if (!pastDir) {
         continue;
       }
-      if (dir === this.node().parentDirection()) {
+      if (dir === this.node().neighbors().parent()?.reverseDirection()) {
         continue;
       }
-      if (this.node().hasNode(dir)) {
-        const candidate = this.node().nodeAt(dir);
+      if (this.node().neighbors().hasNode(dir)) {
+        const candidate = this.node().neighbors().nodeAt(dir);
         if (candidate && !candidate.localPaintGroup()) {
           layoutBefore = candidate;
           break;
@@ -188,7 +202,7 @@ export class DirectionNodeSiblings {
     return layoutBefore;
   }
 
-  later(inDirection: Direction): SiblingNode {
+  later(inDirection: Direction): T {
     let layoutAfter;
     const dirs = this.node().siblings().layoutOrder();
     let pastDir = false;
@@ -202,11 +216,11 @@ export class DirectionNodeSiblings {
       if (!pastDir) {
         continue;
       }
-      if (dir === this.node().parentDirection()) {
+      if (dir === this.node().neighbors().parent()?.reverseDirection()) {
         continue;
       }
-      if (this.node().hasNode(dir)) {
-        const candidate = this.node().nodeAt(dir);
+      if (this.node().neighbors().hasNode(dir)) {
+        const candidate = this.node().neighbors().nodeAt(dir);
         if (candidate && !candidate.localPaintGroup()) {
           layoutAfter = candidate;
           break;
@@ -217,23 +231,23 @@ export class DirectionNodeSiblings {
   }
 
   horzToVert() {
-    const parentDir = this.node().parentDirection();
+    const parentDir = this.node().neighbors().parent()?.reverseDirection();
     const b =
       parentDir === Direction.BACKWARD
         ? null
-        : this.node().nodeAt(Direction.BACKWARD);
+        : this.node().neighbors().nodeAt(Direction.BACKWARD);
     const f =
       parentDir === Direction.FORWARD
         ? null
-        : this.node().nodeAt(Direction.FORWARD);
+        : this.node().neighbors().nodeAt(Direction.FORWARD);
     const u =
       parentDir === Direction.UPWARD
         ? null
-        : this.node().nodeAt(Direction.UPWARD);
+        : this.node().neighbors().nodeAt(Direction.UPWARD);
     const d =
       parentDir === Direction.DOWNWARD
         ? null
-        : this.node().nodeAt(Direction.DOWNWARD);
+        : this.node().neighbors().nodeAt(Direction.DOWNWARD);
     let firstHorz = b || f;
     if (firstHorz) {
       firstHorz = firstHorz.siblings().head();
@@ -267,23 +281,23 @@ export class DirectionNodeSiblings {
   }
 
   vertToHorz() {
-    const parentDir = this.node().parentDirection();
+    const parentDir = this.node().neighbors().parent()?.reverseDirection();
     const b =
       parentDir === Direction.BACKWARD
         ? null
-        : this.node().nodeAt(Direction.BACKWARD);
+        : this.node().neighbors().nodeAt(Direction.BACKWARD);
     const f =
       parentDir === Direction.FORWARD
         ? null
-        : this.node().nodeAt(Direction.FORWARD);
+        : this.node().neighbors().nodeAt(Direction.FORWARD);
     const u =
       parentDir === Direction.UPWARD
         ? null
-        : this.node().nodeAt(Direction.UPWARD);
+        : this.node().neighbors().nodeAt(Direction.UPWARD);
     const d =
       parentDir === Direction.DOWNWARD
         ? null
-        : this.node().nodeAt(Direction.DOWNWARD);
+        : this.node().neighbors().nodeAt(Direction.DOWNWARD);
 
     let firstHorz = b || f;
     if (firstHorz) {
@@ -320,9 +334,9 @@ export class DirectionNodeSiblings {
     this.verify();
   }
 
-  dump(): SiblingNode[] {
-    const nodes: SiblingNode[] = [];
-    let node: SiblingNode = this.node();
+  dump(): T[] {
+    const nodes: T[] = [];
+    let node: T = this.node();
     do {
       node = node.siblings().next();
       nodes.push(node);
@@ -331,7 +345,7 @@ export class DirectionNodeSiblings {
   }
 
   protected sanitizeLayoutPreference(given: PreferredAxis): PreferredAxis {
-    const paxis = getDirectionAxis(this.node().parentDirection());
+    const paxis = getDirectionAxis(this.node().neighbors().parent()?.direction());
     if (given === PreferredAxis.VERTICAL) {
       given =
         paxis === Axis.VERTICAL
@@ -352,7 +366,7 @@ export class DirectionNodeSiblings {
 
   canonicalLayoutPreference(): PreferredAxis {
     // Root nodes do not have a canonical layout preference.
-    if (this.node().isRoot()) {
+    if (this.node().neighbors().isRoot()) {
       throw createException(NODE_IS_ROOT);
     }
 
@@ -362,7 +376,7 @@ export class DirectionNodeSiblings {
     switch (this.getLayoutPreference()) {
       case PreferredAxis.HORIZONTAL: {
         if (
-          getDirectionAxis(this.node().parentDirection()) === Axis.HORIZONTAL
+          getDirectionAxis(this.node().neighbors().parent()?.direction()) === Axis.HORIZONTAL
         ) {
           canonicalPref = PreferredAxis.PARENT;
         } else {
@@ -371,7 +385,7 @@ export class DirectionNodeSiblings {
         break;
       }
       case PreferredAxis.VERTICAL: {
-        if (getDirectionAxis(this.node().parentDirection()) === Axis.VERTICAL) {
+        if (getDirectionAxis(this.node().neighbors().parent()?.direction()) === Axis.VERTICAL) {
           canonicalPref = PreferredAxis.PARENT;
         } else {
           canonicalPref = PreferredAxis.PERPENDICULAR;
@@ -389,7 +403,7 @@ export class DirectionNodeSiblings {
   }
 
   setLayoutPreference(given: PreferredAxis): void {
-    if (this.node().isRoot()) {
+    if (this.node().neighbors().isRoot()) {
       if (
         given !== PreferredAxis.VERTICAL &&
         given !== PreferredAxis.HORIZONTAL
@@ -419,7 +433,7 @@ export class DirectionNodeSiblings {
       return;
     }
 
-    const paxis = getDirectionAxis(this.node().parentDirection());
+    const paxis = getDirectionAxis(this.node().neighbors().parent()?.direction());
     if (curCanon === PreferredAxis.PARENT) {
       if (paxis === Axis.HORIZONTAL) {
         this.horzToVert();
@@ -439,8 +453,8 @@ export class DirectionNodeSiblings {
 
   pull(given: Direction): void {
     if (
-      this.node().isRoot() ||
-      this.node().parentDirection() === Direction.OUTWARD
+      this.node().neighbors().isRoot() ||
+      this.node().neighbors().parent()?.reverseDirection() === Direction.OUTWARD
     ) {
       if (isVerticalDirection(given)) {
         this.setLayoutPreference(PreferredAxis.VERTICAL);
@@ -451,7 +465,7 @@ export class DirectionNodeSiblings {
     }
     if (
       getDirectionAxis(given) ===
-      getDirectionAxis(this.node().parentDirection())
+      getDirectionAxis(this.node().neighbors().parent()?.direction())
     ) {
       // console.log(namePreferredAxis(PreferredAxis.PARENT));
       this.setLayoutPreference(PreferredAxis.PARENT);
@@ -462,7 +476,7 @@ export class DirectionNodeSiblings {
   }
 
   layoutOrder(): Direction[] {
-    if (this.node().isRoot()) {
+    if (this.node().neighbors().isRoot()) {
       if (
         this.getLayoutPreference() === PreferredAxis.HORIZONTAL ||
         this.getLayoutPreference() === PreferredAxis.PERPENDICULAR
@@ -473,7 +487,7 @@ export class DirectionNodeSiblings {
     }
     if (this.canonicalLayoutPreference() === PreferredAxis.PERPENDICULAR) {
       // console.log("PREFER PERP");
-      if (getDirectionAxis(this.node().parentDirection()) === Axis.HORIZONTAL) {
+      if (getDirectionAxis(this.node().neighbors().parent()?.direction()) === Axis.HORIZONTAL) {
         return VERTICAL_ORDER;
       }
       return HORIZONTAL_ORDER;
@@ -481,7 +495,7 @@ export class DirectionNodeSiblings {
     // console.log("PREFER PARALLEL TO PARENT: " +
     //   namePreferredAxis(this.getLayoutPreference()));
     // Parallel preference.
-    if (getDirectionAxis(this.node().parentDirection()) === Axis.HORIZONTAL) {
+    if (getDirectionAxis(this.node().neighbors().parent()?.direction()) === Axis.HORIZONTAL) {
       return HORIZONTAL_ORDER;
     }
     return VERTICAL_ORDER;

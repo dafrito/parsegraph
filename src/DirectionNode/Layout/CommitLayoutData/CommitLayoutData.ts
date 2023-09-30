@@ -39,12 +39,23 @@ import { LayoutPainter } from "./LayoutPainter";
  */
 export const LINE_THICKNESS = 12;
 
+/**
+ * Computes the {@link Layout} for {@link DirectionNode} graphs.
+ * 
+ * @see {@link LayoutPainter}
+ */
 export class CommitLayoutData extends BaseCommitLayoutData {
   lineBounds: Size;
   bv: [number, number, number];
   firstSize: Size;
   secondSize: Size;
 
+  /**
+   * Creates a new run of the layout algorithm.
+   * 
+   * @param {DirectionNode} node - the root node
+   * @param {LayoutPainter} painter - the painter used for sizing and painting information.
+   */
   constructor(node: DirectionNode, painter: LayoutPainter) {
     super(node, painter);
     this.lineBounds = new Size();
@@ -70,18 +81,18 @@ export class CommitLayoutData extends BaseCommitLayoutData {
     let scale: number = 1.0;
 
     // Iterate in the given direction.
-    if (node.hasNode(inDirection)) {
+    if (node.neighbors().hasNode(inDirection)) {
       total += node.separationAt(inDirection);
 
-      scale *= node.nodeAt(inDirection).state().scale();
-      let thisNode: DirectionNode = node.nodeAt(inDirection);
-      let nextNode: DirectionNode = thisNode.nodeAt(inDirection);
+      scale *= node.neighbors().nodeAt(inDirection).state().scale();
+      let thisNode: DirectionNode = node.neighbors().nodeAt(inDirection);
+      let nextNode: DirectionNode = thisNode.neighbors().nodeAt(inDirection);
       while (nextNode) {
         total += thisNode.separationAt(inDirection) * scale;
-        scale *= thisNode.nodeAt(inDirection).state().scale();
+        scale *= thisNode.neighbors().nodeAt(inDirection).state().scale();
 
         thisNode = nextNode;
-        nextNode = nextNode.nodeAt(inDirection);
+        nextNode = nextNode.neighbors().nodeAt(inDirection);
       }
     }
 
@@ -103,7 +114,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
    */
   private getAlignment(node: DirectionNode, childDirection: Direction): number {
     // Calculate the alignment adjustment for both nodes.
-    const child = node.nodeAt(childDirection);
+    const child = node.neighbors().nodeAt(childDirection);
     const axis = getPerpendicularAxis(getDirectionAxis(childDirection));
 
     let rv;
@@ -147,7 +158,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
         rv = -this.findConsecutiveLength(child, getPositiveDirection(axis));
         break;
     }
-    return rv * node.nodeAt(childDirection).state().scale();
+    return rv * node.neighbors().nodeAt(childDirection).state().scale();
   }
 
   /**
@@ -179,7 +190,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
     if (!isCardinalDirection(childDirection)) {
       throw createException(BAD_NODE_DIRECTION);
     }
-    const child: DirectionNode = node.nodeAt(childDirection);
+    const child: DirectionNode = node.neighbors().nodeAt(childDirection);
     const reversedDirection: Direction = reverseDirection(childDirection);
 
     // Save alignment parameters.
@@ -202,11 +213,11 @@ export class CommitLayoutData extends BaseCommitLayoutData {
         .extentsAt(reversedDirection)
         .sizeAt(
           child.layout().extentOffsetAt(reversedDirection) -
-            alignment / node.nodeAt(childDirection).state().scale()
+            alignment / node.neighbors().nodeAt(childDirection).state().scale()
         );
     }
     const lineLength =
-      separation - node.nodeAt(childDirection).state().scale() * extentSize;
+      separation - node.neighbors().nodeAt(childDirection).state().scale() * extentSize;
     node.neighborAt(childDirection).lineLength = lineLength;
     // console.log(
     //   "Line length: " + lineLength + ",
@@ -252,13 +263,13 @@ export class CommitLayoutData extends BaseCommitLayoutData {
 
     if (
       node.state().nodeFit() === Fit.NAIVE &&
-      (node.isRoot() || !isNaN(node.x()))
+      (node.neighbors().isRoot() || !isNaN(node.x()))
     ) {
       node.layout().setPhase(LayoutPhase.COMMITTED);
       return false;
     }
 
-    if (node.isRootlike()) {
+    if (node.neighbors().isRootlike()) {
       if (this.commitRootlikeLayout(node)) {
         node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
         return true;
@@ -294,7 +305,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
 
       // Check for nodes perpendicular to parent's direction
       const hasFirstAxisNodes: [Direction, Direction] =
-        node.hasNodes(firstAxis);
+        node.neighbors().hasNodes(firstAxis);
       const oppositeFromParent: Direction = reverseDirection(
         node.parentDirection()
       );
@@ -305,7 +316,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
       }
 
       // Layout this node's second-axis child, if that child exists.
-      if (node.hasNode(oppositeFromParent)) {
+      if (node.neighbors().hasNode(oppositeFromParent)) {
         // Layout the second-axis child.
         if (this.layoutSingle(node, oppositeFromParent, true)) {
           return true;
@@ -318,11 +329,11 @@ export class CommitLayoutData extends BaseCommitLayoutData {
       );
 
       // Check for nodes perpendicular to parent's direction
-      const perpendicularNodes: [Direction, Direction] = node.hasNodes(
+      const perpendicularNodes: [Direction, Direction] = node.neighbors().hasNodes(
         getPerpendicularAxis(node.parentDirection())
       );
 
-      if (node.hasNode(oppositeFromParent)) {
+      if (node.neighbors().hasNode(oppositeFromParent)) {
         // Layout the second-axis child.
         if (
           this.layoutSingle(
@@ -362,7 +373,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
           node,
           Direction.BACKWARD,
           Direction.FORWARD,
-          !node.hasNode(Direction.UPWARD) && !node.hasNode(Direction.DOWNWARD)
+          !node.neighbors().hasNode(Direction.UPWARD) && !node.neighbors().hasNode(Direction.DOWNWARD)
         )
       ) {
         return true;
@@ -380,7 +391,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
           node,
           Direction.UPWARD,
           Direction.DOWNWARD,
-          !node.hasNode(Direction.BACKWARD) && !node.hasNode(Direction.FORWARD)
+          !node.neighbors().hasNode(Direction.BACKWARD) && !node.neighbors().hasNode(Direction.FORWARD)
         )
       ) {
         return true;
@@ -397,10 +408,10 @@ export class CommitLayoutData extends BaseCommitLayoutData {
   }
 
   private commitInwardLayout(node: DirectionNode): boolean {
-    if (!node.hasNode(Direction.INWARD)) {
+    if (!node.neighbors().hasNode(Direction.INWARD)) {
       return false;
     }
-    const nestedNode: DirectionNode = node.nodeAt(Direction.INWARD);
+    const nestedNode: DirectionNode = node.neighbors().nodeAt(Direction.INWARD);
     if (nestedNode.layout().phase() !== LayoutPhase.COMMITTED) {
       node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
       return true;
@@ -454,11 +465,11 @@ export class CommitLayoutData extends BaseCommitLayoutData {
                 sizeAdjustment + ")"
             );*/
     // Calculate the new offset to this node's center.
-    const child = node.nodeAt(childDirection);
+    const child = node.neighbors().nodeAt(childDirection);
     const lengthOffset =
       node.layout().extentOffsetAt(direction) +
       lengthAdjustment -
-      node.nodeAt(childDirection).state().scale() *
+      node.neighbors().nodeAt(childDirection).state().scale() *
         child.layout().extentOffsetAt(direction);
 
     // Combine the two extents in the given direction.
@@ -469,9 +480,9 @@ export class CommitLayoutData extends BaseCommitLayoutData {
             console.log("ExtentOffset : " +
               node.neighborAt(direction).extentOffset);
             console.log("Scaled child ExtentOffset : " +
-            (node.nodeAt(childDirection).state().scale() * child.extentOffsetAt(direction))); */
+            (node.neighbors().nodeAt(childDirection).state().scale() * child.extentOffsetAt(direction))); */
     const e: Extent = node.layout().extentsAt(direction);
-    const scale: number = node.nodeAt(childDirection).state().scale();
+    const scale: number = node.neighbors().nodeAt(childDirection).state().scale();
     if (node.state().nodeFit() == Fit.LOOSE) {
       e.combineExtentAndSimplify(
         child.layout().extentsAt(direction),
@@ -681,7 +692,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
     direction: Direction,
     allowAxisOverlap: boolean
   ): boolean {
-    if (!node.hasNode(direction)) {
+    if (!node.neighbors().hasNode(direction)) {
       return false;
     }
 
@@ -703,7 +714,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
     const alignment: number = this.getAlignment(node, direction);
     // console.log("Calculated alignment of " + alignment + ".");
 
-    const child: DirectionNode = node.nodeAt(direction);
+    const child: DirectionNode = node.neighbors().nodeAt(direction);
     const reversed: Direction = reverseDirection(direction);
     const childExtent: Extent = child.layout().extentsAt(reversed);
 
@@ -730,10 +741,10 @@ export class CommitLayoutData extends BaseCommitLayoutData {
         childExtent,
         node.layout().extentOffsetAt(direction) +
           alignment -
-          node.nodeAt(direction).state().scale() *
+          node.neighbors().nodeAt(direction).state().scale() *
             child.layout().extentOffsetAt(reversed),
         allowAxisOverlap,
-        node.nodeAt(direction).state().scale(),
+        node.neighbors().nodeAt(direction).state().scale(),
         LINE_THICKNESS / 2
       );
     // console.log("Calculated unpadded separation of " +
@@ -745,21 +756,21 @@ export class CommitLayoutData extends BaseCommitLayoutData {
     if (getDirectionAxis(direction) == Axis.VERTICAL) {
       separationFromChild = Math.max(
         separationFromChild,
-        node.nodeAt(direction).state().scale() * (this.firstSize.height() / 2) +
+        node.neighbors().nodeAt(direction).state().scale() * (this.firstSize.height() / 2) +
           this.bodySize.height() / 2
       );
       separationFromChild +=
         this.painter().getSeparation(node, Axis.VERTICAL, direction, true) *
-        node.nodeAt(direction).state().scale();
+        node.neighbors().nodeAt(direction).state().scale();
     } else {
       separationFromChild = Math.max(
         separationFromChild,
-        node.nodeAt(direction).state().scale() * (this.firstSize.width() / 2) +
+        node.neighbors().nodeAt(direction).state().scale() * (this.firstSize.width() / 2) +
           this.bodySize.width() / 2
       );
       separationFromChild +=
         this.painter().getSeparation(node, Axis.HORIZONTAL, direction, false) *
-        node.nodeAt(direction).state().scale();
+        node.neighbors().nodeAt(direction).state().scale();
     }
     // console.log("Calculated padded separation of " +
     //   separationFromChild + ".");
@@ -788,10 +799,10 @@ export class CommitLayoutData extends BaseCommitLayoutData {
     }
     // Change the node direction to null if there is no node in that
     // direction.
-    if (!node.hasNode(firstDirection)) {
+    if (!node.neighbors().hasNode(firstDirection)) {
       firstDirection = Direction.NULL;
     }
-    if (!node.hasNode(secondDirection)) {
+    if (!node.neighbors().hasNode(secondDirection)) {
       secondDirection = Direction.NULL;
     }
 
@@ -826,8 +837,8 @@ export class CommitLayoutData extends BaseCommitLayoutData {
           );*/
 
     // This node has first-axis children in both directions.
-    const firstNode: DirectionNode = node.nodeAt(firstDirection);
-    const secondNode: DirectionNode = node.nodeAt(secondDirection);
+    const firstNode: DirectionNode = node.neighbors().nodeAt(firstDirection);
+    const secondNode: DirectionNode = node.neighbors().nodeAt(secondDirection);
 
     // Get the alignments for the children.
     const firstNodeAlignment: number = this.getAlignment(node, firstDirection);
@@ -843,18 +854,18 @@ export class CommitLayoutData extends BaseCommitLayoutData {
       .extentsAt(secondDirection)
       .separation(
         secondNode.layout().extentsAt(firstDirection),
-        (node.nodeAt(secondDirection).state().scale() /
-          node.nodeAt(firstDirection).state().scale()) *
+        (node.neighbors().nodeAt(secondDirection).state().scale() /
+          node.neighbors().nodeAt(firstDirection).state().scale()) *
           (secondNodeAlignment -
             secondNode.layout().extentOffsetAt(firstDirection)) -
           (firstNodeAlignment -
             firstNode.layout().extentOffsetAt(secondDirection)),
         true,
-        node.nodeAt(secondDirection).state().scale() /
-          node.nodeAt(firstDirection).state().scale(),
+        node.neighbors().nodeAt(secondDirection).state().scale() /
+          node.neighbors().nodeAt(firstDirection).state().scale(),
         0
       );
-    separationBetweenChildren *= node.nodeAt(firstDirection).state().scale();
+    separationBetweenChildren *= node.neighbors().nodeAt(firstDirection).state().scale();
 
     // console.log("Separation between children="
     //   + separationBetweenChildren);
@@ -876,13 +887,13 @@ export class CommitLayoutData extends BaseCommitLayoutData {
 
           console.log(
               nameDirection(firstDirection) +
-              " " + nameType(this.nodeAt(firstDirection).type()) +
+              " " + nameType(this.neighbors().nodeAt(firstDirection).type()) +
               "'s " + nameDirection(secondDirection) +
               " extent (offset to center=" +
-              this.nodeAt(firstDirection).extentOffsetAt(secondDirection) +
+              this.neighbors().nodeAt(firstDirection).extentOffsetAt(secondDirection) +
               ")"
           );
-          this.nodeAt(firstDirection).extentsAt(secondDirection).forEach(
+          this.neighbors().nodeAt(firstDirection).extentsAt(secondDirection).forEach(
               function(length, size, i) {
                   console.log(i + ". l=" + length + ", s=" + size);
               }
@@ -901,7 +912,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
           );*/
 
     let firstAxisOverlap: boolean = allowAxisOverlap;
-    switch (node.nodeAt(firstDirection).axisOverlap()) {
+    switch (node.neighbors().nodeAt(firstDirection).axisOverlap()) {
       case AxisOverlap.PREVENTED:
         firstAxisOverlap = false;
         break;
@@ -910,7 +921,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
         break;
     }
     let secondAxisOverlap: boolean = allowAxisOverlap;
-    switch (node.nodeAt(secondDirection).axisOverlap()) {
+    switch (node.neighbors().nodeAt(secondDirection).axisOverlap()) {
       case AxisOverlap.PREVENTED:
         secondAxisOverlap = false;
         break;
@@ -928,10 +939,10 @@ export class CommitLayoutData extends BaseCommitLayoutData {
         firstNode.layout().extentsAt(secondDirection),
         node.layout().extentOffsetAt(firstDirection) +
           firstNodeAlignment -
-          node.nodeAt(firstDirection).state().scale() *
+          node.neighbors().nodeAt(firstDirection).state().scale() *
             firstNode.layout().extentOffsetAt(secondDirection),
         firstAxisOverlap,
-        node.nodeAt(firstDirection).state().scale(),
+        node.neighbors().nodeAt(firstDirection).state().scale(),
         LINE_THICKNESS / 2
       );
 
@@ -942,23 +953,23 @@ export class CommitLayoutData extends BaseCommitLayoutData {
         secondNode.layout().extentsAt(firstDirection),
         node.layout().extentOffsetAt(secondDirection) +
           secondNodeAlignment -
-          node.nodeAt(secondDirection).state().scale() *
+          node.neighbors().nodeAt(secondDirection).state().scale() *
             secondNode.layout().extentOffsetAt(firstDirection),
         secondAxisOverlap,
-        node.nodeAt(secondDirection).state().scale(),
+        node.neighbors().nodeAt(secondDirection).state().scale(),
         LINE_THICKNESS / 2
       );
 
     /* console.log(
               "Separation from this " + nameType(this.type()) + " to " +
               nameDirection(firstDirection) + " " +
-              nameType(this.nodeAt(firstDirection).type()) + "=" +
+              nameType(this.neighbors().nodeAt(firstDirection).type()) + "=" +
               separationFromFirst
           );
           console.log(
               "Separation from this " + nameType(this.type()) + " to " +
               nameDirection(secondDirection) + " " +
-              nameType(this.nodeAt(secondDirection).type()) + "=" +
+              nameType(this.neighbors().nodeAt(secondDirection).type()) + "=" +
               separationFromSecond
           );*/
 
@@ -995,7 +1006,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
     if (getDirectionAxis(firstDirection) === Axis.VERTICAL) {
       separationFromFirst = Math.max(
         separationFromFirst,
-        node.nodeAt(firstDirection).state().scale() *
+        node.neighbors().nodeAt(firstDirection).state().scale() *
           (this.firstSize.height() / 2) +
           this.bodySize.height() / 2
       );
@@ -1005,11 +1016,11 @@ export class CommitLayoutData extends BaseCommitLayoutData {
           Axis.VERTICAL,
           firstDirection,
           true
-        ) * node.nodeAt(firstDirection).state().scale();
+        ) * node.neighbors().nodeAt(firstDirection).state().scale();
 
       separationFromSecond = Math.max(
         separationFromSecond,
-        node.nodeAt(secondDirection).state().scale() *
+        node.neighbors().nodeAt(secondDirection).state().scale() *
           (this.secondSize.height() / 2) +
           this.bodySize.height() / 2
       );
@@ -1019,11 +1030,11 @@ export class CommitLayoutData extends BaseCommitLayoutData {
           Axis.VERTICAL,
           secondDirection,
           true
-        ) * node.nodeAt(secondDirection).state().scale();
+        ) * node.neighbors().nodeAt(secondDirection).state().scale();
     } else {
       separationFromFirst = Math.max(
         separationFromFirst,
-        node.nodeAt(firstDirection).state().scale() *
+        node.neighbors().nodeAt(firstDirection).state().scale() *
           (this.firstSize.width() / 2) +
           this.bodySize.width() / 2
       );
@@ -1033,11 +1044,11 @@ export class CommitLayoutData extends BaseCommitLayoutData {
           Axis.HORIZONTAL,
           firstDirection,
           false
-        ) * node.nodeAt(firstDirection).state().scale();
+        ) * node.neighbors().nodeAt(firstDirection).state().scale();
 
       separationFromSecond = Math.max(
         separationFromSecond,
-        node.nodeAt(secondDirection).state().scale() *
+        node.neighbors().nodeAt(secondDirection).state().scale() *
           (this.secondSize.width() / 2) +
           this.bodySize.width() / 2
       );
@@ -1047,7 +1058,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
           Axis.HORIZONTAL,
           secondDirection,
           false
-        ) * node.nodeAt(secondDirection).state().scale();
+        ) * node.neighbors().nodeAt(secondDirection).state().scale();
     }
 
     // Set the positions of the nodes.
@@ -1091,7 +1102,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
   }
 
   private addLineBounds(node: DirectionNode, given: Direction) {
-    if (!node.hasChild(given)) {
+    if (!node.neighbors().hasChild(given)) {
       return;
     }
 
@@ -1119,7 +1130,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
       } else {
         lineSize = this.bodySize.width() / 2;
       }
-      // lineSize = this.nodeAt(given).state().scale() * LINE_THICKNESS / 2;
+      // lineSize = this.neighbors().nodeAt(given).state().scale() * LINE_THICKNESS / 2;
       node
         .layout()
         .extentsAt(getPositiveDirection(perpAxis))

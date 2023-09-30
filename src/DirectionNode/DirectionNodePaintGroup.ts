@@ -1,35 +1,31 @@
-import { reverseDirection } from "../Direction";
-
-import { Layout } from "./Layout";
 import { SiblingNode } from "./DirectionNodeSiblings";
 import makeLimit from "./makeLimit";
 
-export interface PaintGroupNode extends SiblingNode {
-  paintGroup(): DirectionNodePaintGroup;
-  layout(): Layout;
-  _paintGroup: DirectionNodePaintGroup | undefined;
-  getLastPaintGroup(): PaintGroupNode;
+export interface PaintGroupNode<T extends PaintGroupNode<T>> extends SiblingNode<T> {
+  paintGroup(): DirectionNodePaintGroup<T>;
+  getLastPaintGroup(): T;
   findPaintGroupInsert(
-    inserted: PaintGroupNode
-  ): [PaintGroupNode, PaintGroupNode];
-  findDistance(other: PaintGroupNode): number;
-  pathToRoot(): PaintGroupNode[];
-  comesBefore(other: PaintGroupNode): boolean;
+    inserted:T 
+  ): [T, T];
+  clearPaintGroup(): void;
+  findPaintGroup(): T;
+  setPaintGroupRoot(root: T): void;
+  localPaintGroup(): DirectionNodePaintGroup<T> | undefined;
 }
 
-export class DirectionNodePaintGroup {
-  _next: PaintGroupNode;
-  _prev: PaintGroupNode;
-  _node: PaintGroupNode;
+export class DirectionNodePaintGroup<T extends PaintGroupNode<T>> {
+  _next: T;
+  _prev: T;
+  _node: T;
   _explicit: boolean;
 
-  constructor(node: PaintGroupNode, explicit: boolean) {
+  constructor(node: T, explicit: boolean) {
     this._node = node;
     this._next = this._node;
     this._prev = this._node;
     this._explicit = explicit;
 
-    if (this.node().isRoot()) {
+    if (this.node().neighbors().isRoot()) {
       const [firstPaintGroup, lastPaintGroup] = this.firstAndLast();
       if (firstPaintGroup && lastPaintGroup) {
         this.connect(
@@ -41,13 +37,16 @@ export class DirectionNodePaintGroup {
       }
     } else {
       // Remove the node from its parent's layout.
-      this.node()
-        .parentNode()
-        .siblings()
-        .removeFromLayout(reverseDirection(this.node().parentDirection()));
+      const par = this.node().neighbors().parent();
+      if (!par) {
+        throw new Error("Node must have a parent if it is not root");
+      }
+      par.node().siblings().removeFromLayout(
+        par.direction()
+      );
 
       // Connect this node's first and last paint groups to this node.
-      const parentsPaintGroup = this.node().parentNode().paintGroup();
+      const parentsPaintGroup = this.node().neighbors().parent().node().paintGroup();
       const [prevNode, nextNode] = parentsPaintGroup
         .node()
         .findPaintGroupInsert(this.node());
@@ -55,7 +54,7 @@ export class DirectionNodePaintGroup {
       this.connect(this.node(), nextNode);
     }
     this.node().layoutChanged();
-    this.node().forEachNode((n) => n.setPaintGroupRoot(this.node()));
+    this.node().siblings().forEachNode((n) => n.setPaintGroupRoot(this.node()));
     this.verify();
   }
 
@@ -63,19 +62,19 @@ export class DirectionNodePaintGroup {
     this._explicit = false;
   }
 
-  firstAndLast(): [SiblingNode | null, SiblingNode | null] {
+  firstAndLast(): [T | null, T | null] {
     const pg = this.node().findPaintGroup();
     if (!pg.localPaintGroup()) {
       return [null, null];
     }
-    let lastPaintGroup: PaintGroupNode | null = null;
-    let firstPaintGroup: PaintGroupNode | null = null;
+    let lastPaintGroup: T | null = null;
+    let firstPaintGroup: T | null = null;
     for (let n = pg.paintGroup().next(); n != pg; n = n.paintGroup().next()) {
       // console.log("First and last iteration. n=" + n.id());
-      if (!n.hasAncestor(pg)) {
+      if (!n.neighbors().hasAncestor(pg)) {
         break;
       }
-      if (!n.hasAncestor(this.node())) {
+      if (!n.neighbors().hasAncestor(this.node())) {
         continue;
       }
       if (!lastPaintGroup) {
@@ -99,20 +98,16 @@ export class DirectionNodePaintGroup {
     return this._node;
   }
 
-  toString() {
-    return `(Paint group: prev=${this._prev.id()} this=${this.node().id()} next=${this._next.id()})`;
-  }
-
-  private connect(a: SiblingNode, b: SiblingNode): void {
+  private connect(a: SiblingNode<any>, b: SiblingNode<any>): void {
     (a === this.node() ? this : a.localPaintGroup())._next = b;
     (b === this.node() ? this : b.localPaintGroup())._prev = a;
   }
 
-  next(): PaintGroupNode {
+  next(): T {
     return this._next;
   }
 
-  prev(): PaintGroupNode {
+  prev(): T {
     return this._prev;
   }
 
@@ -120,7 +115,7 @@ export class DirectionNodePaintGroup {
     return this._explicit;
   }
 
-  append(node: PaintGroupNode) {
+  append(node: T) {
     const [prevNode, nextNode] = this.node().findPaintGroupInsert(node);
     const nodeLast = node.getLastPaintGroup();
     // console.log("Append", node.id(), "to", nodeLast.id(), "between", prevNode.id(), "and", nextNode.id());
@@ -129,7 +124,7 @@ export class DirectionNodePaintGroup {
     this.verify();
   }
 
-  merge(node: PaintGroupNode) {
+  merge(node: T) {
     const [prevNode, nextNode] = this.node().findPaintGroupInsert(node);
     const paintGroupLast = prevNode;
     const nodeFirst = node.paintGroup().next();
@@ -171,15 +166,15 @@ export class DirectionNodePaintGroup {
     this._explicit = false;
 
     // console.log(this + " is no longer a paint group.");
-    if (this.node().isRoot()) {
+    if (this.node().neighbors().isRoot()) {
       // Retain the paint groups for this implied paint group.
       return;
     }
     const paintGroupLast = this.node().paintGroup().last();
     this.node()
-      .parentNode()
+      .neighbors().parent()?.node()
       .siblings()
-      .insertIntoLayout(reverseDirection(this.node().parentDirection()));
+      .insertIntoLayout(this.node().neighbors().parent().direction());
 
     // Remove the paint group's entry in the parent.
     // console.log("Node " + this +
@@ -192,14 +187,14 @@ export class DirectionNodePaintGroup {
     this._next = this.node();
     this._prev = this.node();
 
-    const pg = this.node().parentNode().findPaintGroup();
-    pg.forEachNode((n) => n.setPaintGroupRoot(pg));
-    this.node()._paintGroup = undefined;
+    const pg = this.node().neighbors().parent().node().findPaintGroup();
+    pg.siblings().forEachNode((n) => n.setPaintGroupRoot(pg));
+    this.node().clearPaintGroup();
     this.node().layoutChanged();
     this.verify();
   }
 
-  last(): SiblingNode {
+  last(): T {
     let candidate = this.node().siblings().prev();
     while (candidate !== this.node()) {
       if (candidate.localPaintGroup()) {
@@ -210,9 +205,9 @@ export class DirectionNodePaintGroup {
     return candidate;
   }
 
-  dump(): PaintGroupNode[] {
-    const pgs: PaintGroupNode[] = [];
-    let pg: PaintGroupNode = this.node();
+  dump(): T[] {
+    const pgs: T[] = [];
+    let pg: T = this.node();
     const lim = makeLimit();
     do {
       pgs.push(pg);

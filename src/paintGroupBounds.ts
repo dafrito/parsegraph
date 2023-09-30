@@ -3,7 +3,7 @@ import { Direction, nameDirection } from "./Direction";
 import { DirectionNode } from "./DirectionNode";
 
 export function paintGroupBounds(nodeRoot: DirectionNode) {
-  if (!nodeRoot.isRoot() && !nodeRoot.localPaintGroup()) {
+  if (!nodeRoot.neighbors().isRoot() && !nodeRoot.localPaintGroup()) {
     throw new Error("Node must be a paint group");
   }
   let node = nodeRoot;
@@ -27,10 +27,10 @@ export function paintGroupBounds(nodeRoot: DirectionNode) {
       if (dir === Direction.OUTWARD || dir === Direction.INWARD) {
         continue;
       }
-      if (!node.hasChildAt(dir)) {
+      if (!node.neighbors().hasChildAt(dir)) {
         continue;
       }
-      const child = node.nodeAt(dir);
+      const child = node.neighbors().nodeAt(dir);
       if (child.findPaintGroup() === nodeRoot) {
         // Node is part of the same paint group.
         const childBounds = groupBounds[child.state().id() as number];

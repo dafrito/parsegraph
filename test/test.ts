@@ -36,12 +36,12 @@ const expect = function (expected: any, actual: any) {
 };
 
 export function getLayoutNodes(node: DirectionNode) {
-  const list = [];
+  const list: DirectionNode[] = [];
   const orig = node;
   const MAX_SIBLINGS = 100000;
   let count = 0;
   do {
-    node = node._layoutNext;
+    node = node.siblings().next();
     for (let i = 0; i < list.length; ++i) {
       if (list[i] == node) {
         throw new Error("Layout list has loop");
@@ -474,7 +474,7 @@ describe("Package", function () {
       readStyle("b").verticalPadding * 2 +
       readStyle("b").borderThickness * 2 +
       readStyle("b").minHeight +
-      verticalSeparation(caret.node().nodeAt(UPWARD), UPWARD);
+      verticalSeparation(caret.node().neighbors().nodeAt(UPWARD), UPWARD);
 
     let diff = expect(
       computedBlockSize * (depth - 1) +
@@ -1176,7 +1176,7 @@ describe("Package", function () {
             readStyle("bu").borderThickness +
             readStyle("bu").minHeight / 2) +
         SHRINK_SCALE *
-          verticalSeparation(caret.node().nodeAt(DOWNWARD), DOWNWARD) +
+          verticalSeparation(caret.node().neighbors().nodeAt(DOWNWARD), DOWNWARD) +
         SHRINK_SCALE *
           (readStyle("b").minHeight +
             readStyle("b").verticalPadding * 2 +

@@ -78,14 +78,14 @@ export class Layout {
     let parentScale = 1.0;
     let scale = 1.0;
     let neededVersion;
-    if (!node.isRoot()) {
+    if (!node.neighbors().isRoot()) {
       neededVersion = node
         .parentNode()
         .findPaintGroup()
         .layout()._absoluteVersion;
     }
     while (true) {
-      if (node.isRoot()) {
+      if (node.neighbors().isRoot()) {
         this._absoluteXPos = 0;
         this._absoluteYPos = 0;
         break;
@@ -124,22 +124,22 @@ export class Layout {
         layout._absoluteYPos = this._absoluteYPos;
         layout._absoluteScale = scale;
         layout._absoluteDirty = false;
-        if (!node.isRoot()) {
+        if (!node.neighbors().isRoot()) {
           layout._absoluteVersion = node
             .parentNode()
             .findPaintGroup()
             .layout()._absoluteVersion;
         }
       }
-      scale *= node.nodeAt(directionToChild).state().scale();
-      node = node.nodeAt(directionToChild);
+      scale *= node.neighbors().nodeAt(directionToChild).state().scale();
+      node = node.neighbors().nodeAt(directionToChild);
     }
 
     this._absoluteXPos += node.x() * parentScale;
     this._absoluteYPos += node.y() * parentScale;
     this._absoluteScale = scale;
     this._absoluteDirty = false;
-    if (!this.owner().isRoot()) {
+    if (!this.owner().neighbors().isRoot()) {
       this._absoluteVersion = this.owner()
         .parentNode()
         .findPaintGroup()
@@ -151,7 +151,7 @@ export class Layout {
     if (this._absoluteDirty) {
       return true;
     }
-    if (this.owner().isRoot()) {
+    if (this.owner().neighbors().isRoot()) {
       return false;
     }
     return (
@@ -195,7 +195,7 @@ export class Layout {
     let parentScale = 1.0;
     let scale = 1.0;
     while (true) {
-      if (node.isRoot() || node.localPaintGroup()) {
+      if (node.neighbors().isRoot() || node.localPaintGroup()) {
         this._groupXPos = 0;
         this._groupYPos = 0;
         break;
@@ -230,8 +230,8 @@ export class Layout {
       }
 
       parentScale = scale;
-      scale *= node.nodeAt(directionToChild).state().scale();
-      node = node.nodeAt(directionToChild);
+      scale *= node.neighbors().nodeAt(directionToChild).state().scale();
+      node = node.neighbors().nodeAt(directionToChild);
     }
     this._groupScale = scale;
 
@@ -430,10 +430,10 @@ export class Layout {
 
     const addCandidate = (node: DirectionNode, direction: Direction) => {
       if (direction !== undefined) {
-        if (!node.hasChildAt(direction)) {
+        if (!node.neighbors().hasChildAt(direction)) {
           return;
         }
-        node = node.nodeAt(direction);
+        node = node.neighbors().nodeAt(direction);
       }
       if (node == null) {
         return;
@@ -451,15 +451,15 @@ export class Layout {
       }
 
       if (candidate.layout().inNodeBody(x, y, userScale, extentSize)) {
-        if (candidate.hasNode(Direction.INWARD)) {
+        if (candidate.neighbors().hasNode(Direction.INWARD)) {
           if (
             candidate
-              .nodeAt(Direction.INWARD)
+              .neighbors().nodeAt(Direction.INWARD)
               .layout()
               .inNodeExtents(x, y, userScale, extentSize)
           ) {
             candidates.push(FORCE_SELECT_PRIOR as any);
-            candidates.push(candidate.nodeAt(Direction.INWARD));
+            candidates.push(candidate.neighbors().nodeAt(Direction.INWARD));
             continue;
           }
         }

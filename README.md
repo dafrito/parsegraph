@@ -128,39 +128,6 @@ This is done iteratively for the entire graph, starting with the deepest nodes
 first. Every separation and combination is always taking place with fully laid
 out descendents, until finally the root and thus the entire graph is laid out.
 
-### Alignment
-
-Alignment is a NeighborData-specific property, so it can be set before the neighbor
-is connected.
-
-A neighbor with no special alignment is aligned with its own body separated
-from its parent. A neighbor can also be arranged to be positively or negatively
-aligned with its parent, resulting in a shift of the neighbor and its contents.
-
-Inward neighbors are aligned either directly forward or directly downward of
-their parents, so their alignment is specifc.
-
-These are the possible alignment values for each DirectionNode's NeighborData:
-
-* `Alignment.NONE`
-* `Alignment.NEGATIVE`
-* `Alignment.CENTER`
-* `Alignment.POSITIVE`
-* `Alignment.INWARD_HORIZONTAL`
-* `Alignment.INWARD_VERTICAL`
-
-
-
-
-### AxisOverlap
-
-AxisOverlap is a NeighborData-specific property, so it can be set before the neighbor
-is connected.
-
-* `AxisOverlap.ALLOWED`
-* `AxisOverlap.PREVENTED`
-* `AxisOverlap.DEFAULT`
-
 # Performance
 
 A sufficiently large graph of DirectionNodes will take intolerably long to
@@ -193,12 +160,3 @@ using their group position. Then, at render time, you pass a world matrix to
 your render call that is the absolute position of that paint group. Both the
 group and the absolute position are computed using the CommitLayoutData
 algorithm.
-
-## Future Ideas
-
-#### "Heat-based" rendering
-
-It's also possible to keep metrics at run-time of how often a paint group is
-changing, or how often it is on-screen, and use these metrics to determine how
-to paint and render the group.
-

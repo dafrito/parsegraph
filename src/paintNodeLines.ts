@@ -5,7 +5,9 @@ import {
   forEachCardinalDirection,
 } from "./Direction";
 
-import { DirectionNode } from "./DirectionNode";
+import {
+  DirectionNode,
+} from "./DirectionNode";
 
 export type LinePainter = (x: number, y: number, w: number, h: number) => void;
 
@@ -18,7 +20,7 @@ const drawLine = (
   if (node.parentDirection() == direction) {
     return;
   }
-  if (!node.hasChild(direction)) {
+  if (!node.neighbors().hasChild(direction)) {
     // Do not draw lines unless there is a node.
     return;
   }
@@ -26,7 +28,7 @@ const drawLine = (
 
   const layout = node.layout();
   const parentScale = layout.groupScale();
-  const scale = directionData.getNode()?.layout().groupScale();
+  const scale = directionData.child()?.layout().groupScale();
   if (typeof scale !== "number" || isNaN(scale)) {
     console.log(directionData.node);
     throw new Error(

@@ -1,4 +1,15 @@
 // Node Direction
+
+/**
+ * The list of axis directions.
+ *
+ * This is used for the positions of DirectionNode neighbors.
+ *
+ * It is also used for naming DirectionNode layout Extents.
+ *
+ * @see {@link DirectionNode}
+ * @see {@link Extent}
+ */
 export enum Direction {
   NULL = -1,
   INWARD,
@@ -16,29 +27,29 @@ export const UPWARD = Direction.UPWARD;
 export const BACKWARD = Direction.BACKWARD;
 export const FORWARD = Direction.FORWARD;
 
+/**
+ * The number of axis directions.
+ */
 export const NUM_DIRECTIONS = 6;
 
-export const HORIZONTAL_ORDER: Direction[] = [
-  Direction.INWARD,
-  Direction.BACKWARD,
-  Direction.FORWARD,
-  Direction.DOWNWARD,
-  Direction.UPWARD,
-  Direction.OUTWARD,
-];
-
-export const VERTICAL_ORDER: Direction[] = [
-  Direction.INWARD,
-  Direction.DOWNWARD,
-  Direction.UPWARD,
-  Direction.BACKWARD,
-  Direction.FORWARD,
-  Direction.OUTWARD,
-];
-
+/**
+ * The list of axes.
+ */
 export enum Axis {
   NULL = 6,
+
+  /**
+   * Forward and backward axis.
+   */
   HORIZONTAL,
+
+  /**
+   * Upward and downward axis.
+   */
   VERTICAL,
+
+  /**
+   * Inward and outward axis.
+   */
   Z,
 }

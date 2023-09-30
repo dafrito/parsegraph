@@ -125,8 +125,8 @@ describe("DirectionNode", function () {
         .map((pg) => pg.id())
     ).toEqual(["root", "0inward", "1inward", "2inward", "3inward"]);
 
-    expect(next.nodeAt(Direction.FORWARD).id()).toEqual("3block");
-    next.nodeAt(Direction.FORWARD).crease();
+    expect(next.neighbors().nodeAt(Direction.FORWARD).id()).toEqual("3block");
+    next.neighbors().nodeAt(Direction.FORWARD).crease();
     expect(
       root
         .paintGroup()

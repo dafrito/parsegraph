@@ -1,5 +1,13 @@
 import createException, { BAD_NODE_ALIGNMENT } from "../Exception";
 
+/**
+ * Alignment is a NeighborData-specific property, so it can be set before the neighbor is connected.
+ *
+ * A neighbor with no special alignment is aligned with its own body separated from its parent. A neighbor can also be arranged to be positively or negatively aligned with its parent, resulting in a shift of the neighbor and its contents.
+ *
+ * Inward neighbors are aligned either directly forward or directly downward of their parents, so their alignment is specifc.
+ *
+ */
 export enum Alignment {
   NULL = 0,
   NONE,
