@@ -1,8 +1,5 @@
 import { expect, assert } from "chai";
-import {
-  Direction,
-  readDirection,
-} from "../../src/Direction";
+import { Direction, readDirection } from "../../src/Direction";
 
 import {
   DirectionNode,
@@ -10,9 +7,7 @@ import {
   namePreferredAxis,
 } from "../../src/DirectionNode";
 
-import {
-  DirectionCaret,
-} from "../../src/DirectionCaret";
+import { DirectionCaret } from "../../src/DirectionCaret";
 
 function makeCaret() {
   return new DirectionCaret();

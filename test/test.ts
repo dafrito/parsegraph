@@ -7,13 +7,9 @@ import {
   BACKWARD,
 } from "../src/Direction";
 
-import {
-  DirectionNode
-} from "../src/DirectionNode";
+import { DirectionNode } from "../src/DirectionNode";
 
-import {
-  DirectionCaret
-} from "../src/DirectionCaret";
+import { DirectionCaret } from "../src/DirectionCaret";
 
 import { CommitLayoutData } from "../src";
 import { Extent, checkExtentsEqual } from "../src/DirectionNode/Layout/Extent";
@@ -1131,16 +1127,10 @@ describe("Package", function () {
         readStyle("b").borderThickness
     );
 
-    if (
-      !caret.node().layout().extentsAt(FORWARD).equals(forwardExtent, 1e-3)
-    ) {
+    if (!caret.node().layout().extentsAt(FORWARD).equals(forwardExtent, 1e-3)) {
       console.log(forwardExtent.dump("Expected forward extents"));
       console.log(
-        caret
-          .node()
-          .layout()
-          .extentsAt(FORWARD)
-          .dump("Given forward extents")
+        caret.node().layout().extentsAt(FORWARD).dump("Given forward extents")
       );
       throw new Error("Forward extent differs");
       /* graph._nodePainter.enableExtentRendering();

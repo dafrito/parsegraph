@@ -19,7 +19,6 @@ import {
   NUM_DIRECTIONS,
   reverseDirection,
   forEachDirection,
-  nameDirection
 } from "../Direction";
 
 import { Layout } from "./Layout";
@@ -254,7 +253,7 @@ export class DirectionNode<Value = any> implements PaintGroupNode {
         return owner;
       }
       return undefined as any;
-      //throw new Error("Node not found");
+      // throw new Error("Node not found");
     }
     if (!n.node) {
       throw new Error("No node for neighbor");
