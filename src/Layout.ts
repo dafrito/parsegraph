@@ -6,8 +6,6 @@ import Extent from "./extent";
 
 import Direction, { DirectionNode, reverseDirection } from "./direction";
 
-import AutocommitBehavior, { getAutocommitBehavior } from "./autocommit";
-
 export default class Layout {
   _extents: Extent[];
   _absoluteVersion: number;
@@ -47,13 +45,6 @@ export default class Layout {
 
   owner() {
     return this._owner;
-  }
-
-  autocommitAbsolutePos(): void {
-    if (getAutocommitBehavior() === AutocommitBehavior.THROW) {
-      throw createException(NODE_DIRTY);
-    }
-    this.commitAbsolutePos();
   }
 
   commitAbsolutePos(): void {
@@ -157,17 +148,14 @@ export default class Layout {
   }
 
   absoluteX(): number {
-    this.autocommitAbsolutePos();
     return this._absoluteXPos;
   }
 
   absoluteY(): number {
-    this.autocommitAbsolutePos();
     return this._absoluteYPos;
   }
 
   absoluteScale(): number {
-    this.autocommitAbsolutePos();
     return this._absoluteScale;
   }
 
