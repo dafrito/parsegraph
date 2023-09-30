@@ -9,4 +9,4 @@ const makeLimit = (maxIterations: number = MAX_ITERATIONS) => {
   };
 };
 
-export { makeLimit };
+export default makeLimit;
