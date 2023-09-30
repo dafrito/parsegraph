@@ -1,4 +1,2 @@
-# parsegraph-layout
-
-This project contains LayoutNode and LayoutCaret, which represent
-the non-graphical Parsegraph API.
+Parsegraph is a platform-independent library to paint a graph of connected
+values in up to five directions.
