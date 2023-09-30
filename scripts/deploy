@@ -5,6 +5,7 @@ BUILD=parsegraph
 
 EXTRA_FILES="LICENSE README.md package.json"
 
+cp $EXTRA_FILES $BUILD
 cd ./$BUILD
 pwd
 npm pub --tag dev --registry https://registry.npmjs.org/ . && rm -rf ./$BUILD 
