@@ -197,6 +197,13 @@ export class DirectionCaret<Value> {
     this._nodes[this._nodes.length - 1] = this._nodeRoot;
   }
 
+  moveToParent(): void {
+    if (this.node().isRoot()) {
+      throw new Error("cannot move to parent of root");
+    }
+    this.setNode(this.node().parentNode());
+  }
+
   pop(): void {
     if (this._nodes.length <= 1) {
       throw createException(NO_NODE_FOUND);
