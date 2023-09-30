@@ -755,7 +755,7 @@ that is still a descendent of this node.
   }
 
   setValue(value: Value | undefined) {
-    this.state().setValue(value);
+    return this.state().setValue(value);
   }
 
   nodeAlignmentMode(inDirection: Direction): Alignment {

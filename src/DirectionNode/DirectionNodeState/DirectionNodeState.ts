@@ -39,16 +39,18 @@ export class DirectionNodeState<Value, T extends StateNode> {
     return this._value;
   }
 
-  setValue(newValue: Value | undefined, report?: boolean): void {
+  setValue(newValue: Value | undefined, report?: boolean): Value | undefined {
     // console.log("Setting value to ", newValue);
     const orig = this.value();
     if (orig === newValue) {
-      return;
+      return orig;
     }
+    const oldVal = this._value;
     this._value = newValue;
     if (arguments.length === 1 || report) {
       this.node().layoutChanged();
     }
+    return this._value;
   }
 
   rightToLeft(): boolean {
