@@ -1,5 +1,5 @@
 const assert = require("assert");
-import Size from "../src/size";
+import { Size } from "../src/Size";
 
 describe("Size", function () {
   it("works", () => {

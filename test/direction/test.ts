@@ -1,12 +1,18 @@
 import { expect, assert } from "chai";
 import {
   Direction,
-  DirectionNode,
   readDirection,
-  DirectionCaret,
+} from "../../src/Direction";
+
+import {
+  DirectionNode,
   PreferredAxis,
   namePreferredAxis,
-} from "../../src/direction";
+} from "../../src/DirectionNode";
+
+import {
+  DirectionCaret,
+} from "../../src/DirectionCaret";
 
 function makeCaret() {
   return new DirectionCaret();
@@ -150,8 +156,8 @@ describe("DirectionNode", function () {
     expect(creased.localPaintGroup()).to.equal(null);
     expect(creased.localPaintGroup()).to.equal(null);
     expect(root.localPaintGroup()).to.not.equal(null);
-    expect(root.localPaintGroup().next()).to.equal(root);
-    expect(root.localPaintGroup().prev()).to.equal(root);
+    expect(root.localPaintGroup()?.next()).to.equal(root);
+    expect(root.localPaintGroup()?.prev()).to.equal(root);
   });
 
   it("Viewport - Block with forward bud, removed", function () {
@@ -161,8 +167,8 @@ describe("DirectionNode", function () {
     const child = caret.spawnMove(Direction.FORWARD);
     caret.spawnMove(Direction.FORWARD);
     expect(child.localPaintGroup()).to.equal(null);
-    expect(root.localPaintGroup().next()).to.not.equal(child);
-    expect(root.localPaintGroup().next()).to.equal(root);
+    expect(root.localPaintGroup()?.next()).to.not.equal(child);
+    expect(root.localPaintGroup()?.next()).to.equal(root);
 
     child.disconnectNode();
     expect(child.localPaintGroup()).to.not.equal(null);
@@ -170,13 +176,13 @@ describe("DirectionNode", function () {
 
     expect(root.localPaintGroup()).to.not.equal(null);
     expect(
-      root.localPaintGroup().next(),
+      root.localPaintGroup()?.next(),
       "Root's paint group should not be child"
     ).to.not.equal(child);
 
-    expect(root.localPaintGroup().next()).to.equal(root);
-    expect(root.localPaintGroup().prev()).to.not.equal(child);
-    expect(root.localPaintGroup().prev()).to.equal(root);
+    expect(root.localPaintGroup()?.next()).to.equal(root);
+    expect(root.localPaintGroup()?.prev()).to.not.equal(child);
+    expect(root.localPaintGroup()?.prev()).to.equal(root);
   });
 
   it("Node Morris world threading spawned", function () {
@@ -353,7 +359,7 @@ describe("DirectionCaret", function () {
     a.connectNode(Direction.DOWNWARD, chi);
     a.connectNode(Direction.FORWARD, b);
     root.connectNode(Direction.FORWARD, a);
-    a.setLayoutPreference(PreferredAxis.PERPENDICULAR);
+    a.siblings().setLayoutPreference(PreferredAxis.PERPENDICULAR);
 
     // console.log("new a",
     //   namePreferredAxis(a._layoutPreference));
@@ -363,10 +369,10 @@ describe("DirectionCaret", function () {
     }
 
     root.disconnectNode(Direction.FORWARD);
-    if (a.getLayoutPreference() !== PreferredAxis.VERTICAL) {
+    if (a.siblings().getLayoutPreference() !== PreferredAxis.VERTICAL) {
       throw new Error(
         "a layoutPreference was not VERT but " +
-          namePreferredAxis(a.getLayoutPreference())
+          namePreferredAxis(a.siblings().getLayoutPreference())
       );
     }
   });

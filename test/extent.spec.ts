@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import Extent from "../src/extent";
+import { Extent } from "../src/DirectionNode/Layout/Extent";
 
 describe("Extent", function () {
   it("can simplify", () => {

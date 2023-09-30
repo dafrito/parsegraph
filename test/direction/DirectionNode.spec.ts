@@ -1,5 +1,6 @@
 import { assert } from "chai";
-import Direction, { PreferredAxis, DirectionNode } from "../../src/direction";
+import { Direction } from "../../src/Direction";
+import { PreferredAxis, DirectionNode } from "../../src/DirectionNode";
 
 describe("DirectionNode", function () {
   it("can be constructed without a Type param", () => {
@@ -15,7 +16,7 @@ describe("DirectionNode", function () {
 
   it("can be constructed with a layout", () => {
     const n = new DirectionNode<string>();
-    assert.isNotNull(n.getLayout());
+    assert.isNotNull(n.layout());
   });
 
   it("can handle paint group array creasing", () => {
@@ -28,7 +29,7 @@ describe("DirectionNode", function () {
 
     let next = root;
 
-    const blocks = [];
+    const blocks: DirectionNode<string>[] = [];
     for (let i = 0; i < 2; ++i) {
       const b = new DirectionNode<string>().setId(`block-${i}`);
       blocks.push(b);
@@ -300,21 +301,21 @@ describe("DirectionNode", function () {
 
   it("can be pulled", () => {
     const bud = new DirectionNode().setId("bud");
-    bud.setLayoutPreference(PreferredAxis.VERTICAL);
+    bud.siblings().setLayoutPreference(PreferredAxis.VERTICAL);
     bud.connectNode(Direction.FORWARD, new DirectionNode().setId("f"));
     bud.connectNode(Direction.BACKWARD, new DirectionNode().setId("b"));
     bud.connectNode(Direction.DOWNWARD, new DirectionNode().setId("d"));
     bud.connectNode(Direction.UPWARD, new DirectionNode().setId("u"));
-    bud.setLayoutPreference(PreferredAxis.HORIZONTAL);
+    bud.siblings().setLayoutPreference(PreferredAxis.HORIZONTAL);
   });
 
   it("can be pulled the other way", () => {
     const bud = new DirectionNode().setId("bud");
-    bud.setLayoutPreference(PreferredAxis.HORIZONTAL);
+    bud.siblings().setLayoutPreference(PreferredAxis.HORIZONTAL);
     bud.connectNode(Direction.FORWARD, new DirectionNode().setId("f"));
     bud.connectNode(Direction.BACKWARD, new DirectionNode().setId("b"));
     bud.connectNode(Direction.DOWNWARD, new DirectionNode().setId("d"));
     bud.connectNode(Direction.UPWARD, new DirectionNode().setId("u"));
-    bud.setLayoutPreference(PreferredAxis.VERTICAL);
+    bud.siblings().setLayoutPreference(PreferredAxis.VERTICAL);
   });
 });

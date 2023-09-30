@@ -1,15 +1,23 @@
-import Direction, {
+import {
+  Direction,
   Axis,
   FORWARD,
   DOWNWARD,
   UPWARD,
   BACKWARD,
-  DirectionCaret,
-  DirectionNode,
-} from "../src/direction";
-import { checkExtentsEqual, CommitLayoutData } from "../src";
-import Extent from "../src/extent";
-import Size from "../src/size";
+} from "../src/Direction";
+
+import {
+  DirectionNode
+} from "../src/DirectionNode";
+
+import {
+  DirectionCaret
+} from "../src/DirectionCaret";
+
+import { CommitLayoutData } from "../src";
+import { Extent, checkExtentsEqual } from "../src/DirectionNode/Layout/Extent";
+import { Size } from "../src/Size";
 
 import { assert } from "chai";
 
@@ -178,7 +186,7 @@ describe("Package", function () {
     const caret = makeCaret("b");
     commitLayout(caret.node());
 
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
     const style = readStyle(BLOCK);
 
     // Run the comparison tests.
@@ -237,7 +245,7 @@ describe("Package", function () {
     caret.spawn(FORWARD, BUD);
     commitLayout(caret.node());
 
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
     const style = readStyle(BLOCK);
 
     // Run the comparison tests.
@@ -289,7 +297,7 @@ describe("Package", function () {
     caret.moveToRoot();
 
     const rootNode = caret.node();
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
     const style = readStyle(BLOCK);
 
     // Run the comparison tests.
@@ -346,7 +354,7 @@ describe("Package", function () {
     commitLayout(caret.node());
     caret.moveToRoot();
 
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
 
     // Run the comparison tests.
 
@@ -398,7 +406,7 @@ describe("Package", function () {
     caret.moveToRoot();
     commitLayout(caret.node());
 
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
 
     // Run the comparison tests.
 
@@ -462,7 +470,7 @@ describe("Package", function () {
     commitLayout(caret.node());
 
     const rootNode = caret.node();
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
 
     // Run comparison tests.
 
@@ -531,7 +539,7 @@ describe("Package", function () {
     commitLayout(caret.node());
 
     const rootNode = caret.node();
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
 
     // Run comparison tests.
 
@@ -594,7 +602,7 @@ describe("Package", function () {
     commitLayout(caret.node());
 
     const rootNode = caret.node();
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
 
     // Run comparison tests.
 
@@ -658,7 +666,7 @@ describe("Package", function () {
     // Run comparison tests.
 
     const rootNode = caret.node();
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
 
     let diff = expect(
       readStyle("b").minHeight / 2 +
@@ -720,7 +728,7 @@ describe("Package", function () {
 
     // Run comparison tests.
     const rootNode = caret.node();
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
 
     if (layout.extentOffsetAt(BACKWARD) != layout.extentOffsetAt(FORWARD)) {
       throw new Error(
@@ -794,7 +802,7 @@ describe("Package", function () {
 
     // Run the tests.
     const rootNode = caret.node();
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
 
     if (layout.extentOffsetAt(BACKWARD) != layout.extentOffsetAt(FORWARD)) {
       throw new Error(
@@ -868,7 +876,7 @@ describe("Package", function () {
 
     // Run comparison tests.
     const rootNode = caret.node();
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
     if (layout.extentOffsetAt(BACKWARD) != layout.extentOffsetAt(FORWARD)) {
       throw new Error(
         "Graphs symmetric about the root should" +
@@ -943,7 +951,7 @@ describe("Package", function () {
 
     // Run comparison tests.
     const rootNode = caret.node();
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
     if (layout.extentOffsetAt(BACKWARD) != layout.extentOffsetAt(FORWARD)) {
       throw new Error(
         "Graphs symmetric about the root should" +
@@ -1065,9 +1073,9 @@ describe("Package", function () {
           readStyle("bu").minWidth / 2)
     );
 
-    if (!caret.node().getLayout().extentsAt(DOWNWARD).equals(downwardExtent)) {
+    if (!caret.node().layout().extentsAt(DOWNWARD).equals(downwardExtent)) {
       console.log(downwardExtent.dump(""));
-      caret.node().getLayout().extentsAt(DOWNWARD).dump("");
+      caret.node().layout().extentsAt(DOWNWARD).dump("");
       throw new Error("Downward extent differs");
       /* // graph._nodePainter.enableExtentRendering();
       // resultDom.appendChild(
@@ -1124,13 +1132,13 @@ describe("Package", function () {
     );
 
     if (
-      !caret.node().getLayout().extentsAt(FORWARD).equals(forwardExtent, 1e-3)
+      !caret.node().layout().extentsAt(FORWARD).equals(forwardExtent, 1e-3)
     ) {
       console.log(forwardExtent.dump("Expected forward extents"));
       console.log(
         caret
           .node()
-          .getLayout()
+          .layout()
           .extentsAt(FORWARD)
           .dump("Given forward extents")
       );
@@ -1201,7 +1209,7 @@ describe("Package", function () {
 
     // Run comparison tests.
     const rootNode = caret.node();
-    const layout = caret.node().getLayout();
+    const layout = caret.node().layout();
     if (layout.extentOffsetAt(BACKWARD) != layout.extentOffsetAt(FORWARD)) {
       throw new Error(
         "Graphs symmetric about the root should" +
@@ -1232,7 +1240,7 @@ describe("Package", function () {
           layout.extentOffsetAt(FORWARD) +
           ")"
       );
-      const forwardExtent = caret.node().getLayout().extentsAt(FORWARD);
+      const forwardExtent = caret.node().layout().extentsAt(FORWARD);
       forwardExtent.forEach(function (length: number, size: number, i: number) {
         console.log(i + ". l=" + length + ", s=" + size);
       });
@@ -1240,7 +1248,7 @@ describe("Package", function () {
       console.log(
         "UPWARDExtent (offset to center=" + layout.extentOffsetAt(UPWARD) + ")"
       );
-      const UPWARDExtent = caret.node().getLayout().extentsAt(UPWARD);
+      const UPWARDExtent = caret.node().layout().extentsAt(UPWARD);
       UPWARDExtent.forEach(function (length: number, size: number, i: number) {
         console.log(i + ". l=" + length + ", s=" + size);
       });
@@ -1332,10 +1340,10 @@ describe("Package", function () {
     const anode = car.spawnMove("f", "u");
     const mnode = car.spawn("d", "b");
     commitLayout(car.root());
-    const ax = anode.getLayout().groupX();
+    const ax = anode.layout().groupX();
     assert.isNotNaN(ax);
 
-    const gx = mnode.getLayout().groupX();
+    const gx = mnode.layout().groupX();
     assert.isNotNaN(gx);
 
     const ns = { ...readStyle("b") };
@@ -1344,23 +1352,23 @@ describe("Package", function () {
     bnode.setValue(ns);
     bnode.layoutChanged();
     commitLayout(car.root());
-    if (ax === anode.getLayout().groupX()) {
+    if (ax === anode.layout().groupX()) {
       // simpleGraph(out, car);
       throw new Error(
         "Bud must move when another node grows in size. (ax=" +
           ax +
           ", x=" +
-          anode.getLayout().groupX() +
+          anode.layout().groupX() +
           ")"
       );
     }
-    if (gx + increase / 2 !== mnode.getLayout().groupX()) {
+    if (gx + increase / 2 !== mnode.layout().groupX()) {
       // simpleGraph(out, car);
       throw new Error(
         "Node must be moved when another node grows in size. (expected " +
           (gx + increase / 2) +
           " versus actual " +
-          mnode.getLayout().groupX() +
+          mnode.layout().groupX() +
           ")"
       );
     }
@@ -1384,17 +1392,17 @@ describe("Package", function () {
 
   it("Node lisp test simplified", function () {
     const root = makeNode(BUD);
-    root._id = "root";
+    root.state().setId("root");
 
     const a = makeNode(BLOCK);
-    a._id = "a";
+    a.state().setId("a");
     const b = makeNode(BLOCK);
-    b._id = "b";
+    b.state().setId("b");
     const c = makeNode(BLOCK);
-    c._id = "c";
+    c.state().setId("c");
 
     const chi = makeNode(BUD);
-    chi._id = "chi";
+    chi.state().setId("chi");
 
     chi.connectNode(FORWARD, c);
 
@@ -1424,7 +1432,7 @@ describe("Package", function () {
       node = inner;
     }
     commitLayout(root);
-    assert.isNotTrue(root.needsCommit());
+    assert.isNotTrue(root.layout().needsCommit());
   });
 
   it("Disconnect trivial test", function () {
@@ -1462,16 +1470,16 @@ describe("Package", function () {
     commitLayout(root);
 
     root.forEachPaintGroup((pg) => {
-      assert(!pg.getLayout().needsAbsolutePos());
+      assert(!pg.layout().needsAbsolutePos());
     });
-    assert(!root.getLayout().needsAbsolutePos());
-    assert(!creased?.getLayout().needsAbsolutePos());
+    assert(!root.layout().needsAbsolutePos());
+    assert(!creased?.layout().needsAbsolutePos());
 
     assert(
-      creased?.getLayout().absoluteScale() !== null,
+      creased?.layout().absoluteScale() !== null,
       "Scale must not be null"
     );
-    assert(creased?.getLayout().absoluteScale() === 0.5, "Scale must be 0.5");
+    assert(creased?.layout().absoluteScale() === 0.5, "Scale must be 0.5");
   });
 
   it("Proportion pull test", function () {

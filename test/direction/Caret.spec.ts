@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { DirectionCaret } from "../../src/direction";
+import { DirectionCaret } from "../../src/DirectionCaret";
 
 describe("Caret", function () {
   it("can use a ", () => {

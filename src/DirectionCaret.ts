@@ -1,23 +1,29 @@
-import Direction, { readDirection, reverseDirection } from "./Direction";
 import createException, { NO_NODE_FOUND } from "./Exception";
-import generateID from "../generateid";
-import DirectionNode from "./DirectionNode";
-import PreferredAxis from "./PreferredAxis";
-import Fit from "./Fit";
-import AxisOverlap, { readAxisOverlap } from "./AxisOverlap";
-import Alignment, { readAlignment } from "./Alignment";
+import { Direction, readDirection, reverseDirection } from "./Direction";
+import { DirectionNode } from "./DirectionNode";
+
+import {
+  PreferredAxis,
+  Fit,
+  AxisOverlap,
+  readAxisOverlap,
+  Alignment,
+  readAlignment,
+} from "./DirectionNode";
 
 // The scale at which shrunk nodes are shrunk.
 export const SHRINK_SCALE = 0.85;
 
-export default class DirectionCaret<Value> {
+let nextID = 0;
+
+export class DirectionCaret<Value> {
   _nodeRoot: DirectionNode<Value>;
   _nodes: DirectionNode<Value>[];
-  _savedNodes: { [key: string]: DirectionNode<Value> };
+  _savedNodes: { [key: string]: DirectionNode<Value> } | undefined;
 
   constructor(given: any = null) {
     // A mapping of nodes to their saved names.
-    this._savedNodes = null;
+    this._savedNodes = undefined;
 
     this._nodeRoot = this.doSpawn(given) as DirectionNode<Value>;
 
@@ -82,8 +88,10 @@ export default class DirectionCaret<Value> {
     return node;
   }
 
-  disconnect(inDirection?: Direction | string): DirectionNode<Value> {
-    if (arguments.length > 0) {
+  disconnect(
+    inDirection?: Direction | string
+  ): DirectionNode<Value> | undefined {
+    if (inDirection) {
       // Interpret the given direction for ease-of-use.
       inDirection = readDirection(inDirection);
       return this.node().disconnectNode(inDirection);
@@ -99,14 +107,9 @@ export default class DirectionCaret<Value> {
   }
 
   crease(inDirection?: Direction | string): void {
-    // Interpret the given direction for ease-of-use.
-    inDirection = readDirection(inDirection);
-
-    let node: DirectionNode<Value>;
-    if (arguments.length === 0) {
-      node = this.node();
-    } else {
-      node = this.node().nodeAt(inDirection);
+    let node: DirectionNode<Value> = this.node();
+    if (inDirection) {
+      node = this.node().nodeAt(readDirection(inDirection));
     }
 
     // Create a new paint group for the connection.
@@ -114,14 +117,9 @@ export default class DirectionCaret<Value> {
   }
 
   uncrease(inDirection?: Direction | string) {
-    // Interpret the given direction for ease-of-use.
-    inDirection = readDirection(inDirection);
-
-    let node: DirectionNode<Value>;
-    if (arguments.length === 0) {
-      node = this.node();
-    } else {
-      node = this.node().nodeAt(inDirection);
+    let node: DirectionNode<Value> = this.node();
+    if (inDirection) {
+      node = this.node().nodeAt(readDirection(inDirection));
     }
 
     // Remove the paint group.
@@ -129,14 +127,9 @@ export default class DirectionCaret<Value> {
   }
 
   isCreased(inDirection?: Direction | string): boolean {
-    // Interpret the given direction for ease-of-use.
-    inDirection = readDirection(inDirection);
-
-    let node: DirectionNode<Value>;
-    if (arguments.length === 0) {
-      node = this.node();
-    } else {
-      node = this.node().nodeAt(inDirection);
+    let node: DirectionNode<Value> = this.node();
+    if (inDirection) {
+      node = this.node().nodeAt(readDirection(inDirection));
     }
 
     return !!node.localPaintGroup();
@@ -166,7 +159,7 @@ export default class DirectionCaret<Value> {
 
   save(id?: string): string {
     if (id === undefined) {
-      id = generateID();
+      id = ++nextID + "";
     }
     if (!this._savedNodes) {
       this._savedNodes = {};
@@ -213,7 +206,7 @@ export default class DirectionCaret<Value> {
 
   pull(given: Direction | string): void {
     given = readDirection(given);
-    this.node().pull(given);
+    this.node().siblings().pull(given);
   }
 
   /*
@@ -227,7 +220,6 @@ export default class DirectionCaret<Value> {
     inDirection: Direction | string,
     newAlignmentMode: Alignment | string
   ): void {
-    // Interpret the arguments.
     inDirection = readDirection(inDirection);
     newAlignmentMode = readAlignment(newAlignmentMode);
 
@@ -257,7 +249,7 @@ export default class DirectionCaret<Value> {
 
   shrink(inDirection?: Direction | string): void {
     let node = this.node();
-    if (arguments.length > 0) {
+    if (inDirection) {
       node = node.nodeAt(readDirection(inDirection));
     }
     if (node) {
@@ -267,7 +259,7 @@ export default class DirectionCaret<Value> {
 
   grow(inDirection?: Direction | string): void {
     let node = this.node();
-    if (arguments.length > 0) {
+    if (inDirection) {
       node = node.nodeAt(readDirection(inDirection));
     }
     if (node) {
@@ -277,7 +269,7 @@ export default class DirectionCaret<Value> {
 
   fitExact(inDirection?: Direction | string): void {
     let node = this.node();
-    if (arguments.length > 0) {
+    if (inDirection) {
       node = node.nodeAt(readDirection(inDirection));
     }
     node.state().setNodeFit(Fit.EXACT);
@@ -285,7 +277,7 @@ export default class DirectionCaret<Value> {
 
   fitLoose(inDirection?: Direction | string): void {
     let node = this.node();
-    if (arguments.length > 0) {
+    if (inDirection) {
       node = node.nodeAt(readDirection(inDirection));
     }
     node.state().setNodeFit(Fit.LOOSE);
@@ -293,7 +285,7 @@ export default class DirectionCaret<Value> {
 
   fitNaive(inDirection?: Direction | string): void {
     let node = this.node();
-    if (arguments.length > 0) {
+    if (inDirection) {
       node = node.nodeAt(readDirection(inDirection));
     }
     node.state().setNodeFit(Fit.NAIVE);
@@ -316,7 +308,7 @@ export default class DirectionCaret<Value> {
     // Spawn a node in the given direction.
     const created = this.doSpawn(newType);
     this.node().connectNode(inDirection, created);
-    created.setLayoutPreference(PreferredAxis.PERPENDICULAR);
+    created.siblings().setLayoutPreference(PreferredAxis.PERPENDICULAR);
     created.state().setNodeFit(this.node().state().nodeFit());
 
     // Use the given alignment mode.
@@ -359,6 +351,7 @@ export default class DirectionCaret<Value> {
     if (this.node().hasNode(inDirection)) {
       return this.node().nodeAt(inDirection);
     }
+    throw new Error("No node at direction");
   }
 
   id(val?: string | number) {

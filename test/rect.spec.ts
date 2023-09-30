@@ -1,5 +1,5 @@
 const { assert } = require("chai");
-import Rect from "../src/rect";
+import { Rect } from "../src";
 
 describe("Package", function () {
   it("vMin", function () {
