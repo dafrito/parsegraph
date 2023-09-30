@@ -334,17 +334,12 @@ export class DirectionCaret<Value> {
     return created;
   }
 
-  replace(...args: any[]): void {
-    // Retrieve the arguments.
-    let node = this.node();
-    let withType: DirectionNode<Value> | string;
-    if (args.length > 1) {
-      node = node.nodeAt(readDirection(args[0]));
-      withType = args[1];
-    } else {
-      withType = args[0];
-    }
-    this.doReplace(node, withType);
+  replace(value?: Value) {
+    return this.doReplace(this.node(), value);
+  }
+
+  value() {
+    return this.node().value();
   }
 
   spawnMove(
