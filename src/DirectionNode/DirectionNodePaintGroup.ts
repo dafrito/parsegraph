@@ -17,7 +17,7 @@ export interface PaintGroupNode extends SiblingNode {
   comesBefore(other: PaintGroupNode): boolean;
 }
 
-export default class DirectionNodePaintGroup {
+export class DirectionNodePaintGroup {
   _next: PaintGroupNode;
   _prev: PaintGroupNode;
   _node: PaintGroupNode;

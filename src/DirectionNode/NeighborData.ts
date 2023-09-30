@@ -3,7 +3,7 @@ import { Direction } from "../Direction";
 import Alignment from "./Alignment";
 import AxisOverlap from "./AxisOverlap";
 
-export default class NeighborData<T> {
+export class NeighborData<T> {
   owner: T;
   direction: Direction;
   node: T | undefined;

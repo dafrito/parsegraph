@@ -29,9 +29,10 @@ import { LayoutPhase } from "./Layout";
 import { PreferredAxis } from "./DirectionNodeSiblings";
 import Alignment from "./Alignment";
 import AxisOverlap from "./AxisOverlap";
-import NeighborData from "./NeighborData";
+import { NeighborData } from "./NeighborData";
 import { DirectionNodeSiblings } from "./DirectionNodeSiblings";
-import DirectionNodePaintGroup, {
+import {
+  DirectionNodePaintGroup,
   PaintGroupNode,
 } from "./DirectionNodePaintGroup";
 import { DirectionNodeState } from "./DirectionNodeState";
