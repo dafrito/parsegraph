@@ -51,7 +51,7 @@ export class DirectionNode<Value = any> implements PaintGroupNode {
   _paintGroup: DirectionNodePaintGroup | undefined;
   _paintGroupRoot: DirectionNode;
 
-  constructor() {
+  constructor(value?: Value) {
     // Neighbors
     this._neighbors = new Array(NUM_DIRECTIONS);
     this._parentNeighbor = null;
@@ -61,6 +61,10 @@ export class DirectionNode<Value = any> implements PaintGroupNode {
     this._paintGroupRoot = this;
     this._paintGroup = new DirectionNodePaintGroup(this, false);
     this._layout = undefined;
+
+    if (value !== undefined) {
+      this.setValue(value);
+    }
   }
 
   layoutChanged(): void {
