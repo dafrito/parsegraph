@@ -621,7 +621,7 @@ describe("CommitLayout", () => {
     for (let i = 0; i < 10; ++i) {
       root.crease();
       const newRoot = new DirectionNode();
-      root.connectNode(Direction.BACKWARD, newRoot);
+      root.connect(Direction.BACKWARD, newRoot);
       root = newRoot;
       const m = demo2(root.neighbors().root());
       paintedNodes += m.paintedNodes;
@@ -640,7 +640,7 @@ describe("CommitLayout", () => {
     let renders = 0;
     for (let i = 0; i < 10; ++i) {
       const newRoot = new DirectionNode();
-      root.connectNode(Direction.BACKWARD, newRoot);
+      root.connect(Direction.BACKWARD, newRoot);
       root = newRoot;
       const m = demo(root.neighbors().root());
       paints += m.paints;
@@ -658,7 +658,7 @@ describe("CommitLayout", () => {
     for (let i = 0; i < 10; ++i) {
       root.crease();
       const newRoot = new DirectionNode();
-      newRoot.connectNode(Direction.BACKWARD, root);
+      newRoot.connect(Direction.BACKWARD, root);
       root = newRoot;
       const m = demo(root);
       paints += m.paints;
@@ -676,7 +676,7 @@ describe("CommitLayout", () => {
     let paintedNodes = 0;
     for (let i = 0; i < 10; ++i) {
       const newRoot = new DirectionNode();
-      newRoot.connectNode(Direction.BACKWARD, root);
+      newRoot.connect(Direction.BACKWARD, root);
       root = newRoot;
       const m = demo2(root);
       paints += m.paints;
@@ -697,7 +697,7 @@ describe("CommitLayout", () => {
     for (let i = 0; i < 10; ++i) {
       root.crease();
       const newRoot = new DirectionNode();
-      newRoot.connectNode(Direction.BACKWARD, root);
+      newRoot.connect(Direction.BACKWARD, root);
       root = newRoot;
       const m = demo2(root);
       paints += m.paints;

@@ -80,7 +80,7 @@ export class DirectionCaret<Value> {
     inDirection: Direction | string,
     node: DirectionNode<Value>
   ): DirectionNode<Value> {
-    this.node().connectNode(readDirection(inDirection), node);
+    this.node().connect(readDirection(inDirection), node);
 
     return node;
   }
@@ -102,7 +102,7 @@ export class DirectionCaret<Value> {
   ): DirectionNode<Value> | undefined {
     if (inDirection) {
       // Interpret the given direction for ease-of-use.
-      return this.node().disconnectNode(readDirection(inDirection));
+      return this.node().disconnect(readDirection(inDirection));
     }
 
     if (this.node().neighbors().isRoot()) {
@@ -111,7 +111,7 @@ export class DirectionCaret<Value> {
 
     return this.node()
       .parentNode()
-      .disconnectNode(reverseDirection(this.node().parentDirection()));
+      .disconnect(reverseDirection(this.node().parentDirection()));
   }
 
   crease(inDirection?: Direction | string): void {
@@ -361,7 +361,7 @@ export class DirectionCaret<Value> {
   ): DirectionNode<Value> {
     // Spawn a node in the given direction.
     const created = this.doSpawn(newType);
-    this.node().connectNode(readDirection(inDirection), created);
+    this.node().connect(readDirection(inDirection), created);
     created.siblings().setLayoutPreference(PreferredAxis.PERPENDICULAR);
     created.setNodeFit(this.node().nodeFit());
 

@@ -345,7 +345,7 @@ export class DirectionNode<Value = any> {
   //
   // ///////////////////////////////////////////////////////////////////////////
 
-  connectNode(
+  connect(
     inDirection: Direction,
     node: DirectionNode<Value>
   ): DirectionNode<Value> {
@@ -360,13 +360,13 @@ export class DirectionNode<Value = any> {
       throw createException(NO_PARENT_CONNECT);
     }
     if (this.neighbors().hasNode(inDirection)) {
-      this.disconnectNode(inDirection);
+      this.disconnect(inDirection);
     }
     if (!node.neighbors().isRoot()) {
-      node.disconnectNode();
+      node.disconnect();
     }
     if (node.neighbors().hasNode(reverseDirection(inDirection))) {
-      node.disconnectNode(reverseDirection(inDirection));
+      node.disconnect(reverseDirection(inDirection));
     }
 
     // Connect the node.
@@ -399,12 +399,12 @@ export class DirectionNode<Value = any> {
     return node;
   }
 
-  disconnectNode(inDirection?: Direction): DirectionNode | undefined {
+  disconnect(inDirection?: Direction): DirectionNode | undefined {
     if (arguments.length === 0 || inDirection === undefined) {
       if (this.neighbors().isRoot()) {
         return this;
       }
-      return this.parentNode().disconnectNode(
+      return this.parentNode().disconnect(
         reverseDirection(this.parentDirection())
       );
     }
@@ -414,7 +414,7 @@ export class DirectionNode<Value = any> {
     }
 
     if (!this.neighbors().isRoot() && this.parentDirection() === inDirection) {
-      return this.parentNode().disconnectNode(
+      return this.parentNode().disconnect(
         reverseDirection(this.parentDirection())
       );
     }
@@ -450,7 +450,7 @@ export class DirectionNode<Value = any> {
         return;
       }
       if (this.neighbors().hasNode(dir)) {
-        const removed = this.disconnectNode(dir);
+        const removed = this.disconnect(dir);
         if (!removed) {
           throw new Error("removed no node in a direction that has a node?");
         }

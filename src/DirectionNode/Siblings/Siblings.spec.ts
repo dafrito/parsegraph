@@ -9,11 +9,11 @@ describe("Siblings", () => {
     assert.equal(n.siblings().getLayoutPreference(), PreferredAxis.VERTICAL);
 
     const root = new DirectionNode();
-    root.connectNode(Direction.DOWNWARD, n);
+    root.connect(Direction.DOWNWARD, n);
 
     assert.equal(n.siblings().getLayoutPreference(), PreferredAxis.VERTICAL);
 
-    root.disconnectNode(Direction.DOWNWARD);
+    root.disconnect(Direction.DOWNWARD);
 
     assert.equal(n.siblings().getLayoutPreference(), PreferredAxis.VERTICAL);
   });
@@ -25,13 +25,13 @@ describe("Siblings", () => {
     assert.equal(n.siblings().getLayoutPreference(), PreferredAxis.VERTICAL);
 
     const root = new DirectionNode();
-    root.connectNode(Direction.DOWNWARD, n);
+    root.connect(Direction.DOWNWARD, n);
 
     n.siblings().pull(Direction.DOWNWARD);
 
     assert.equal(n.siblings().getLayoutPreference(), PreferredAxis.PARENT);
 
-    root.disconnectNode(Direction.DOWNWARD);
+    root.disconnect(Direction.DOWNWARD);
 
     assert.equal(n.siblings().getLayoutPreference(), PreferredAxis.VERTICAL);
   });

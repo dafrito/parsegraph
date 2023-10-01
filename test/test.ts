@@ -1397,13 +1397,13 @@ describe("Package", function () {
     const chi = makeNode(BUD);
     chi.setId("chi");
 
-    chi.connectNode(FORWARD, c);
+    chi.connect(FORWARD, c);
 
-    a.connectNode(DOWNWARD, chi);
-    a.connectNode(FORWARD, b);
+    a.connect(DOWNWARD, chi);
+    a.connect(FORWARD, b);
     // console.log("LISP TEST");
     // console.log(getLayoutNodes(a));
-    root.connectNode(FORWARD, a);
+    root.connect(FORWARD, a);
 
     commitLayout(root);
   });
@@ -1421,7 +1421,7 @@ describe("Package", function () {
       if (i % 5 === 0) {
         inner.crease();
       }
-      node.connectNode(Direction.INWARD, inner);
+      node.connect(Direction.INWARD, inner);
       node = inner;
     }
     commitLayout(root);
@@ -1451,7 +1451,7 @@ describe("Package", function () {
     let n: DirectionNode = root;
     for (let i = 0; i < 10; ++i) {
       const child = makeBlock();
-      n.connectNode(i % 2 ? Direction.FORWARD : Direction.DOWNWARD, child);
+      n.connect(i % 2 ? Direction.FORWARD : Direction.DOWNWARD, child);
       n = child;
       if (i == 5) {
         n.crease();
@@ -1536,10 +1536,10 @@ describe("Package", function () {
     originalRoot.setId("ROOT");
     for (let i = 0; i < 5; ++i) {
       const subCar = makeCaret(BUD);
-      car.node().connectNode(Direction.DOWNWARD, subCar.root());
+      car.node().connect(Direction.DOWNWARD, subCar.root());
       commitLayout(originalRoot);
       const nextCar = makeCaret(BLOCK);
-      car.node().connectNode(Direction.DOWNWARD, nextCar.root());
+      car.node().connect(Direction.DOWNWARD, nextCar.root());
       car = nextCar;
       commitLayout(originalRoot);
     }

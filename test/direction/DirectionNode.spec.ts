@@ -24,9 +24,9 @@ describe("DirectionNode", function () {
     const root = new DirectionNode<string>().setId("root");
 
     const arrNode = new DirectionNode<string>().setId("main-array");
-    root.connectNode(Direction.FORWARD, arrNode);
+    root.connect(Direction.FORWARD, arrNode);
     const beforeBud = new DirectionNode().setId(`before-bud`);
-    root.connectNode(Direction.INWARD, beforeBud);
+    root.connect(Direction.INWARD, beforeBud);
 
     let next = root;
 
@@ -35,14 +35,14 @@ describe("DirectionNode", function () {
       const b = new DirectionNode<string>().setId(`block-${i}`);
       blocks.push(b);
       const afterBud = new DirectionNode().setId(`${i}-after-bud`);
-      b.connectNode(Direction.FORWARD, afterBud);
-      next.connectNode(Direction.FORWARD, b);
+      b.connect(Direction.FORWARD, afterBud);
+      next.connect(Direction.FORWARD, b);
       next = afterBud;
     }
 
     const inner = new DirectionNode<string>().setId("last-inward");
     inner.crease();
-    blocks[blocks.length - 1].connectNode(Direction.INWARD, inner);
+    blocks[blocks.length - 1].connect(Direction.INWARD, inner);
 
     expect(
       root
@@ -53,7 +53,7 @@ describe("DirectionNode", function () {
 
     const inner2 = new DirectionNode<string>().setId("next-last-inward");
     inner2.crease();
-    blocks[blocks.length - 2].connectNode(Direction.INWARD, inner2);
+    blocks[blocks.length - 2].connect(Direction.INWARD, inner2);
 
     expect(
       root
@@ -70,7 +70,7 @@ describe("DirectionNode", function () {
       const node = new DirectionNode<string>().setId(name + "block");
       const inner = new DirectionNode<string>().setId(name + "inward");
       inner.crease();
-      node.connectNode(Direction.INWARD, inner);
+      node.connect(Direction.INWARD, inner);
       return node;
     };
 
@@ -79,9 +79,9 @@ describe("DirectionNode", function () {
     for (let i = 0; i < 2; ++i) {
       const b = makeBlock(String(i));
       const bud = new DirectionNode().setId(`${i} bud`);
-      bud.connectNode(Direction.FORWARD, b);
+      bud.connect(Direction.FORWARD, b);
       // b.crease();
-      next.connectNode(Direction.DOWNWARD, bud);
+      next.connect(Direction.DOWNWARD, bud);
       last = next;
       next = bud;
     }
@@ -103,7 +103,7 @@ describe("DirectionNode", function () {
       const node = new DirectionNode<string>().setId(name + "block");
       const inner = new DirectionNode<string>().setId(name + "inward");
       inner.crease();
-      node.connectNode(Direction.INWARD, inner);
+      node.connect(Direction.INWARD, inner);
       return node;
     };
 
@@ -112,9 +112,9 @@ describe("DirectionNode", function () {
     for (let i = 0; i < 4; ++i) {
       const b = makeBlock(String(i));
       const bud = new DirectionNode().setId(`${i} bud`);
-      bud.connectNode(Direction.FORWARD, b);
+      bud.connect(Direction.FORWARD, b);
       // b.crease();
-      next.connectNode(Direction.DOWNWARD, bud);
+      next.connect(Direction.DOWNWARD, bud);
       last = next;
       next = bud;
     }
@@ -134,7 +134,7 @@ describe("DirectionNode", function () {
         .dump()
         .map((pg) => pg.id())
     ).toEqual(["root", "0inward", "1inward", "2inward", "3block", "3inward"]);
-    next.disconnectNode(Direction.FORWARD);
+    next.disconnect(Direction.FORWARD);
     root.paintGroup().verify();
     expect(
       root
@@ -143,7 +143,7 @@ describe("DirectionNode", function () {
         .map((pg) => pg.id())
     ).toEqual(["root", "0inward", "1inward", "2inward"]);
     const spawned = makeBlock("spawned");
-    next.connectNode(Direction.FORWARD, spawned);
+    next.connect(Direction.FORWARD, spawned);
     expect(
       root
         .paintGroup()
@@ -164,14 +164,14 @@ describe("DirectionNode", function () {
       "spawnedblock",
       "spawnedinward",
     ]);
-    next.disconnectNode(Direction.FORWARD);
+    next.disconnect(Direction.FORWARD);
     expect(
       root
         .paintGroup()
         .dump()
         .map((pg) => pg.id())
     ).toEqual(["root", "0inward", "1inward", "2inward"]);
-    next.connectNode(Direction.FORWARD, spawned);
+    next.connect(Direction.FORWARD, spawned);
     expect(
       root
         .paintGroup()
@@ -192,7 +192,7 @@ describe("DirectionNode", function () {
         .dump()
         .map((pg) => pg.id())
     ).toEqual(["root", "0inward", "1inward", "2inward", "spawnedinward"]);
-    next.disconnectNode(Direction.FORWARD);
+    next.disconnect(Direction.FORWARD);
     expect(
       root
         .paintGroup()
@@ -200,7 +200,7 @@ describe("DirectionNode", function () {
         .map((pg) => pg.id())
     ).toEqual(["root", "0inward", "1inward", "2inward"]);
 
-    last.disconnectNode(Direction.FORWARD);
+    last.disconnect(Direction.FORWARD);
     expect(
       root
         .paintGroup()
@@ -209,7 +209,7 @@ describe("DirectionNode", function () {
     ).toEqual(["root", "0inward", "1inward"]);
     const spawned2 = makeBlock("spawned2");
     // spawned2.crease();
-    last.connectNode(Direction.FORWARD, spawned2);
+    last.connect(Direction.FORWARD, spawned2);
 
     expect(
       root
@@ -233,7 +233,7 @@ describe("DirectionNode", function () {
       "spawned2inward",
     ]);
 
-    last.disconnectNode(Direction.FORWARD);
+    last.disconnect(Direction.FORWARD);
 
     expect(
       root
@@ -243,7 +243,7 @@ describe("DirectionNode", function () {
     ).toEqual(["root", "0inward", "1inward"]);
     spawned2.uncrease();
 
-    last.connectNode(Direction.FORWARD, spawned2);
+    last.connect(Direction.FORWARD, spawned2);
     expect(
       root
         .paintGroup()
@@ -252,7 +252,7 @@ describe("DirectionNode", function () {
     ).toEqual(["root", "0inward", "1inward", "spawned2inward"]);
 
     const spawned3 = makeBlock("spawned3");
-    next.connectNode(Direction.FORWARD, spawned3);
+    next.connect(Direction.FORWARD, spawned3);
     expect(
       root
         .paintGroup()
@@ -265,7 +265,7 @@ describe("DirectionNode", function () {
       "spawned2inward",
       "spawned3inward",
     ]);
-    next.connectNode(Direction.FORWARD, makeBlock("spawned4"));
+    next.connect(Direction.FORWARD, makeBlock("spawned4"));
     expect(
       root
         .paintGroup()
@@ -278,14 +278,14 @@ describe("DirectionNode", function () {
       "spawned2inward",
       "spawned4inward",
     ]);
-    last.disconnectNode(Direction.FORWARD);
+    last.disconnect(Direction.FORWARD);
     expect(
       root
         .paintGroup()
         .dump()
         .map((pg) => pg.id())
     ).toEqual(["root", "0inward", "1inward", "spawned4inward"]);
-    last.connectNode(Direction.FORWARD, makeBlock("spawned5"));
+    last.connect(Direction.FORWARD, makeBlock("spawned5"));
     expect(
       root
         .paintGroup()
@@ -303,20 +303,20 @@ describe("DirectionNode", function () {
   it("can be pulled", () => {
     const bud = new DirectionNode().setId("bud");
     bud.siblings().setLayoutPreference(PreferredAxis.VERTICAL);
-    bud.connectNode(Direction.FORWARD, new DirectionNode().setId("f"));
-    bud.connectNode(Direction.BACKWARD, new DirectionNode().setId("b"));
-    bud.connectNode(Direction.DOWNWARD, new DirectionNode().setId("d"));
-    bud.connectNode(Direction.UPWARD, new DirectionNode().setId("u"));
+    bud.connect(Direction.FORWARD, new DirectionNode().setId("f"));
+    bud.connect(Direction.BACKWARD, new DirectionNode().setId("b"));
+    bud.connect(Direction.DOWNWARD, new DirectionNode().setId("d"));
+    bud.connect(Direction.UPWARD, new DirectionNode().setId("u"));
     bud.siblings().setLayoutPreference(PreferredAxis.HORIZONTAL);
   });
 
   it("can be pulled the other way", () => {
     const bud = new DirectionNode().setId("bud");
     bud.siblings().setLayoutPreference(PreferredAxis.HORIZONTAL);
-    bud.connectNode(Direction.FORWARD, new DirectionNode().setId("f"));
-    bud.connectNode(Direction.BACKWARD, new DirectionNode().setId("b"));
-    bud.connectNode(Direction.DOWNWARD, new DirectionNode().setId("d"));
-    bud.connectNode(Direction.UPWARD, new DirectionNode().setId("u"));
+    bud.connect(Direction.FORWARD, new DirectionNode().setId("f"));
+    bud.connect(Direction.BACKWARD, new DirectionNode().setId("b"));
+    bud.connect(Direction.DOWNWARD, new DirectionNode().setId("d"));
+    bud.connect(Direction.UPWARD, new DirectionNode().setId("u"));
     bud.siblings().setLayoutPreference(PreferredAxis.VERTICAL);
   });
 });

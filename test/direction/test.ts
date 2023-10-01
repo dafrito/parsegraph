@@ -168,7 +168,7 @@ describe("DirectionNode", function () {
     expect(root.paintGroup()?.next()).to.not.equal(child);
     expect(root.paintGroup()?.next()).to.equal(root);
 
-    child.disconnectNode();
+    child.disconnect();
     expect(child.isPaintGroup()).to.not.equal(false);
 
     expect(root.isPaintGroup()).to.not.equal(false);
@@ -184,7 +184,7 @@ describe("DirectionNode", function () {
 
   it("Node Morris world threading spawned", function () {
     const n = new DirectionNode();
-    n.connectNode(Direction.FORWARD, new DirectionNode());
+    n.connect(Direction.FORWARD, new DirectionNode());
   });
 });
 
@@ -345,7 +345,7 @@ describe("DirectionCaret", function () {
     const chi = new DirectionNode();
     chi.setId("chi");
 
-    chi.connectNode(Direction.FORWARD, c);
+    chi.connect(Direction.FORWARD, c);
 
     // root--a--b
     //       |
@@ -353,9 +353,9 @@ describe("DirectionCaret", function () {
 
     // console.log("cur a",
     //   namePreferredAxis(a._layoutPreference));
-    a.connectNode(Direction.DOWNWARD, chi);
-    a.connectNode(Direction.FORWARD, b);
-    root.connectNode(Direction.FORWARD, a);
+    a.connect(Direction.DOWNWARD, chi);
+    a.connect(Direction.FORWARD, b);
+    root.connect(Direction.FORWARD, a);
     a.siblings().setLayoutPreference(PreferredAxis.PERPENDICULAR);
 
     // console.log("new a",
@@ -365,7 +365,7 @@ describe("DirectionCaret", function () {
       throw new Error("Expected c, got " + r.id());
     }
 
-    root.disconnectNode(Direction.FORWARD);
+    root.disconnect(Direction.FORWARD);
     if (a.siblings().getLayoutPreference() !== PreferredAxis.VERTICAL) {
       throw new Error(
         "a layoutPreference was not VERT but " +
@@ -391,7 +391,7 @@ describe("DirectionCaret", function () {
       throw new Error("Next sanity");
     }
 
-    n.connectNode(Direction.FORWARD, b);
+    n.connect(Direction.FORWARD, b);
     if (n.siblings().prev() != b) {
       throw new Error("Next connected sanity");
     }
@@ -425,7 +425,7 @@ describe("DirectionCaret", function () {
       throw new Error("Next sanity");
     }
 
-    n.connectNode(Direction.FORWARD, b);
+    n.connect(Direction.FORWARD, b);
     if (n.siblings().prev() != b) {
       throw new Error("Next connected sanity");
     }
@@ -440,7 +440,7 @@ describe("DirectionCaret", function () {
     }
     const c = new DirectionNode();
     c.setId("c");
-    n.connectNode(Direction.BACKWARD, c);
+    n.connect(Direction.BACKWARD, c);
 
     const nodes = getLayoutNodes(n);
     if (nodes[0] != c) {
@@ -463,7 +463,7 @@ describe("DirectionCaret", function () {
       const b = new DirectionNode();
       b.setId("b");
 
-      const inner = b.connectNode(Direction.INWARD, new DirectionNode());
+      const inner = b.connect(Direction.INWARD, new DirectionNode());
       inner.setId("inner");
       if (b.siblings().prev() != inner) {
         throw new Error("B layoutBefore isn't inner");
@@ -472,7 +472,7 @@ describe("DirectionCaret", function () {
         throw new Error("Inner layoutBefore isn't B");
       }
 
-      n.connectNode(Direction.FORWARD, b);
+      n.connect(Direction.FORWARD, b);
       if (n.siblings().prev() != b) {
         throw new Error("Next connected sanity");
       }
@@ -495,7 +495,7 @@ describe("DirectionCaret", function () {
       // console.log(getLayoutNodes(n));
       const c = new DirectionNode();
       c.setId("c");
-      n.connectNode(Direction.BACKWARD, c);
+      n.connect(Direction.BACKWARD, c);
       // console.log("PLNS");
       // console.log(getLayoutNodes(n));
 
@@ -512,7 +512,7 @@ describe("DirectionCaret", function () {
       if (nodes[3] != n) {
         throw new Error("Third node is not n");
       }
-      if (b !== n.disconnectNode(Direction.FORWARD)) {
+      if (b !== n.disconnect(Direction.FORWARD)) {
         throw new Error("Not even working properly");
       }
     }
@@ -535,17 +535,17 @@ describe("DirectionCaret", function () {
       b.setId("b");
       testLayoutNodes([b]);
 
-      const inner = b.connectNode(Direction.INWARD, new DirectionNode());
+      const inner = b.connect(Direction.INWARD, new DirectionNode());
       inner.setId("inner");
       testLayoutNodes([inner, b]);
 
-      n.connectNode(Direction.FORWARD, b);
+      n.connect(Direction.FORWARD, b);
       testLayoutNodes([inner, b, n]);
       const c = new DirectionNode();
       c.setId("c");
-      n.connectNode(Direction.BACKWARD, c);
+      n.connect(Direction.BACKWARD, c);
       testLayoutNodes([c, inner, b, n]);
-      if (c !== n.disconnectNode(Direction.BACKWARD)) {
+      if (c !== n.disconnect(Direction.BACKWARD)) {
         throw new Error("Not even working properly");
       }
       testLayoutNodes([c], "disconnected");
@@ -557,13 +557,13 @@ describe("DirectionCaret", function () {
     const n = new DirectionNode();
     n.setId("n");
     testLayoutNodes([n], "deeply conn 1");
-    const b = n.connectNode(Direction.FORWARD, new DirectionNode());
+    const b = n.connect(Direction.FORWARD, new DirectionNode());
     b.setId("b");
     testLayoutNodes([b, n], "deeply conn 2");
-    const c = b.connectNode(Direction.DOWNWARD, new DirectionNode());
+    const c = b.connect(Direction.DOWNWARD, new DirectionNode());
     c.setId("c");
     testLayoutNodes([c, b, n], "deeply conn 3");
-    const d = b.connectNode(Direction.FORWARD, new DirectionNode());
+    const d = b.connect(Direction.FORWARD, new DirectionNode());
     d.setId("d");
     b.siblings().setLayoutPreference(PreferredAxis.VERTICAL);
     testLayoutNodes([c, d, b, n], "deeply conn 4");
@@ -635,7 +635,7 @@ describe("DirectionCaret", function () {
   it("Node Morris world threading connected with crease", function () {
     const n = new DirectionNode();
     const b = new DirectionNode();
-    n.connectNode(Direction.FORWARD, b);
+    n.connect(Direction.FORWARD, b);
     b.crease();
     if (b.siblings().next() !== b) {
       throw new Error(
@@ -655,7 +655,7 @@ describe("DirectionCaret", function () {
     const n = new DirectionNode();
     const b = new DirectionNode();
     b.crease();
-    n.connectNode(Direction.FORWARD, b);
+    n.connect(Direction.FORWARD, b);
     if (b.siblings().next() !== b) {
       throw new Error(
         "Crease must remove that node" +
@@ -692,7 +692,7 @@ describe("DirectionCaret", function () {
     const originalRoot = car.node();
     car.spawnMove("f", "b");
     const newNode = makeCaret().node();
-    originalRoot.connectNode(Direction.FORWARD, newNode);
+    originalRoot.connect(Direction.FORWARD, newNode);
     if (originalRoot.neighbors().nodeAt(Direction.FORWARD) !== newNode) {
       throw new Error("Unexpected node");
     }
@@ -703,7 +703,7 @@ describe("DirectionCaret", function () {
     const originalRoot = car.node();
     car.spawnMove("i", "b");
     const newNode = makeCaret().node();
-    originalRoot.connectNode(Direction.INWARD, newNode);
+    originalRoot.connect(Direction.INWARD, newNode);
     if (originalRoot.neighbors().nodeAt(Direction.INWARD) !== newNode) {
       throw new Error("Unexpected node");
     }
@@ -713,13 +713,13 @@ describe("DirectionCaret", function () {
     const n = new DirectionNode().setId("n");
     const b = new DirectionNode().setId("b");
     b.crease();
-    n.connectNode(Direction.INWARD, b);
+    n.connect(Direction.INWARD, b);
 
     const a = new DirectionNode().setId("a");
     const r = new DirectionNode().setId("r");
     r.crease();
-    a.connectNode(Direction.INWARD, r);
-    r.connectNode(Direction.INWARD, b);
+    a.connect(Direction.INWARD, r);
+    r.connect(Direction.INWARD, b);
 
     // a > r > b
 
@@ -750,7 +750,7 @@ describe("DirectionCaret", function () {
     const originalRoot = car.node();
     car.spawnMove("i", "b");
     const newNode = makeCaret().spawnMove("i", "b");
-    originalRoot.connectNode(Direction.INWARD, newNode);
+    originalRoot.connect(Direction.INWARD, newNode);
     if (originalRoot.neighbors().nodeAt(Direction.INWARD) !== newNode) {
       throw new Error("Unexpected node");
     }
@@ -765,7 +765,7 @@ describe("DirectionCaret", function () {
     assert.deepEqual(pgs, [originalRoot, midRoot]);
     const newNode = makeCaret().spawnMove("i", "b");
     newNode.crease();
-    originalRoot.connectNode(Direction.INWARD, newNode);
+    originalRoot.connect(Direction.INWARD, newNode);
     if (originalRoot.neighbors().nodeAt(Direction.INWARD) !== newNode) {
       throw new Error("Unexpected node");
     }
@@ -787,7 +787,7 @@ describe("DirectionCaret", function () {
     const newNode = makeCaret().spawnMove("i", "b");
     newNode.setId("newNode");
     newNode.crease();
-    midRoot.connectNode(Direction.INWARD, newNode);
+    midRoot.connect(Direction.INWARD, newNode);
     // assert.isTrue(newNode.comesBefore(midRoot));
   });
 
@@ -803,7 +803,7 @@ describe("DirectionCaret", function () {
     const newNode = makeCaret().spawnMove("i", "b");
     newNode.setId("newNode");
     newNode.crease();
-    midRoot.connectNode(Direction.INWARD, newNode);
+    midRoot.connect(Direction.INWARD, newNode);
     pgs = originalRoot.paintGroup().dump();
     assert.deepEqual(
       pgs.map((n) => n.id()),
@@ -824,7 +824,7 @@ describe("DirectionCaret", function () {
     newNode.setId("newNode");
     newNode.crease();
     newNode.neighbors().root().setId("newNode-root");
-    midRoot.connectNode(Direction.INWARD, newNode.neighbors().root());
+    midRoot.connect(Direction.INWARD, newNode.neighbors().root());
     pgs = originalRoot.paintGroup().dump();
     assert.deepEqual(
       pgs.map((n) => n.id()),
@@ -870,7 +870,7 @@ describe("DirectionCaret", function () {
       [car.root().id(), midRoot.id(), newNode.id()]
     );
 
-    midRoot.disconnectNode();
+    midRoot.disconnect();
     assert.deepEqual(
       midRoot
         .paintGroup()
@@ -894,10 +894,10 @@ describe("DirectionCaret", function () {
     const car = makeCaret();
     car.spawnMove("f", "s");
     const hello = new DirectionNode();
-    car.node().connectNode(Direction.INWARD, hello);
+    car.node().connect(Direction.INWARD, hello);
 
     const notime = new DirectionNode();
-    hello.connectNode(Direction.FORWARD, notime);
+    hello.connect(Direction.FORWARD, notime);
 
     const ccar = makeCaret();
     const there = ccar.spawnMove("i", "b");
@@ -918,7 +918,7 @@ describe("DirectionCaret", function () {
     const containerBlock = new DirectionNode().setId("containerBlock");
     const icar = makeCaret();
     const objectNode = icar.root().setId("objectNode");
-    containerBlock.connectNode(Direction.INWARD, icar.root());
+    containerBlock.connect(Direction.INWARD, icar.root());
     assert.deepEqual(
       icar
         .root()
@@ -977,7 +977,7 @@ describe("DirectionCaret", function () {
 
     const containerBlock = new DirectionNode().setId("containerBlock");
     const icar = makeCaret();
-    containerBlock.connectNode(Direction.INWARD, icar.root());
+    containerBlock.connect(Direction.INWARD, icar.root());
     icar.crease();
     const objectNode = icar.node().setId("object");
     icar.spawnMove("d", "u");
@@ -1250,7 +1250,7 @@ describe("DirectionCaret", function () {
 
     car.spawnMove("f", "b");
 
-    r.disconnectNode(Direction.INWARD);
+    r.disconnect(Direction.INWARD);
     // assert.notEqual(car.root().paintGroup().next().id(), b.id(), "First paint group after disconnection must not be b");
     assert.equal(
       car.root().paintGroup().next().id(),
@@ -1263,7 +1263,7 @@ describe("DirectionCaret", function () {
       "R's next paint group after disconnection is root"
     );
 
-    r.connectNode(Direction.INWARD, c);
+    r.connect(Direction.INWARD, c);
     assert.equal(
       c.paintGroup().next().id(),
       car.root().id(),
@@ -1291,7 +1291,7 @@ describe("DirectionCaret", function () {
       car.root().id(),
       "Paint group after c is root"
     );
-    root.connectNode(Direction.FORWARD, lisp);
+    root.connect(Direction.FORWARD, lisp);
 
     assert.deepEqual(
       car

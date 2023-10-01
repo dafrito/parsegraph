@@ -26,7 +26,7 @@ describe("Caret", function () {
     const child = new DirectionNode("child");
     child.setId("child");
     assert.isTrue(child.neighbors().isRoot());
-    root.connectNode(Direction.BACKWARD, child);
+    root.connect(Direction.BACKWARD, child);
     assert.isFalse(child.neighbors().isRoot());
     const car = new DirectionCaret(child);
     car.move(Direction.FORWARD);
@@ -51,7 +51,7 @@ describe("Caret", function () {
     assert.isTrue(root.neighbors().isRoot());
     assert.isTrue(root.neighbors().isRootlike());
     const child = new DirectionNode("b");
-    root.connectNode(Direction.FORWARD, child);
+    root.connect(Direction.FORWARD, child);
     assert.isFalse(child.neighbors().isRoot());
   });
 

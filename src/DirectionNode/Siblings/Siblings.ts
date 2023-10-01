@@ -115,7 +115,7 @@ export class Siblings {
       .earlier(inDirection);
 
     const nodeTail: DirectionNode = node;
-    // console.log(this + ".connectNode(" + nameDirection(inDirection) +
+    // console.log(this + ".connect(" + nameDirection(inDirection) +
     //   ", " + node + ") layoutBefore=" +
     //   layoutBefore + " layoutAfter=" +
     //   layoutAfter + " nodeHead=" + nodeHead);
