@@ -73,7 +73,15 @@ export class DirectionNode<Value = any> {
     return this._value;
   }
 
-  setValue(newValue: Value | undefined, report?: boolean): Value | undefined {
+  /**
+   * Sets a new value for this DirectionNode.
+   * 
+   * The layout is invaidated if the value is changed.
+   * 
+   * @param { Value | undefined } newValue - the new value to use
+   * @returns the new value
+   */
+  setValue(newValue: Value | undefined): Value | undefined {
     // console.log("Setting value to ", newValue);
     const orig = this.value();
     if (orig === newValue) {
@@ -81,9 +89,7 @@ export class DirectionNode<Value = any> {
     }
     const oldVal = this._value;
     this._value = newValue;
-    if (arguments.length === 1 || report) {
-      this.layoutChanged();
-    }
+    this.layoutChanged();
     return this._value;
   }
 
