@@ -33,6 +33,7 @@ import { Size } from "../../../Size";
 
 import { BaseCommitLayout } from "./BaseCommitLayout";
 import { LayoutPainter } from "./LayoutPainter";
+import { positionChild } from "./positionChild";
 
 /**
  * The thickness (diameter) of the line.
@@ -1099,13 +1100,13 @@ export class CommitLayout extends BaseCommitLayout {
     }
 
     // Set the positions of the nodes.
-    this.positionChild(
+    positionChild(
       node,
       firstDirection,
       firstNodeAlignment,
       separationFromFirst
     );
-    this.positionChild(
+    positionChild(
       node,
       secondDirection,
       secondNodeAlignment,
