@@ -142,13 +142,6 @@ export class Neighbors {
     return node;
   }
 
-  destroy() {
-    this._neighbors.forEach((neighbor) => {
-      // Leave all neighbors
-      neighbor.leave();
-    });
-  }
-
   root(): DirectionNode {
     let p: DirectionNode = this.node();
     while (!p.neighbors().isRoot()) {

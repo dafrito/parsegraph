@@ -147,10 +147,6 @@ export class DirectionCaret<Value> {
     return this.isCreased(inDirection);
   }
 
-  erase(inDirection: Direction | string): void {
-    this.node().eraseNode(readDirection(inDirection));
-  }
-
   move(toDirection: Direction | string): void {
     const dest: DirectionNode<Value> = this.node()
       .neighbors()

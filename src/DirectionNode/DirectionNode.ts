@@ -502,25 +502,4 @@ export class DirectionNode<Value = any> {
 
     return disconnected;
   }
-
-  eraseNode(givenDirection: Direction): void {
-    if (!this.neighbors().hasNode(givenDirection)) {
-      return;
-    }
-    if (
-      !this.neighbors().isRoot() &&
-      givenDirection == this.parentDirection()
-    ) {
-      throw createException(CANNOT_AFFECT_PARENT);
-    }
-    this.disconnectNode(givenDirection);
-  }
-
-  destroy(): void {
-    if (!this.neighbors().isRoot()) {
-      this.disconnectNode();
-    }
-    this.neighbors().destroy();
-    this.layout().setPhase(LayoutPhase.NULL);
-  }
 }
