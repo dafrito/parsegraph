@@ -11,7 +11,7 @@ import {
 import { LayoutPhase, commitAxisBasedLayout } from "..";
 
 import { LayoutPainter } from "./LayoutPainter";
-import { addLineBounds } from "./AddLineBounds";
+import { addLineBounds } from "./addLineBounds";
 import { commitInwardLayout } from "./commitInwardLayout";
 import { commitRootlikeLayout } from "./commitRootlikeLayout";
 import createException, { BAD_LAYOUT_STATE } from "../../../Exception";

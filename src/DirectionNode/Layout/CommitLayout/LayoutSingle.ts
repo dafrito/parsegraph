@@ -15,7 +15,7 @@ import {
 import { LayoutPhase } from "..";
 
 import { LayoutPainter } from "./LayoutPainter";
-import { combineExtents } from "./CombineExtents";
+import { combineExtents } from "./combineExtents";
 import { positionChild } from "./positionChild";
 import { getAlignment } from "./getAlignment";
 import { Size } from "../../../Size";

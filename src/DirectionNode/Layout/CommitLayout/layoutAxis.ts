@@ -16,10 +16,10 @@ import createException, {
 import { LayoutPhase } from "..";
 
 import { LayoutPainter } from "./LayoutPainter";
-import { combineExtents } from "./CombineExtents";
+import { combineExtents } from "./combineExtents";
 import { positionChild } from "./positionChild";
 import { getAlignment } from "./getAlignment";
-import { layoutSingle } from "./LayoutSingle";
+import { layoutSingle } from "./layoutSingle";
 import { Size } from "../../../Size";
 import { getSeparation } from "./getSeparation";
 
