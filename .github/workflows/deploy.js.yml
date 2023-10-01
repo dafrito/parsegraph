@@ -23,6 +23,7 @@ jobs:
     - run: yarn test:cov
     - run: yarn build
     - run: yarn doc
+    - run: mv ./dist/docs ./docs
     - run: yarn tar
     - run: yarn deploy
       env:
@@ -30,5 +31,10 @@ jobs:
     - run: tar cvzf parsegraph.tgz parsegraph/
     - uses: actions/upload-artifact@v2
       with:
-        name: parsegraph-github.run_number }}
+        name: parsegraph-${{ github.run_number }}
         path: parsegraph.tgz
+    - run: tar cvzf parsegraph-doc.tgz parsegraph/dist/docs
+    - uses: actions/upload-artifact@v2
+      with:
+        name: parsegraph-docs-${{ github.run_number }}
+        path: parsegraph-docs.tgz
