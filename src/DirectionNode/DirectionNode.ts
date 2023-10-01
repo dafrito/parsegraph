@@ -60,6 +60,25 @@ export class DirectionNode<Value = any> {
   //
   // ///////////////////////////////////////////////////////////////////////////
 
+  layoutChanged(): void {
+    let node: DirectionNode = this;
+    while (node !== null) {
+      const oldLayoutPhase = node.layout().phase();
+
+      // Set the needs layout flag.
+      node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
+
+      if (node.neighbors().isRoot()) {
+        break;
+      } else if (oldLayoutPhase === LayoutPhase.COMMITTED) {
+        // Notify our parent, if we were previously committed.
+        node = node.parentNode();
+      } else {
+        break;
+      }
+    }
+  }
+
   id(): string | number | undefined {
     return this._id;
   }
@@ -180,25 +199,6 @@ export class DirectionNode<Value = any> {
       this._layout = new Layout(this);
     }
     return this._layout;
-  }
-
-  layoutChanged(): void {
-    let node: DirectionNode = this;
-    while (node !== null) {
-      const oldLayoutPhase = node.layout().phase();
-
-      // Set the needs layout flag.
-      node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
-
-      if (node.neighbors().isRoot()) {
-        break;
-      } else if (oldLayoutPhase === LayoutPhase.COMMITTED) {
-        // Notify our parent, if we were previously committed.
-        node = node.parentNode();
-      } else {
-        break;
-      }
-    }
   }
 
   // ///////////////////////////////////////////////////////////////////////////
