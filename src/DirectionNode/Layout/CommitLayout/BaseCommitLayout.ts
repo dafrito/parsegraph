@@ -9,14 +9,14 @@ export class BaseCommitLayout {
   protected bodySize: Size;
   protected firstSize: Size;
   protected secondSize: Size;
-  needsPosition: boolean;
+  protected needsPosition: boolean;
 
-  rootPaintGroup: DirectionNode;
-  paintGroup?: DirectionNode;
-  root?: DirectionNode;
-  node?: DirectionNode;
-  layoutPhase: number;
-  _painter: LayoutPainter;
+  protected rootPaintGroup: DirectionNode;
+  protected paintGroup?: DirectionNode;
+  protected root?: DirectionNode;
+  protected node?: DirectionNode;
+  protected layoutPhase: number;
+  private _painter: LayoutPainter;
 
   constructor(node: DirectionNode, painter: LayoutPainter) {
     this._painter = painter;
@@ -56,7 +56,7 @@ export class BaseCommitLayout {
     return this.rootPaintGroup;
   }
 
-  painter(): LayoutPainter {
+  protected painter(): LayoutPainter {
     return this._painter;
   }
 
@@ -176,8 +176,8 @@ export class BaseCommitLayout {
             throw new Error("Node must not be undefined");
           }
           const layout = this.node.layout();
-          layout._absoluteDirty = true;
-          layout._hasGroupPos = false;
+          layout.invalidateAbsolutePos();
+          layout.invalidateGroupPos();
           layout.commitGroupPos();
           this.node = this.node.siblings().prev() as DirectionNode;
         } while (this.node !== this.root);
@@ -222,8 +222,8 @@ export class BaseCommitLayout {
       }
       // Loop from the root to the last node.
       const layout = this.node.layout();
-      layout._absoluteDirty = true;
-      layout._hasGroupPos = false;
+      layout.invalidateAbsolutePos();
+      layout.invalidateGroupPos();
       layout.commitGroupPos();
       this.node = this.node.siblings().prev() as DirectionNode;
       return true;
@@ -253,8 +253,7 @@ export class BaseCommitLayout {
 
     const layout = this.paintGroup?.layout();
     if (layout) {
-      ++layout._absoluteVersion;
-      layout._absoluteDirty = true;
+      layout.invalidateAbsolutePos();
       layout.commitAbsolutePos();
     }
 

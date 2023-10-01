@@ -10,19 +10,19 @@ import { DirectionNode } from "../../DirectionNode/DirectionNode";
 import { LayoutPhase } from "./LayoutPhase";
 
 export class Layout {
-  _extents: Extent[];
-  _absoluteVersion: number;
-  _absoluteDirty: boolean;
-  _absoluteXPos: number;
-  _absoluteYPos: number;
-  _absoluteScale: number;
-  _hasGroupPos: boolean;
-  _groupXPos: number;
-  _groupYPos: number;
-  _groupScale: number;
-  _node: DirectionNode;
-  _size: Size;
-  _layoutPhase: LayoutPhase;
+  private _extents: Extent[];
+  private _absoluteVersion: number;
+  private _absoluteDirty: boolean;
+  private _absoluteXPos: number;
+  private _absoluteYPos: number;
+  private _absoluteScale: number;
+  private _hasGroupPos: boolean;
+  private _groupXPos: number;
+  private _groupYPos: number;
+  private _groupScale: number;
+  private _node: DirectionNode;
+  private _size: Size;
+  private _layoutPhase: LayoutPhase;
 
   constructor(node: DirectionNode) {
     this._node = node;
@@ -175,6 +175,9 @@ export class Layout {
   }
 
   invalidateAbsolutePos(): void {
+    if (!this._absoluteDirty) {
+      ++this._absoluteVersion;
+    }
     this._absoluteDirty = true;
   }
 

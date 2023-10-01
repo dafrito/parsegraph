@@ -45,8 +45,8 @@ export const LINE_THICKNESS = 12;
  * @see {@link LayoutPainter}
  */
 export class CommitLayout extends BaseCommitLayout {
-  lineBounds: Size;
-  bv: [number, number, number];
+  private lineBounds: Size;
+  private bv: [number, number, number];
 
   /**
    * Creates a new run of the layout algorithm.
@@ -260,7 +260,7 @@ export class CommitLayout extends BaseCommitLayout {
 
     if (
       node.nodeFit() === Fit.NAIVE &&
-      (node.neighbors().isRoot() || !isNaN(node.x()))
+      (node.neighbors().isRoot() || !isNaN(node.parentX()))
     ) {
       node.layout().setPhase(LayoutPhase.COMMITTED);
       return false;
@@ -1101,7 +1101,7 @@ export class CommitLayout extends BaseCommitLayout {
     return false;
   }
 
-  sizeIn(node: DirectionNode, direction: Direction, bodySize: Size): number {
+  private sizeIn(node: DirectionNode, direction: Direction, bodySize: Size): number {
     node.layout().size().copyTo(bodySize);
     if (isVerticalDirection(direction)) {
       return bodySize.height() / 2;
