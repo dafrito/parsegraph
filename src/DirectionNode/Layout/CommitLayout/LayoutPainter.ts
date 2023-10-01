@@ -1,6 +1,5 @@
 import { Direction, Axis } from "../../../Direction";
 import { DirectionNode } from "../../DirectionNode";
-import { Size } from "../../../Size";
 
 /**
  * Provides sizing information for {@link DirectionNode} graphs and can paint
@@ -11,9 +10,9 @@ export interface LayoutPainter {
    * Computes the size for the given {@link DirectionNode} and its value.
    *
    * @param {DirectionNode} node - the node to be sized
-   * @param {Size} bodySize - the destination for the computed size
+   * @param {number[]} bodySize - the destination for the computed size, i.e. [width, height]
    */
-  size(node: DirectionNode, bodySize: Size): void;
+  size(node: DirectionNode, bodySize: number[]): void;
 
   /**
    * Calculates the minimum separation between a node and the neighbor
