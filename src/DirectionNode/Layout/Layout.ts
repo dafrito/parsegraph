@@ -454,7 +454,8 @@ export class Layout {
         if (candidate.neighbors().hasNode(Direction.INWARD)) {
           if (
             candidate
-              .neighbors().nodeAt(Direction.INWARD)
+              .neighbors()
+              .nodeAt(Direction.INWARD)
               .layout()
               .inNodeExtents(x, y, userScale, extentSize)
           ) {

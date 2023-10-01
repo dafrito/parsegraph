@@ -5,9 +5,7 @@ import {
   forEachCardinalDirection,
 } from "./Direction";
 
-import {
-  DirectionNode,
-} from "./DirectionNode";
+import { DirectionNode } from "./DirectionNode";
 
 export type LinePainter = (x: number, y: number, w: number, h: number) => void;
 

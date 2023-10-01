@@ -9,7 +9,7 @@ import { Size } from "../../../Size";
 export interface LayoutPainter {
   /**
    * Computes the size for the given {@link DirectionNode} and its value.
-   * 
+   *
    * @param {DirectionNode} node - the node to be sized
    * @param {Size} bodySize - the destination for the computed size
    */
@@ -18,12 +18,12 @@ export interface LayoutPainter {
   /**
    * Calculates the minimum separation between a node and the neighbor
    * on the given direction, according to the given Axis.
-   * 
+   *
    * @param {DirectionNode} node
    * @param {Axis} axis
-   * @param {Direction} dir  
-   * @param {boolean} preferVertical 
-   * 
+   * @param {Direction} dir
+   * @param {boolean} preferVertical
+   *
    * @return {number} the minimum separation
    */
   getSeparation(
@@ -35,11 +35,11 @@ export interface LayoutPainter {
 
   /**
    * Optional. Paints the nodes of a newly committed paint group.
-   * 
+   *
    * This can be used to pre-render a paint group.
-   * 
+   *
    * @param {DirectionNode} pg - the paint group to paint
-   * 
+   *
    * @return {boolean} true if painting needs another call, false if done
    */
   paint(pg: DirectionNode): boolean;

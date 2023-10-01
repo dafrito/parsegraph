@@ -1,9 +1,6 @@
 import createException, { BAD_AXIS, BAD_NODE_DIRECTION } from "../Exception";
 
-import {
-  Direction,
-  Axis,
-} from "./constants";
+import { Direction, Axis } from "./constants";
 
 export function readDirection(given: string | Direction): Direction {
   if (typeof given === "number") {

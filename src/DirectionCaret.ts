@@ -42,7 +42,9 @@ export class DirectionCaret<Value> {
     this._nodes = [this._nodeRoot];
   }
 
-  protected doSpawn(given?: Value | DirectionNode<Value>): DirectionNode<Value> {
+  protected doSpawn(
+    given?: Value | DirectionNode<Value>
+  ): DirectionNode<Value> {
     if (given instanceof DirectionNode) {
       return given as DirectionNode<Value>;
     }
@@ -150,7 +152,9 @@ export class DirectionCaret<Value> {
   }
 
   move(toDirection: Direction | string): void {
-    const dest: DirectionNode<Value> = this.node().neighbors().nodeAt(readDirection(toDirection));
+    const dest: DirectionNode<Value> = this.node()
+      .neighbors()
+      .nodeAt(readDirection(toDirection));
     if (!dest) {
       throw createException(NO_NODE_FOUND);
     }
@@ -235,7 +239,9 @@ export class DirectionCaret<Value> {
 
   moveToParent(): void {
     if (this.node().neighbors().isRoot()) {
-      throw new Error("cannot move to parent of root (node is " + this.node().id() + ")");
+      throw new Error(
+        "cannot move to parent of root (node is " + this.node().id() + ")"
+      );
     }
     this.setNode(this.node().parentNode());
   }

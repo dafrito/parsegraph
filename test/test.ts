@@ -1176,7 +1176,10 @@ describe("Package", function () {
             readStyle("bu").borderThickness +
             readStyle("bu").minHeight / 2) +
         SHRINK_SCALE *
-          verticalSeparation(caret.node().neighbors().nodeAt(DOWNWARD), DOWNWARD) +
+          verticalSeparation(
+            caret.node().neighbors().nodeAt(DOWNWARD),
+            DOWNWARD
+          ) +
         SHRINK_SCALE *
           (readStyle("b").minHeight +
             readStyle("b").verticalPadding * 2 +

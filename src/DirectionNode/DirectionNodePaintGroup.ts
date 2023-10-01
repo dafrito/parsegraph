@@ -1,12 +1,11 @@
 import { SiblingNode } from "./DirectionNodeSiblings";
 import makeLimit from "./makeLimit";
 
-export interface PaintGroupNode<T extends PaintGroupNode<T>> extends SiblingNode<T> {
+export interface PaintGroupNode<T extends PaintGroupNode<T>>
+  extends SiblingNode<T> {
   paintGroup(): DirectionNodePaintGroup<T>;
   getLastPaintGroup(): T;
-  findPaintGroupInsert(
-    inserted:T 
-  ): [T, T];
+  findPaintGroupInsert(inserted: T): [T, T];
   clearPaintGroup(): void;
   findPaintGroup(): T;
   setPaintGroupRoot(root: T): void;
@@ -41,9 +40,7 @@ export class DirectionNodePaintGroup<T extends PaintGroupNode<T>> {
       if (!par) {
         throw new Error("Node must have a parent if it is not root");
       }
-      par.node().siblings().removeFromLayout(
-        par.direction()
-      );
+      par.node().siblings().removeFromLayout(par.direction());
 
       // Connect this node's first and last paint groups to this node.
       const parentsPaintGroup = par.node().paintGroup();
@@ -54,7 +51,9 @@ export class DirectionNodePaintGroup<T extends PaintGroupNode<T>> {
       this.connect(this.node(), nextNode);
     }
     this.node().layoutChanged();
-    this.node().siblings().forEachNode((n) => n.setPaintGroupRoot(this.node()));
+    this.node()
+      .siblings()
+      .forEachNode((n) => n.setPaintGroupRoot(this.node()));
     this.verify();
   }
 

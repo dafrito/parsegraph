@@ -12,7 +12,9 @@ import createException, {
 import { NeighborNode } from "../Neighbors";
 import { StateNode } from "../..";
 
-export interface SiblingNode<T extends SiblingNode<T>> extends NeighborNode<T>, StateNode {
+export interface SiblingNode<T extends SiblingNode<T>>
+  extends NeighborNode<T>,
+    StateNode {
   siblings(): DirectionNodeSiblings<T>;
   localPaintGroup(): any;
 }
@@ -77,12 +79,8 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
     if (!disconnected) {
       return;
     }
-    const layoutBefore: T = this.node()
-      .siblings()
-      .earlier(inDirection);
-    const earliestDisc: T = disconnected
-      .siblings()
-      .head(disconnected);
+    const layoutBefore: T = this.node().siblings().earlier(inDirection);
+    const earliestDisc: T = disconnected.siblings().head(disconnected);
 
     if (layoutBefore) {
       this.connect(layoutBefore, disconnected.siblings().next());
@@ -112,9 +110,7 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
     const nodeHead: T = node.siblings().head();
 
     const layoutAfter: T = this.node().siblings().later(inDirection);
-    const layoutBefore: T = this.node()
-      .siblings()
-      .earlier(inDirection);
+    const layoutBefore: T = this.node().siblings().earlier(inDirection);
 
     const nodeTail: T = node;
     // console.log(this + ".connectNode(" + nameDirection(inDirection) +
@@ -345,7 +341,9 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
   }
 
   protected sanitizeLayoutPreference(given: PreferredAxis): PreferredAxis {
-    const paxis = getDirectionAxis(this.node().neighbors().parent()?.direction());
+    const paxis = getDirectionAxis(
+      this.node().neighbors().parent()?.direction()
+    );
     if (given === PreferredAxis.VERTICAL) {
       given =
         paxis === Axis.VERTICAL
@@ -398,7 +396,8 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
     switch (this.getLayoutPreference()) {
       case PreferredAxis.HORIZONTAL: {
         if (
-          getDirectionAxis(this.node().neighbors().parent()?.direction()) === Axis.HORIZONTAL
+          getDirectionAxis(this.node().neighbors().parent()?.direction()) ===
+          Axis.HORIZONTAL
         ) {
           canonicalPref = PreferredAxis.PARENT;
         } else {
@@ -407,7 +406,10 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
         break;
       }
       case PreferredAxis.VERTICAL: {
-        if (getDirectionAxis(this.node().neighbors().parent()?.direction()) === Axis.VERTICAL) {
+        if (
+          getDirectionAxis(this.node().neighbors().parent()?.direction()) ===
+          Axis.VERTICAL
+        ) {
           canonicalPref = PreferredAxis.PARENT;
         } else {
           canonicalPref = PreferredAxis.PERPENDICULAR;
@@ -455,7 +457,9 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
       return;
     }
 
-    const paxis = getDirectionAxis(this.node().neighbors().parent()?.direction());
+    const paxis = getDirectionAxis(
+      this.node().neighbors().parent()?.direction()
+    );
     if (curCanon === PreferredAxis.PARENT) {
       if (paxis === Axis.HORIZONTAL) {
         this.horzToVert();
@@ -509,7 +513,10 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
     }
     if (this.canonicalLayoutPreference() === PreferredAxis.PERPENDICULAR) {
       // console.log("PREFER PERP");
-      if (getDirectionAxis(this.node().neighbors().parent()?.direction()) === Axis.HORIZONTAL) {
+      if (
+        getDirectionAxis(this.node().neighbors().parent()?.direction()) ===
+        Axis.HORIZONTAL
+      ) {
         return VERTICAL_ORDER;
       }
       return HORIZONTAL_ORDER;
@@ -517,7 +524,10 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
     // console.log("PREFER PARALLEL TO PARENT: " +
     //   namePreferredAxis(this.getLayoutPreference()));
     // Parallel preference.
-    if (getDirectionAxis(this.node().neighbors().parent()?.direction()) === Axis.HORIZONTAL) {
+    if (
+      getDirectionAxis(this.node().neighbors().parent()?.direction()) ===
+      Axis.HORIZONTAL
+    ) {
       return HORIZONTAL_ORDER;
     }
     return VERTICAL_ORDER;

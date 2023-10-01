@@ -1,5 +1,11 @@
 import { NeighborData } from "./NeighborData";
-import { Axis, Direction, getNegativeDirection, NUM_DIRECTIONS, getPositiveDirection } from "../Direction";
+import {
+  Axis,
+  Direction,
+  getNegativeDirection,
+  NUM_DIRECTIONS,
+  getPositiveDirection,
+} from "../Direction";
 import createException, { BAD_NODE_DIRECTION, BAD_AXIS } from "../Exception";
 
 export interface NeighborNode<T extends NeighborNode<T>> {
@@ -12,14 +18,11 @@ export class Neighbors<T extends NeighborNode<T>> {
   private _parentNeighbor: NeighborData<T> | undefined;
 
   constructor(node: T) {
-      this._node = node;
-      this._neighbors = new Array(NUM_DIRECTIONS);
+    this._node = node;
+    this._neighbors = new Array(NUM_DIRECTIONS);
   }
 
-  assignParent(
-    fromNode?: T,
-    parentDirection?: Direction
-  ): void {
+  assignParent(fromNode?: T, parentDirection?: Direction): void {
     if (arguments.length === 0 || !fromNode) {
       // Clearing the parent.
       this._parentNeighbor = undefined;
@@ -45,9 +48,7 @@ export class Neighbors<T extends NeighborNode<T>> {
     return this._neighbors[dir];
   }
 
-  ensure(
-    inDirection: Direction
-  ): NeighborData<T> {
+  ensure(inDirection: Direction): NeighborData<T> {
     if (!this.at(inDirection)) {
       this._neighbors[inDirection] = new NeighborData(this.node(), inDirection);
     }
@@ -82,7 +83,9 @@ export class Neighbors<T extends NeighborNode<T>> {
   }
 
   hasChildAt(direction: Direction): boolean {
-    return this.hasNode(direction) && this.parent()?.reverseDirection() !== direction;
+    return (
+      this.hasNode(direction) && this.parent()?.reverseDirection() !== direction
+    );
   }
 
   hasChild(direction: Direction): boolean {
@@ -97,7 +100,7 @@ export class Neighbors<T extends NeighborNode<T>> {
       }
       candidate = candidate.neighbors().parent()?.node();
       if (!candidate) {
-        throw new Error("node was not root but had no parent")
+        throw new Error("node was not root but had no parent");
       }
     }
     return candidate == parent;
@@ -105,9 +108,9 @@ export class Neighbors<T extends NeighborNode<T>> {
 
   /**
    * Returns whether this DirectionNode has any non-parent neighbors in any direction.
-   * 
-   * @returns {boolean} true if this DirectionNode has any child neighbors in any direction.
-   * 
+   *
+   * @return {boolean} true if this DirectionNode has any child neighbors in any direction.
+   *
    * @see {@link hasChildAt}
    */
   hasAnyNeighbors(): boolean {
@@ -170,5 +173,4 @@ export class Neighbors<T extends NeighborNode<T>> {
       this.parent()?.direction() === Direction.OUTWARD
     );
   }
-
 }

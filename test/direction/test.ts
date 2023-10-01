@@ -842,7 +842,10 @@ describe("DirectionCaret", function () {
       const newNode = makeCaret().spawnMove("i", "b");
       newNode.setId("newNode-" + i);
       newNode.crease();
-      newNode.neighbors().root().setId("newNode-root-" + i);
+      newNode
+        .neighbors()
+        .root()
+        .setId("newNode-root-" + i);
       expected.push(newNode.id());
       car.connect("f", newNode.neighbors().root());
     }

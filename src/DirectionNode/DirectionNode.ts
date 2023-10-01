@@ -41,7 +41,9 @@ import makeLimit from "./makeLimit";
 
 import { Neighbors } from "./Neighbors";
 
-export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<Value>> {
+export class DirectionNode<Value = any>
+  implements PaintGroupNode<DirectionNode<Value>>
+{
   private _layout?: Layout;
 
   private _state: DirectionNodeState<Value, DirectionNode<Value>>;
@@ -49,7 +51,9 @@ export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<
   private _neighbors: Neighbors<DirectionNode<Value>>;
 
   private _siblings: DirectionNodeSiblings<DirectionNode<Value>>;
-  private _paintGroup: DirectionNodePaintGroup<DirectionNode<Value>> | undefined;
+  private _paintGroup:
+    | DirectionNodePaintGroup<DirectionNode<Value>>
+    | undefined;
   private _paintGroupRoot: DirectionNode;
 
   constructor(value?: Value) {
@@ -59,7 +63,10 @@ export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<
     // Layout
     this._siblings = new DirectionNodeSiblings<DirectionNode<Value>>(this);
     this._paintGroupRoot = this;
-    this._paintGroup = new DirectionNodePaintGroup<DirectionNode<Value>>(this, false);
+    this._paintGroup = new DirectionNodePaintGroup<DirectionNode<Value>>(
+      this,
+      false
+    );
 
     if (value !== undefined) {
       this.setValue(value);
@@ -156,7 +163,6 @@ export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<
     }
   }
 
-
   // ///////////////////////////////////////////////////////////////////////////
   //
   // Paint groups
@@ -165,8 +171,8 @@ export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<
 
   /**
    * Gets this node's paint group, if it is a paint group.
-   * 
-   * @returns {DirectionNodePaintGroup | undefined} this node's paint group, or undefined if it is not a paint group.
+   *
+   * @return {DirectionNodePaintGroup | undefined} this node's paint group, or undefined if it is not a paint group.
    */
   localPaintGroup(): DirectionNodePaintGroup<DirectionNode<Value>> | undefined {
     return this._paintGroup;
@@ -181,8 +187,8 @@ export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<
 
   /**
    * Gets the DirectionNode that is the paint group root for this DirectionNode.
-   * 
-   * @returns {DirectionNode} the paint group root for this DirectionNode.
+   *
+   * @return {DirectionNode} the paint group root for this DirectionNode.
    */
   paintGroupRoot(): DirectionNode {
     return this._paintGroupRoot;
@@ -190,9 +196,9 @@ export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<
 
   /**
    * Changes the paint group root.
-   * 
+   *
    * This does not trigger a layout change.
-   * 
+   *
    * @param {DirectionNode} pg - the new paint group root
    */
   setPaintGroupRoot(pg: DirectionNode) {
@@ -204,8 +210,8 @@ export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<
 
   /**
    * Gets the paint group used for this DirectionNode.
-   * 
-   * @returns {DirectionNodePaintGroup} the paint group used for this DirectionNode.
+   *
+   * @return {DirectionNodePaintGroup} the paint group used for this DirectionNode.
    */
   paintGroup(): DirectionNodePaintGroup<DirectionNode<Value>> {
     if (!this._paintGroup) {
@@ -214,7 +220,9 @@ export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<
         throw new Error("Paint group root is null");
       }
       if (node === this) {
-        throw new Error("This root paint group doesn't have a paint group object");
+        throw new Error(
+          "This root paint group doesn't have a paint group object"
+        );
       }
       return node.paintGroup();
     }
@@ -239,11 +247,11 @@ export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<
 
   /**
    * Finds the paint group root.
-   * 
+   *
    * This iterates up the parent neighbors until a paint group root is
    * found. If none is found, then the root is used.
-   * 
-   * @returns {DirectionNode} the paint group root
+   *
+   * @return {DirectionNode} the paint group root
    */
   findPaintGroup(): DirectionNode<Value> {
     if (!this.paintGroupRoot()) {
@@ -282,10 +290,10 @@ export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<
 
   /**
    * Returns true if the given other node comes before this node in layout order.
-   * 
+   *
    * @param {DirectionNode} given - other DirectionNode.
-   * @returns {boolean} true if this node comes before the given node.
-   * 
+   * @return {boolean} true if this node comes before the given node.
+   *
    * @see {@link comesAfter}
    */
   comesBefore(other: DirectionNode): boolean {
@@ -345,10 +353,10 @@ export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<
 
   /**
    * Returns true if the given other node comes after this node in layout order.
-   * 
+   *
    * @param {DirectionNode} given - other DirectionNode.
-   * @returns {boolean} true if this node comes after the given node.
-   * 
+   * @return {boolean} true if this node comes after the given node.
+   *
    * @see {@link comesBefore}
    */
   comesAfter(other: DirectionNode<Value>): boolean {
@@ -468,7 +476,10 @@ that is still a descendent of this node.
     if (this.localPaintGroup()) {
       this.paintGroup().crease();
     } else {
-      this._paintGroup = new DirectionNodePaintGroup<DirectionNode<Value>>(this, true);
+      this._paintGroup = new DirectionNodePaintGroup<DirectionNode<Value>>(
+        this,
+        true
+      );
     }
   }
 
@@ -536,7 +547,9 @@ that is still a descendent of this node.
     } else {
       this.siblings().insertIntoLayout(inDirection);
       node.setPaintGroupRoot(this.paintGroupRoot());
-      node.siblings().forEachNode((n) => n.setPaintGroupRoot(this.paintGroupRoot()));
+      node
+        .siblings()
+        .forEachNode((n) => n.setPaintGroupRoot(this.paintGroupRoot()));
       if (node.paintGroup().next() !== node) {
         const pg = this.findPaintGroup();
         pg.paintGroup().merge(node);
@@ -614,7 +627,10 @@ that is still a descendent of this node.
     if (!this.neighbors().hasNode(givenDirection)) {
       return;
     }
-    if (!this.neighbors().isRoot() && givenDirection == this.parentDirection()) {
+    if (
+      !this.neighbors().isRoot() &&
+      givenDirection == this.parentDirection()
+    ) {
       throw createException(CANNOT_AFFECT_PARENT);
     }
     this.disconnectNode(givenDirection);

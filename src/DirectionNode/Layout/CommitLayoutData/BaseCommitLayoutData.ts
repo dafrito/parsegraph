@@ -269,7 +269,7 @@ export class BaseCommitLayoutData {
 
   /**
    * Traverse the graph depth-first, committing each node's layout in turn.
-   * 
+   *
    * @return {boolean} true if the algorithm needs more cranks.
    */
   crank(): boolean {
