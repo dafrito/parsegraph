@@ -123,10 +123,10 @@ const readStyle = (given?: any): BlockStyle => {
 const layoutPainter = {
   size: (node: DirectionNode, size: Size) => {
     const style = readStyle(node.value());
-    size[0] = 
+    size[0] =
       style.minWidth + style.borderThickness * 2 + style.horizontalPadding * 2;
-    size[1] = 
-      style.minHeight + style.borderThickness * 2 + style.verticalPadding * 2
+    size[1] =
+      style.minHeight + style.borderThickness * 2 + style.verticalPadding * 2;
   },
   getSeparation: (
     node: DirectionNode,

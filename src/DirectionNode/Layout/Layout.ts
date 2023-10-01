@@ -1,6 +1,5 @@
 import createException, { BAD_NODE_DIRECTION } from "../../Exception";
 
-import { Rect } from "./Rect";
 import { Size } from "../../Size";
 import { Extent } from "./Extent";
 
@@ -332,12 +331,7 @@ export class Layout {
     bodySize[1] = this._size[1] * groupScale;
   }
 
-  inNodeBody(
-    x: number,
-    y: number,
-    userScale: number,
-    bodySize: Size
-  ): boolean {
+  inNodeBody(x: number, y: number, userScale: number, bodySize: Size): boolean {
     this.size(bodySize);
     const s = bodySize;
     const ax = this.absoluteX();

@@ -8,10 +8,7 @@ import {
   isVerticalDirection,
 } from "../../../Direction";
 
-import {
-  DirectionNode,
-  Fit,
-} from "../..";
+import { DirectionNode, Fit } from "../..";
 
 import { Size } from "../../../Size";
 
@@ -28,9 +25,13 @@ const sizeIn = (
   } else {
     return bodySize[0] / 2;
   }
-}
+};
 
-export const addLineBounds = (node: DirectionNode, given: Direction, bodySize: Size) => {
+export const addLineBounds = (
+  node: DirectionNode,
+  given: Direction,
+  bodySize: Size
+) => {
   if (!node.neighbors().hasChild(given)) {
     return;
   }

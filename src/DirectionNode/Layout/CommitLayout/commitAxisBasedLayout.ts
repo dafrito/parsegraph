@@ -5,10 +5,7 @@ import {
   reverseDirection,
 } from "../../../Direction";
 
-import {
-  DirectionNode,
-  PreferredAxis,
-} from "../..";
+import { DirectionNode, PreferredAxis } from "../..";
 
 import { layoutAxis } from "..";
 
@@ -16,7 +13,12 @@ import { LayoutPainter } from "./LayoutPainter";
 import { layoutSingle } from "./layoutSingle";
 import { Size } from "../../../Size";
 
-export const commitAxisBasedLayout = (painter: LayoutPainter, node: DirectionNode, lineThickness: number, bodySize: Size): boolean => {
+export const commitAxisBasedLayout = (
+  painter: LayoutPainter,
+  node: DirectionNode,
+  lineThickness: number,
+  bodySize: Size
+): boolean => {
   // Layout based upon the axis preference.
   if (
     node.siblings().canonicalLayoutPreference() == PreferredAxis.PERPENDICULAR
@@ -33,7 +35,15 @@ export const commitAxisBasedLayout = (painter: LayoutPainter, node: DirectionNod
       node.neighbors().parentDirection()
     );
     if (
-      layoutAxis(painter, node, hasFirstAxisNodes[0], hasFirstAxisNodes[1], false, lineThickness, bodySize)
+      layoutAxis(
+        painter,
+        node,
+        hasFirstAxisNodes[0],
+        hasFirstAxisNodes[1],
+        false,
+        lineThickness,
+        bodySize
+      )
     ) {
       return true;
     }
@@ -41,7 +51,16 @@ export const commitAxisBasedLayout = (painter: LayoutPainter, node: DirectionNod
     // Layout this node's second-axis child, if that child exists.
     if (node.neighbors().hasNode(oppositeFromParent)) {
       // Layout the second-axis child.
-      if (layoutSingle(node, oppositeFromParent, true, lineThickness, bodySize, painter)) {
+      if (
+        layoutSingle(
+          node,
+          oppositeFromParent,
+          true,
+          lineThickness,
+          bodySize,
+          painter
+        )
+      ) {
         return true;
       }
     }

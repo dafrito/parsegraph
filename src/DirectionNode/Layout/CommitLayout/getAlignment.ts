@@ -6,14 +6,9 @@ import {
   getDirectionAxis,
 } from "../../../Direction";
 
-import {
-  Alignment,
-  DirectionNode,
-} from "../..";
+import { Alignment, DirectionNode } from "../..";
 
-import createException, {
-  BAD_NODE_ALIGNMENT,
-} from "../../../Exception";
+import createException, { BAD_NODE_ALIGNMENT } from "../../../Exception";
 
 import { findConsecutiveLength } from "./findConsecutiveLength";
 
@@ -30,7 +25,10 @@ import { findConsecutiveLength } from "./findConsecutiveLength";
  * @param {Direction} childDirection the direction where alignment offset is retrieved
  * @return {number} the alignment offset
  */
-export const getAlignment = (node: DirectionNode, childDirection: Direction): number => {
+export const getAlignment = (
+  node: DirectionNode,
+  childDirection: Direction
+): number => {
   // Calculate the alignment adjustment for both nodes.
   const child = node.neighbors().nodeAt(childDirection);
   const axis = getPerpendicularAxis(getDirectionAxis(childDirection));

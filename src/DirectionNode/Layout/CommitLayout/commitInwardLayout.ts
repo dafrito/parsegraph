@@ -1,12 +1,6 @@
-import {
-  Direction,
-  Axis,
-} from "../../../Direction";
+import { Direction, Axis } from "../../../Direction";
 
-import {
-  Alignment,
-  DirectionNode,
-} from "../..";
+import { Alignment, DirectionNode } from "../..";
 
 import { LayoutPhase } from "..";
 
@@ -14,7 +8,12 @@ import { LayoutPainter } from "./LayoutPainter";
 import { Size } from "../../../Size";
 import { getSeparation } from "./getSeparation";
 
-export const commitInwardLayout = (painter: LayoutPainter, node: DirectionNode, bodySize: Size, firstSize: Size): boolean => {
+export const commitInwardLayout = (
+  painter: LayoutPainter,
+  node: DirectionNode,
+  bodySize: Size,
+  firstSize: Size
+): boolean => {
   if (!node.neighbors().hasNode(Direction.INWARD)) {
     return false;
   }
@@ -37,8 +36,7 @@ export const commitInwardLayout = (painter: LayoutPainter, node: DirectionNode, 
           (nestedNode.layout().extentOffsetAt(Direction.DOWNWARD) -
             nestedSize[0] / 2),
         bodySize[1] / 2 -
-          getSeparation(painter, node, Axis.Z, Direction.INWARD, true) /
-            2 +
+          getSeparation(painter, node, Axis.Z, Direction.INWARD, true) / 2 +
           nestedNode.scale() *
             (-nestedSize[1] +
               nestedNode.layout().extentOffsetAt(Direction.FORWARD))
@@ -50,14 +48,7 @@ export const commitInwardLayout = (painter: LayoutPainter, node: DirectionNode, 
       .setPosAt(
         Direction.INWARD,
         bodySize[0] / 2 -
-          getSeparation(
-            painter,
-            node,
-            Axis.Z,
-            Direction.INWARD,
-            false
-          ) /
-            2 +
+          getSeparation(painter, node, Axis.Z, Direction.INWARD, false) / 2 +
           nestedNode.scale() *
             (-nestedSize[0] +
               nestedNode.layout().extentOffsetAt(Direction.DOWNWARD)),

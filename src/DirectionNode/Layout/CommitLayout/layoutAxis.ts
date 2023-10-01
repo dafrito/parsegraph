@@ -1,17 +1,8 @@
-import {
-  Direction,
-  Axis,
-  getDirectionAxis,
-} from "../../../Direction";
+import { Direction, Axis, getDirectionAxis } from "../../../Direction";
 
-import {
-  DirectionNode,
-  AxisOverlap,
-} from "../..";
+import { DirectionNode, AxisOverlap } from "../..";
 
-import createException, {
-  BAD_NODE_DIRECTION,
-} from "../../../Exception";
+import createException, { BAD_NODE_DIRECTION } from "../../../Exception";
 
 import { LayoutPhase } from "..";
 
@@ -28,20 +19,28 @@ const secondSize: Size = [NaN, NaN];
 
 /**
  * Layout a pair of nodes in the given directions.
+ *
+ * The child nodes must have already been laid out.
+ *
+ * @param {LayoutPainter} painter - the layout painter to use for this layout
+ * @param {DirectionNode} node - the parent node being laid out
+ * @param {Direction} firstDirection - the first direction to lay out
+ * @param {Direction} secondDirection - the second direction to lay out
+ * @param {boolean} allowAxisOverlap - whether the child can overlap the parent's axis.
+ * @param {number} lineThickness - the thickness of lines between nodes
+ * @param {Size} bodySize - the size of the node
+ * @return {boolean} true if another call is needed, false if done
  */
 export const layoutAxis = (
-    painter: LayoutPainter,
-    node: DirectionNode,
-    firstDirection: Direction,
-    secondDirection: Direction,
-    allowAxisOverlap: boolean,
-    lineThickness: number,
-    bodySize: Size
+  painter: LayoutPainter,
+  node: DirectionNode,
+  firstDirection: Direction,
+  secondDirection: Direction,
+  allowAxisOverlap: boolean,
+  lineThickness: number,
+  bodySize: Size
 ): boolean => {
-  if (
-    firstDirection === secondDirection &&
-    firstDirection != Direction.NULL
-  ) {
+  if (firstDirection === secondDirection && firstDirection != Direction.NULL) {
     throw createException(BAD_NODE_DIRECTION);
   }
   // Change the node direction to null if there is no node in that
@@ -70,7 +69,16 @@ export const layoutAxis = (
     }
 
     // Layout that node.
-    if (layoutSingle(node, firstAxisDirection, allowAxisOverlap, lineThickness, bodySize, painter)) {
+    if (
+      layoutSingle(
+        node,
+        firstAxisDirection,
+        allowAxisOverlap,
+        lineThickness,
+        bodySize,
+        painter
+      )
+    ) {
       node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
       return true;
     }
@@ -89,10 +97,7 @@ export const layoutAxis = (
 
   // Get the alignments for the children.
   const firstNodeAlignment: number = getAlignment(node, firstDirection);
-  const secondNodeAlignment: number = getAlignment(
-    node,
-    secondDirection
-  );
+  const secondNodeAlignment: number = getAlignment(node, secondDirection);
   // console.log("First alignment: " + firstNodeAlignment);
   // console.log("Second alignment: " + secondNodeAlignment);
 
@@ -112,10 +117,7 @@ export const layoutAxis = (
         node.neighbors().nodeAt(firstDirection).scale(),
       0
     );
-  separationBetweenChildren *= node
-    .neighbors()
-    .nodeAt(firstDirection)
-    .scale();
+  separationBetweenChildren *= node.neighbors().nodeAt(firstDirection).scale();
 
   // console.log("Separation between children="
   //   + separationBetweenChildren);
@@ -171,9 +173,7 @@ export const layoutAxis = (
       break;
   }
   let secondAxisOverlap: boolean = allowAxisOverlap;
-  switch (
-    node.neighbors().nodeAt(secondDirection).neighbors().axisOverlap()
-  ) {
+  switch (node.neighbors().nodeAt(secondDirection).neighbors().axisOverlap()) {
     case AxisOverlap.PREVENTED:
       secondAxisOverlap = false;
       break;
@@ -229,10 +229,7 @@ export const layoutAxis = (
   // if we have a second-axis child. Doesn't this code need to ensure
   // the second-axis child is not trapped inside too small a space?
 
-  if (
-    separationBetweenChildren >=
-    separationFromFirst + separationFromSecond
-  ) {
+  if (separationBetweenChildren >= separationFromFirst + separationFromSecond) {
     // The separation between the children is greater than the
     // separation between each child and this node.
 
@@ -258,72 +255,43 @@ export const layoutAxis = (
   if (getDirectionAxis(firstDirection) === Axis.VERTICAL) {
     separationFromFirst = Math.max(
       separationFromFirst,
-      node.neighbors().nodeAt(firstDirection).scale() *
-        (firstSize[1] / 2) +
+      node.neighbors().nodeAt(firstDirection).scale() * (firstSize[1] / 2) +
         bodySize[1] / 2
     );
     separationFromFirst +=
-      getSeparation(
-        painter,
-        node,
-        Axis.VERTICAL,
-        firstDirection,
-        true
-      ) * node.neighbors().nodeAt(firstDirection).scale();
+      getSeparation(painter, node, Axis.VERTICAL, firstDirection, true) *
+      node.neighbors().nodeAt(firstDirection).scale();
 
     separationFromSecond = Math.max(
       separationFromSecond,
-      node.neighbors().nodeAt(secondDirection).scale() *
-        (secondSize[1] / 2) +
+      node.neighbors().nodeAt(secondDirection).scale() * (secondSize[1] / 2) +
         bodySize[1] / 2
     );
     separationFromSecond +=
-      getSeparation(
-        painter,
-        node,
-        Axis.VERTICAL,
-        secondDirection,
-        true
-      ) * node.neighbors().nodeAt(secondDirection).scale();
+      getSeparation(painter, node, Axis.VERTICAL, secondDirection, true) *
+      node.neighbors().nodeAt(secondDirection).scale();
   } else {
     separationFromFirst = Math.max(
       separationFromFirst,
-      node.neighbors().nodeAt(firstDirection).scale() *
-        (firstSize[0] / 2) +
+      node.neighbors().nodeAt(firstDirection).scale() * (firstSize[0] / 2) +
         bodySize[0] / 2
     );
     separationFromFirst +=
-      getSeparation(
-        painter,
-        node,
-        Axis.HORIZONTAL,
-        firstDirection,
-        false
-      ) * node.neighbors().nodeAt(firstDirection).scale();
+      getSeparation(painter, node, Axis.HORIZONTAL, firstDirection, false) *
+      node.neighbors().nodeAt(firstDirection).scale();
 
     separationFromSecond = Math.max(
       separationFromSecond,
-      node.neighbors().nodeAt(secondDirection).scale() *
-        (secondSize[0] / 2) +
+      node.neighbors().nodeAt(secondDirection).scale() * (secondSize[0] / 2) +
         bodySize[0] / 2
     );
     separationFromSecond +=
-      getSeparation(
-        painter,
-        node,
-        Axis.HORIZONTAL,
-        secondDirection,
-        false
-      ) * node.neighbors().nodeAt(secondDirection).scale();
+      getSeparation(painter, node, Axis.HORIZONTAL, secondDirection, false) *
+      node.neighbors().nodeAt(secondDirection).scale();
   }
 
   // Set the positions of the nodes.
-  positionChild(
-    node,
-    firstDirection,
-    firstNodeAlignment,
-    separationFromFirst
-  );
+  positionChild(node, firstDirection, firstNodeAlignment, separationFromFirst);
   positionChild(
     node,
     secondDirection,
@@ -332,12 +300,7 @@ export const layoutAxis = (
   );
 
   // Combine their extents.
-  combineExtents(
-    node,
-    firstDirection,
-    firstNodeAlignment,
-    separationFromFirst
-  );
+  combineExtents(node, firstDirection, firstNodeAlignment, separationFromFirst);
   combineExtents(
     node,
     secondDirection,
@@ -346,4 +309,4 @@ export const layoutAxis = (
   );
 
   return false;
-}
+};

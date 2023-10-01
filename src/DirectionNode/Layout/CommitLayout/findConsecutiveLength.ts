@@ -1,8 +1,16 @@
 import { DirectionNode } from "../../DirectionNode";
-import { Direction, isCardinalDirection, getDirectionAxis, Axis } from "../../../Direction";
+import {
+  Direction,
+  isCardinalDirection,
+  getDirectionAxis,
+  Axis,
+} from "../../../Direction";
 import createException, { BAD_NODE_DIRECTION } from "../../../Exception";
 
-export const findConsecutiveLength = (node: DirectionNode, inDirection: Direction): number => {
+export const findConsecutiveLength = (
+  node: DirectionNode,
+  inDirection: Direction
+): number => {
   // Exclude some directions that cannot be calculated.
   if (!isCardinalDirection(inDirection)) {
     throw createException(BAD_NODE_DIRECTION);
@@ -35,4 +43,4 @@ export const findConsecutiveLength = (node: DirectionNode, inDirection: Directio
   }
 
   return total;
-}
+};

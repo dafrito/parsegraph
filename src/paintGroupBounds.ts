@@ -1,4 +1,3 @@
-import { Size } from "./Size";
 import { Direction, nameDirection } from "./Direction";
 import { DirectionNode } from "./DirectionNode";
 import { findPaintGroup } from "./DirectionNode/findPaintGroup";

@@ -1,17 +1,17 @@
-import {
-  Direction,
-} from "../../../Direction";
+import { Direction } from "../../../Direction";
 
-import {
-  DirectionNode,
-  PreferredAxis,
-} from "../..";
+import { DirectionNode, PreferredAxis } from "../..";
 
 import { LayoutPainter } from "./LayoutPainter";
 import { layoutAxis } from "./layoutAxis";
 import { Size } from "../../../Size";
 
-export const commitRootlikeLayout = (painter: LayoutPainter, node: DirectionNode, lineThickness: number, bodySize: Size): boolean => {
+export const commitRootlikeLayout = (
+  painter: LayoutPainter,
+  node: DirectionNode,
+  lineThickness: number,
+  bodySize: Size
+): boolean => {
   if (
     node.siblings().getLayoutPreference() === PreferredAxis.HORIZONTAL ||
     node.siblings().getLayoutPreference() === PreferredAxis.PERPENDICULAR
@@ -34,7 +34,17 @@ export const commitRootlikeLayout = (painter: LayoutPainter, node: DirectionNode
 
     // This node is root-like, so it lays out the second-axis children in
     // the same method as the first axis.
-    if (layoutAxis(painter, node, Direction.UPWARD, Direction.DOWNWARD, true, lineThickness, bodySize)) {
+    if (
+      layoutAxis(
+        painter,
+        node,
+        Direction.UPWARD,
+        Direction.DOWNWARD,
+        true,
+        lineThickness,
+        bodySize
+      )
+    ) {
       return true;
     }
   } else {
@@ -56,10 +66,20 @@ export const commitRootlikeLayout = (painter: LayoutPainter, node: DirectionNode
 
     // This node is root-like, so it lays out the second-axis children in
     // the same method as the first axis.
-    if (layoutAxis(painter, node, Direction.BACKWARD, Direction.FORWARD, true, lineThickness, bodySize)) {
+    if (
+      layoutAxis(
+        painter,
+        node,
+        Direction.BACKWARD,
+        Direction.FORWARD,
+        true,
+        lineThickness,
+        bodySize
+      )
+    ) {
       return true;
     }
   }
 
   return false;
-}
+};

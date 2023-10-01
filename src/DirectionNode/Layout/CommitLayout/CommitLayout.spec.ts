@@ -902,7 +902,7 @@ describe("CommitLayout", () => {
   it("is recoverable if replaced", () => {
     const root = new DirectionNode("root");
     let n = root;
-    for(let i = 0; i < 100; ++i) {
+    for (let i = 0; i < 100; ++i) {
       const child = new DirectionNode("child");
       n.connect(Direction.FORWARD, child);
       n = child;
@@ -914,7 +914,7 @@ describe("CommitLayout", () => {
       },
       getSeparation: () => {
         return 0;
-      }
+      },
     };
     const firstCld = new CommitLayout(root, painter);
     for (let i = 0; i < 50; ++i) {
@@ -922,7 +922,7 @@ describe("CommitLayout", () => {
     }
     expect(root.layout().needsCommit()).toEqual(true);
     const secondCld = new CommitLayout(root, painter);
-    while(secondCld.crank());
+    while (secondCld.crank());
     expect(root.layout().needsCommit()).toEqual(false);
   });
 });

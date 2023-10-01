@@ -1,18 +1,10 @@
 import { Extent } from "../Extent";
 
-import {
-  Direction,
- } from "../../../Direction";
+import { Direction } from "../../../Direction";
 
-import {
-  Alignment,
-  DirectionNode,
-  Fit,
-} from "../..";
+import { Alignment, DirectionNode, Fit } from "../..";
 
-import createException, {
-  BAD_NODE_DIRECTION,
-} from "../../../Exception";
+import createException, { BAD_NODE_DIRECTION } from "../../../Exception";
 
 const bv = [NaN, NaN, NaN];
 
@@ -249,4 +241,4 @@ export const combineExtents = (
     default:
       throw createException(BAD_NODE_DIRECTION);
   }
-}
+};

@@ -48,18 +48,14 @@ const drawLine = (
   if (isVerticalDirection(direction)) {
     painter(
       x,
-      y +
-        length / 2 +
-        (parentScale * directionSign(direction) * size[1]) / 2,
+      y + length / 2 + (parentScale * directionSign(direction) * size[1]) / 2,
       thickness,
       Math.abs(length)
     );
   } else {
     // Horizontal line.
     painter(
-      x +
-        length / 2 +
-        (parentScale * directionSign(direction) * size[0]) / 2,
+      x + length / 2 + (parentScale * directionSign(direction) * size[0]) / 2,
       y,
       Math.abs(length),
       thickness

@@ -3,21 +3,25 @@ import { DirectionNode } from "..";
 
 /**
  * Removes the child in the specified direction.
- * 
+ *
  * This will invalidate the parent.
- * 
+ *
  * @param {DirectionNode} parent - the parent that will remove the child
  * @param {Direction | undefined} inDirection - the direction of the child. If undefined, the node to remove
  * is this node from its parent.
- * @returns {DirectionNode | undefined} the disconnected node, or undefined if no node was disconnected.
+ * @return {DirectionNode | undefined} the disconnected node, or undefined if no node was disconnected.
  * If this node was to be removed and this node is a root node, this node is returned.
  */
-export const disconnectNode = (parent: DirectionNode, inDirection?: Direction): DirectionNode | undefined => {
+export const disconnectNode = (
+  parent: DirectionNode,
+  inDirection?: Direction
+): DirectionNode | undefined => {
   if (inDirection === undefined) {
     if (parent.neighbors().isRoot()) {
       return parent;
     }
-    return parent.neighbors()
+    return parent
+      .neighbors()
       .parentNode()
       .disconnect(reverseDirection(parent.neighbors().parentDirection()));
   }
@@ -29,7 +33,8 @@ export const disconnectNode = (parent: DirectionNode, inDirection?: Direction): 
     !parent.neighbors().isRoot() &&
     parent.neighbors().parentDirection() === inDirection
   ) {
-    return parent.neighbors()
+    return parent
+      .neighbors()
       .parentNode()
       .disconnect(reverseDirection(parent.neighbors().parentDirection()));
   }

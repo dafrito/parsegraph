@@ -235,8 +235,8 @@ export class DirectionCaret<Value> {
   }
 
   /**
-   * Moves the caret to the current node's parent. 
-   * 
+   * Moves the caret to the current node's parent.
+   *
    * @throws if the current node is root.
    */
   moveToParent(): void {

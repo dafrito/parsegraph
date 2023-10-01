@@ -1,21 +1,14 @@
-import createException, {
-  BAD_NODE_DIRECTION,
-  NO_OUTWARD_CONNECT,
-  NO_PARENT_CONNECT,
-} from "../Exception";
 import { Fit } from "./Fit";
 
-import { Direction, reverseDirection } from "../Direction";
+import { Direction } from "../Direction";
 
 import { Layout } from "./Layout";
 
 import { LayoutPhase } from "./Layout";
-import Alignment from "./Neighbors/Alignment";
 import { Siblings } from "./Siblings";
 import { PaintGroup } from "./PaintGroup";
 
 import { Neighbors } from "./Neighbors/Neighbors";
-import { findPaintGroup } from "./findPaintGroup";
 import { connectNode } from "./connectNode";
 import { disconnectNode } from "./disconnectNode";
 
@@ -253,16 +246,16 @@ export class DirectionNode<Value = any> {
 
   /**
    * Connects the given node to this node in the specified direction.
-   * 
+   *
    * If the node already has a parent, it will be disconnected. If this node already
    * has a child in the specified direction, that child will be disconected.
-   * 
+   *
    * This will invalidate the layout of this node.
-   * 
+   *
    * @param {Direction} inDirection - the direction to attach the given node
    * @param {DirectionNode<Value>} node - the node to attach
-   * @returns the givn node
-   * 
+   * @return {DirectionNode} the given node
+   *
    * @see {@link connectNode}
    */
   connect(
@@ -274,12 +267,12 @@ export class DirectionNode<Value = any> {
 
   /**
    * Removes the child in the specified direction.
-   * 
+   *
    * @param {Direction | undefined} inDirection - the direction of the child. If undefined, the node to remove
    * is this node from its parent.
-   * @returns {DirectionNode | undefined} the disconnected node, or undefined if no node was disconnected.
+   * @return {DirectionNode | undefined} the disconnected node, or undefined if no node was disconnected.
    * If this node was to be removed and this node is a root node, this node is returned.
-   * 
+   *
    * @see {@link disconnectNode}
    */
   disconnect(inDirection?: Direction): DirectionNode | undefined {

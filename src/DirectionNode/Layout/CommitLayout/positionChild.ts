@@ -6,37 +6,32 @@ import {
   isVerticalDirection,
 } from "../../../Direction";
 
-import {
-  Alignment,
-  DirectionNode,
-} from "../..";
+import { Alignment, DirectionNode } from "../..";
 
-import createException, {
-  BAD_NODE_DIRECTION,
-} from "../../../Exception";
+import createException, { BAD_NODE_DIRECTION } from "../../../Exception";
 
-  /**
-   * Positions a child.
-   *
-   * The alignment is positive in the positive direction.
-   *
-   * The separation is positive in the direction of the child.
-   *
-   * These values should in this node's space.
-   *
-   * The child's position is in this node's space.
-   *
-   * @param {DirectionNode} node the node to position
-   * @param {Direction} childDirection the direction to position
-   * @param {Alignment} alignment the alignment used for the given direction
-   * @param {number} separation the separation used for the given child
-   */
+/**
+ * Positions a child.
+ *
+ * The alignment is positive in the positive direction.
+ *
+ * The separation is positive in the direction of the child.
+ *
+ * These values should in this node's space.
+ *
+ * The child's position is in this node's space.
+ *
+ * @param {DirectionNode} node the node to position
+ * @param {Direction} childDirection the direction to position
+ * @param {Alignment} alignment the alignment used for the given direction
+ * @param {number} separation the separation used for the given child
+ */
 const firstSize = [NaN, NaN];
 export const positionChild = (
-    node: DirectionNode,
-    childDirection: Direction,
-    alignment: Alignment,
-    separation: number
+  node: DirectionNode,
+  childDirection: Direction,
+  alignment: Alignment,
+  separation: number
 ): void => {
   // Validate arguments.
   if (separation < 0) {
@@ -83,13 +78,9 @@ export const positionChild = (
   const dirSign = directionSign(childDirection);
   if (isVerticalDirection(childDirection)) {
     // The child is positioned vertically.
-    node
-      .neighbors()
-      .setPosAt(childDirection, alignment, dirSign * separation);
+    node.neighbors().setPosAt(childDirection, alignment, dirSign * separation);
   } else {
-    node
-      .neighbors()
-      .setPosAt(childDirection, dirSign * separation, alignment);
+    node.neighbors().setPosAt(childDirection, dirSign * separation, alignment);
   }
   /* console.log(
             nameDirection(childDirection) + " " +

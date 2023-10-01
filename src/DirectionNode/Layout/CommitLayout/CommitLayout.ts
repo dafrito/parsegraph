@@ -1,12 +1,6 @@
-import {
-  Direction,
-  forEachCardinalDirection,
-} from "../../../Direction";
+import { Direction, forEachCardinalDirection } from "../../../Direction";
 
-import {
-  DirectionNode,
-  Fit,
-} from "../..";
+import { DirectionNode, Fit } from "../..";
 
 import { LayoutPhase, commitAxisBasedLayout } from "..";
 
@@ -174,12 +168,26 @@ export class CommitLayout {
     }
 
     if (node.neighbors().isRootlike()) {
-      if (commitRootlikeLayout(this.painter(), node, this._lineThickness, this.bodySize)) {
+      if (
+        commitRootlikeLayout(
+          this.painter(),
+          node,
+          this._lineThickness,
+          this.bodySize
+        )
+      ) {
         node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
         return true;
       }
     } else {
-      if (commitAxisBasedLayout(this.painter(), node, this._lineThickness, this.bodySize)) {
+      if (
+        commitAxisBasedLayout(
+          this.painter(),
+          node,
+          this._lineThickness,
+          this.bodySize
+        )
+      ) {
         node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
         return true;
       }
@@ -190,7 +198,14 @@ export class CommitLayout {
       addLineBounds(node, dir, this.bodySize);
     });
 
-    if (commitInwardLayout(this.painter(), node, this.bodySize, this.firstSize) === true) {
+    if (
+      commitInwardLayout(
+        this.painter(),
+        node,
+        this.bodySize,
+        this.firstSize
+      ) === true
+    ) {
       return true;
     }
 
@@ -199,7 +214,6 @@ export class CommitLayout {
     // Needed a commit, so return true.
     return true;
   }
-
 
   protected commitLayoutPhaseOne(): boolean {
     // Commit layout for all nodes.

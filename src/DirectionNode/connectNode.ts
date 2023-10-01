@@ -13,16 +13,16 @@ import { DirectionNode } from "./DirectionNode";
 
 /**
  * Connects the given node to this node in the specified direction.
- * 
+ *
  * If the node already has a parent, it will be disconnect. If this node already
  * has a child in the specified direction, that child will be disconected.
- * 
+ *
  * This will invalidate the layout of the parent.
- * 
+ *
  * @param {DirectionNode} parent - the node that will attach the child
  * @param {Direction} inDirection - the direction to attach the given node, relative to the parent
  * @param {DirectionNode} node - the node to attach
- * @returns the givn node
+ * @return {DirectionNode} the given node
  * @throws if inDirection is NULL, OUTWARD
  * @throws if inDirection is the parent's direction
  */

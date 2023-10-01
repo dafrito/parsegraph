@@ -7,10 +7,7 @@ import {
   reverseDirection,
 } from "../../../Direction";
 
-import {
-  DirectionNode,
-  AxisOverlap,
-} from "../..";
+import { DirectionNode, AxisOverlap } from "../..";
 
 import { LayoutPhase } from "..";
 
@@ -97,8 +94,7 @@ export const layoutSingle = (
   if (getDirectionAxis(direction) == Axis.VERTICAL) {
     separationFromChild = Math.max(
       separationFromChild,
-      node.neighbors().nodeAt(direction).scale() *
-        (firstSize[1] / 2) +
+      node.neighbors().nodeAt(direction).scale() * (firstSize[1] / 2) +
         bodySize[1] / 2
     );
     separationFromChild +=
@@ -107,8 +103,7 @@ export const layoutSingle = (
   } else {
     separationFromChild = Math.max(
       separationFromChild,
-      node.neighbors().nodeAt(direction).scale() *
-        (firstSize[0] / 2) +
+      node.neighbors().nodeAt(direction).scale() * (firstSize[0] / 2) +
         bodySize[0] / 2
     );
     separationFromChild +=
