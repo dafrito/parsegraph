@@ -28,7 +28,7 @@ const drawLine = (
 
   const layout = node.layout();
   const parentScale = layout.groupScale();
-  const scale = directionData.child()?.layout().groupScale();
+  const scale = directionData.neighbor()?.layout().groupScale();
   if (typeof scale !== "number" || isNaN(scale)) {
     console.log(directionData.node);
     throw new Error(

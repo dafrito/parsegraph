@@ -787,7 +787,7 @@ describe("CommitLayoutData", () => {
         str += '"run"\t' + Object.keys(m).sort().map(key => `"${key}"`).join("\t");
         str += "\n"
       } else {
-        str += i + "\t" + Object.keys(m).sort().map(key => (m[key]/i)).join("\t");
+        str += i + "\t" + Object.keys(m).sort().map(key => ((m as any)[key]/i)).join("\t");
         str += "\n"
       }
     }
