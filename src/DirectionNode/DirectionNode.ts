@@ -56,9 +56,38 @@ export class DirectionNode<Value = any> {
 
   // ///////////////////////////////////////////////////////////////////////////
   //
-  // Node state
+  // Invalidation
   //
   // ///////////////////////////////////////////////////////////////////////////
+
+  layout(): Layout {
+    if (!this._layout) {
+      this._layout = new Layout(this);
+    }
+    return this._layout;
+  }
+
+  neighbors(): Neighbors {
+    return this._neighbors;
+  }
+
+  parentDirection(): Direction {
+    if (this.neighbors().isRoot()) {
+      return Direction.NULL;
+    }
+    const n = this.neighbors().parent();
+    if (n === undefined) {
+      return Direction.NULL;
+    }
+    return reverseDirection(n.direction());
+  }
+
+  parentNode(): DirectionNode {
+    if (this.neighbors().isRoot()) {
+      throw createException(NODE_IS_ROOT);
+    }
+    return this.neighbors().parent()?.node() as this;
+  }
 
   invalidate(): void {
     let node: DirectionNode = this;
@@ -78,6 +107,12 @@ export class DirectionNode<Value = any> {
       }
     }
   }
+
+  // ///////////////////////////////////////////////////////////////////////////
+  //
+  // Node state
+  //
+  // ///////////////////////////////////////////////////////////////////////////
 
   id(): string | number | undefined {
     return this._id;
@@ -188,40 +223,11 @@ export class DirectionNode<Value = any> {
     this.invalidate();
   }
 
-  layout(): Layout {
-    if (!this._layout) {
-      this._layout = new Layout(this);
-    }
-    return this._layout;
-  }
-
   // ///////////////////////////////////////////////////////////////////////////
   //
   // Adjacency
   //
   // ///////////////////////////////////////////////////////////////////////////
-
-  neighbors(): Neighbors {
-    return this._neighbors;
-  }
-
-  parentDirection(): Direction {
-    if (this.neighbors().isRoot()) {
-      return Direction.NULL;
-    }
-    const n = this.neighbors().parent();
-    if (n === undefined) {
-      return Direction.NULL;
-    }
-    return reverseDirection(n.direction());
-  }
-
-  parentNode(): DirectionNode {
-    if (this.neighbors().isRoot()) {
-      throw createException(NODE_IS_ROOT);
-    }
-    return this.neighbors().parent()?.node() as this;
-  }
 
   parentX(): number {
     if (this.neighbors().isRoot()) {
