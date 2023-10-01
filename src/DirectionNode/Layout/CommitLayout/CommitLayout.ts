@@ -11,6 +11,8 @@ import { commitRootlikeLayout } from "./commitRootlikeLayout";
 import createException, { BAD_LAYOUT_STATE } from "../../../Exception";
 import { Size } from "../../../Size";
 
+const LINE_THICKNESS = 12;
+
 /**
  * Computes the {@link Layout} for {@link DirectionNode} graphs.
  *
@@ -28,7 +30,6 @@ export class CommitLayout {
   protected node?: DirectionNode;
   protected layoutPhase: number;
   private _painter: LayoutPainter;
-  private _lineThickness: number;
 
   /**
    * Creates a new run of the layout algorithm.
@@ -41,12 +42,7 @@ export class CommitLayout {
     this.bodySize = [NaN, NaN];
     this.firstSize = [NaN, NaN];
     this.secondSize = [NaN, NaN];
-    this._lineThickness = 1;
     this.reset(node);
-  }
-
-  setLineThickness(lineThickness: number) {
-    this._lineThickness = lineThickness;
   }
 
   protected initExtent(
@@ -167,12 +163,15 @@ export class CommitLayout {
       return false;
     }
 
+    const thicknessFunc = this.painter().lineThickness;
+    const thickness = thicknessFunc ? thicknessFunc(node) : LINE_THICKNESS;
+
     if (node.neighbors().isRootlike()) {
       if (
         commitRootlikeLayout(
           this.painter(),
           node,
-          this._lineThickness,
+          thickness,
           this.bodySize
         )
       ) {
@@ -184,7 +183,7 @@ export class CommitLayout {
         commitAxisBasedLayout(
           this.painter(),
           node,
-          this._lineThickness,
+          thickness,
           this.bodySize
         )
       ) {

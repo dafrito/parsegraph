@@ -33,6 +33,13 @@ export interface LayoutPainter {
   ) => number;
 
   /**
+   * Gets the line thickness between nodes.
+   *
+   * @return {number} the line thickness
+   */
+  lineThickness?: (node: DirectionNode) => number;
+
+  /**
    * Optional. Paints the nodes of a newly committed paint group.
    *
    * This can be used to pre-render a paint group.
