@@ -34,19 +34,9 @@ import { AddLineBounds } from "./AddLineBounds";
 import { positionChild } from "./positionChild";
 import { getAlignment } from "./getAlignment";
 import { Size } from "../../../Size";
+import { getSeparation } from "./getSeparation";
 
-const getSeparation = (painter: LayoutPainter, node: DirectionNode, axis: Axis, dir: Direction, preferVertical: boolean): number => {
-  const getSeparation = painter.getSeparation;
-  if (!getSeparation) {
-    return 0;
-  }
-  return getSeparation(
-    node,
-    axis,
-    dir,
-    preferVertical
-  );
-};
+const firstSize: Size = [NaN, NaN];
 
 // Layout a single node in the given direction.
 export const layoutSingle = (
@@ -55,7 +45,6 @@ export const layoutSingle = (
   allowAxisOverlap: boolean,
   lineThickness: number,
   bodySize: Size,
-  firstSize: Size,
   painter: LayoutPainter
 ): boolean => {
   if (!node.neighbors().hasNode(direction)) {
