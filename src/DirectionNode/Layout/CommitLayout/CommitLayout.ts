@@ -412,6 +412,19 @@ export class CommitLayout extends BaseCommitLayout {
     return false;
   }
 
+  private getSeparation(node: DirectionNode, axis: Axis, dir: Direction, preferVertical: boolean): number {
+    const getSeparation = this.painter().getSeparation;
+    if (!getSeparation) {
+      return 0;
+    }
+    return getSeparation(
+      node,
+      axis,
+      dir,
+      preferVertical
+    );
+  }
+
   private commitInwardLayout(node: DirectionNode): boolean {
     if (!node.neighbors().hasNode(Direction.INWARD)) {
       return false;
@@ -434,7 +447,7 @@ export class CommitLayout extends BaseCommitLayout {
             (nestedNode.layout().extentOffsetAt(Direction.DOWNWARD) -
               nestedSize.width() / 2),
           this.bodySize.height() / 2 -
-            this.painter().getSeparation(node, Axis.Z, Direction.INWARD, true) /
+            this.getSeparation(node, Axis.Z, Direction.INWARD, true) /
               2 +
             nestedNode.scale() *
               (-nestedSize.height() +
@@ -447,7 +460,7 @@ export class CommitLayout extends BaseCommitLayout {
         .setPosAt(
           Direction.INWARD,
           this.bodySize.width() / 2 -
-            this.painter().getSeparation(
+            this.getSeparation(
               node,
               Axis.Z,
               Direction.INWARD,
@@ -777,7 +790,7 @@ export class CommitLayout extends BaseCommitLayout {
           this.bodySize.height() / 2
       );
       separationFromChild +=
-        this.painter().getSeparation(node, Axis.VERTICAL, direction, true) *
+        this.getSeparation(node, Axis.VERTICAL, direction, true) *
         node.neighbors().nodeAt(direction).scale();
     } else {
       separationFromChild = Math.max(
@@ -787,7 +800,7 @@ export class CommitLayout extends BaseCommitLayout {
           this.bodySize.width() / 2
       );
       separationFromChild +=
-        this.painter().getSeparation(node, Axis.HORIZONTAL, direction, false) *
+        this.getSeparation(node, Axis.HORIZONTAL, direction, false) *
         node.neighbors().nodeAt(direction).scale();
     }
     // console.log("Calculated padded separation of " +
@@ -1034,7 +1047,7 @@ export class CommitLayout extends BaseCommitLayout {
           this.bodySize.height() / 2
       );
       separationFromFirst +=
-        this.painter().getSeparation(
+        this.getSeparation(
           node,
           Axis.VERTICAL,
           firstDirection,
@@ -1048,7 +1061,7 @@ export class CommitLayout extends BaseCommitLayout {
           this.bodySize.height() / 2
       );
       separationFromSecond +=
-        this.painter().getSeparation(
+        this.getSeparation(
           node,
           Axis.VERTICAL,
           secondDirection,
@@ -1062,7 +1075,7 @@ export class CommitLayout extends BaseCommitLayout {
           this.bodySize.width() / 2
       );
       separationFromFirst +=
-        this.painter().getSeparation(
+        this.getSeparation(
           node,
           Axis.HORIZONTAL,
           firstDirection,
@@ -1076,7 +1089,7 @@ export class CommitLayout extends BaseCommitLayout {
           this.bodySize.width() / 2
       );
       separationFromSecond +=
-        this.painter().getSeparation(
+        this.getSeparation(
           node,
           Axis.HORIZONTAL,
           secondDirection,

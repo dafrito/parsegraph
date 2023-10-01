@@ -26,12 +26,12 @@ export interface LayoutPainter {
    *
    * @return {number} the minimum separation
    */
-  getSeparation(
+  getSeparation?: (
     node: DirectionNode,
     axis: Axis,
     dir: Direction,
     preferVertical: boolean
-  ): number;
+  ) => number;
 
   /**
    * Optional. Paints the nodes of a newly committed paint group.
