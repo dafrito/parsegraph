@@ -226,23 +226,6 @@ export class DirectionNode<Value = any> {
     return this._paintGroup;
   }
 
-  forEachPaintGroup(func: (node: DirectionNode<Value>) => void): void {
-    let node: DirectionNode<Value> = this;
-    let prev = node;
-    do {
-      if (!node.paintGroup()) {
-        throw createException(NOT_PAINT_GROUP);
-      }
-      func(node);
-      node = node.paintGroup().prev();
-      if (prev === node && node !== this) {
-        throw new Error("loop detected");
-      }
-      prev = node;
-    } while (node !== this);
-  }
-
-
   crease() {
     if (this.localPaintGroup()) {
       this.paintGroup().crease();
@@ -548,25 +531,6 @@ export class DirectionNode<Value = any> {
   setPosAt(inDirection: Direction, x: number, y: number): void {
     this.neighborAt(inDirection).xPos = x;
     this.neighborAt(inDirection).yPos = y;
-  }
-
-  separationAt(inDirection: Direction): number {
-    // Exclude some directions that cannot be calculated.
-    if (!isCardinalDirection(inDirection)) {
-      throw createException(BAD_NODE_DIRECTION);
-    }
-
-    // If the given direction is the parent's direction, use
-    // their measurement instead.
-    if (!this.neighbors().isRoot() && inDirection == this.parentDirection()) {
-      return this.parentNode().separationAt(reverseDirection(inDirection));
-    }
-
-    if (!this.neighbors().hasNode(inDirection)) {
-      throw createException(NO_NODE_FOUND);
-    }
-
-    return this.neighborAt(inDirection).separation;
   }
 
   lineLengthAt(direction: Direction): number {

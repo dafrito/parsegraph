@@ -5,8 +5,10 @@ import {
   getNegativeDirection,
   NUM_DIRECTIONS,
   getPositiveDirection,
+  isCardinalDirection,
+  reverseDirection,
 } from "../Direction";
-import createException, { BAD_NODE_DIRECTION, BAD_AXIS } from "../Exception";
+import createException, { BAD_NODE_DIRECTION, BAD_AXIS, NO_NODE_FOUND } from "../Exception";
 import { DirectionNode } from "./DirectionNode";
 
 export class Neighbors {
@@ -169,5 +171,24 @@ export class Neighbors {
       this.parent()?.direction() === Direction.INWARD ||
       this.parent()?.direction() === Direction.OUTWARD
     );
+  }
+ 
+  separationAt(inDirection: Direction): number {
+    // Exclude some directions that cannot be calculated.
+    if (!isCardinalDirection(inDirection)) {
+      throw createException(BAD_NODE_DIRECTION);
+    }
+
+    // If the given direction is the parent's direction, use
+    // their measurement instead.
+    if (!this.isRoot() && inDirection == this.node().parentDirection()) {
+      return this.node().parentNode().neighbors().separationAt(reverseDirection(inDirection));
+    }
+
+    if (!this.node().neighbors().hasNode(inDirection)) {
+      throw createException(NO_NODE_FOUND);
+    }
+
+    return this.at(inDirection).separation;
   }
 }

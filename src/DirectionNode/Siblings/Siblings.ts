@@ -333,9 +333,11 @@ export class Siblings {
   }
 
   protected sanitizeLayoutPreference(given: PreferredAxis): PreferredAxis {
-    const paxis = getDirectionAxis(
-      this.node().neighbors().parent()?.direction()
-    );
+    const parentDir = this.node().neighbors().parent()?.direction()
+    if (parentDir === undefined) {
+      throw new Error("Cannot sanitize root layout preference")
+    }
+    const paxis = getDirectionAxis(parentDir);
     if (given === PreferredAxis.VERTICAL) {
       given =
         paxis === Axis.VERTICAL
@@ -382,13 +384,18 @@ export class Siblings {
       throw createException(NODE_IS_ROOT);
     }
 
+    const parentDir = this.node().neighbors().parent()?.direction();
+    if (parentDir === undefined) {
+      throw new Error("Cannot canonicalize root layout preference")
+    }
+
     // Convert the layout preference to either preferring the parent or
     // the perpendicular axis.
     let canonicalPref: PreferredAxis = this.getLayoutPreference();
     switch (this.getLayoutPreference()) {
       case PreferredAxis.HORIZONTAL: {
         if (
-          getDirectionAxis(this.node().neighbors().parent()?.direction()) ===
+          getDirectionAxis(parentDir) ===
           Axis.HORIZONTAL
         ) {
           canonicalPref = PreferredAxis.PARENT;
@@ -399,7 +406,7 @@ export class Siblings {
       }
       case PreferredAxis.VERTICAL: {
         if (
-          getDirectionAxis(this.node().neighbors().parent()?.direction()) ===
+          getDirectionAxis(parentDir) ===
           Axis.VERTICAL
         ) {
           canonicalPref = PreferredAxis.PARENT;
@@ -449,9 +456,12 @@ export class Siblings {
       return;
     }
 
-    const paxis = getDirectionAxis(
-      this.node().neighbors().parent()?.direction()
-    );
+    const parentDir = this.node().neighbors().parent()?.direction()
+    if (!parentDir) {
+      throw new Error("unreachable");
+    }
+
+    const paxis = getDirectionAxis(parentDir)
     if (curCanon === PreferredAxis.PARENT) {
       if (paxis === Axis.HORIZONTAL) {
         this.horzToVert();
@@ -481,9 +491,13 @@ export class Siblings {
       }
       return;
     }
+    const parentDir = this.node().neighbors().parent()?.direction();
+    if (parentDir === undefined) {
+      throw new Error("unreachable");
+    }
     if (
       getDirectionAxis(given) ===
-      getDirectionAxis(this.node().neighbors().parent()?.direction())
+      getDirectionAxis(parentDir)
     ) {
       // console.log(namePreferredAxis(PreferredAxis.PARENT));
       this.setLayoutPreference(PreferredAxis.PARENT);
@@ -503,10 +517,14 @@ export class Siblings {
       }
       return VERTICAL_ORDER;
     }
+    const parentDir = this.node().neighbors().parent()?.direction();
+    if (parentDir === undefined) {
+      throw new Error("unreachable");
+    }
     if (this.canonicalLayoutPreference() === PreferredAxis.PERPENDICULAR) {
       // console.log("PREFER PERP");
       if (
-        getDirectionAxis(this.node().neighbors().parent()?.direction()) ===
+        getDirectionAxis(parentDir) ===
         Axis.HORIZONTAL
       ) {
         return VERTICAL_ORDER;
@@ -517,7 +535,7 @@ export class Siblings {
     //   namePreferredAxis(this.getLayoutPreference()));
     // Parallel preference.
     if (
-      getDirectionAxis(this.node().neighbors().parent()?.direction()) ===
+      getDirectionAxis(parentDir) ===
       Axis.HORIZONTAL
     ) {
       return HORIZONTAL_ORDER;

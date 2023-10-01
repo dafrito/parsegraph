@@ -38,7 +38,7 @@ const cld = new CommitLayout(rootNode, {
 while (cld.crank());
 
 // Render the graph.
-rootNode.forEachPaintGroup((pg: DirectionNode) => {
+rootNode.paintGroup().forEach((pg: DirectionNode) => {
   pg.forEachNode(node => {
     paintNodeLines(node, (x, y, w, h) => {
       // TODO Draw lines from node to neighbor.

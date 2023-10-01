@@ -78,13 +78,13 @@ export class CommitLayout extends BaseCommitLayout {
 
     // Iterate in the given direction.
     if (node.neighbors().hasNode(inDirection)) {
-      total += node.separationAt(inDirection);
+      total += node.neighbors().separationAt(inDirection);
 
       scale *= node.neighbors().nodeAt(inDirection).scale();
       let thisNode: DirectionNode = node.neighbors().nodeAt(inDirection);
       let nextNode: DirectionNode = thisNode.neighbors().nodeAt(inDirection);
       while (nextNode) {
-        total += thisNode.separationAt(inDirection) * scale;
+        total += thisNode.neighbors().separationAt(inDirection) * scale;
         scale *= thisNode.neighbors().nodeAt(inDirection).scale();
 
         thisNode = nextNode;

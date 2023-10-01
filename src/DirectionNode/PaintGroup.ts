@@ -3,6 +3,7 @@ import { findPaintGroupInsert } from "./findPaintGroupInsert";
 import { getLastPaintGroup } from "./getLastPaintGroup";
 import makeLimit from "./makeLimit";
 import { DirectionNode } from "..";
+import createException, { NOT_PAINT_GROUP } from "../Exception";
 
 export class PaintGroup {
   _next: DirectionNode;
@@ -201,6 +202,23 @@ export class PaintGroup {
       candidate = candidate.siblings().prev();
     }
     return candidate;
+  }
+
+
+  forEach(func: (node: DirectionNode) => void): void {
+    let node: DirectionNode = this.node();
+    let prev = node;
+    do {
+      if (!node.paintGroup()) {
+        throw createException(NOT_PAINT_GROUP);
+      }
+      func(node);
+      node = node.paintGroup().prev();
+      if (prev === node && node !== this.node()) {
+        throw new Error("loop detected");
+      }
+      prev = node;
+    } while (node !== this.node());
   }
 
   dump(): DirectionNode[] {

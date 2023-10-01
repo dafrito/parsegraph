@@ -1039,12 +1039,12 @@ describe("Package", function () {
         (readStyle("bu").horizontalPadding +
           readStyle("bu").borderThickness +
           readStyle("bu").minWidth / 2);
-    if (caret.node().separationAt(FORWARD) != expectedSeparation) {
+    if (caret.node().neighbors().separationAt(FORWARD) != expectedSeparation) {
       throw new Error(
         "Expected forward separation = " +
           expectedSeparation +
           ", actual = " +
-          caret.node().separationAt(FORWARD)
+          caret.node().neighbors().separationAt(FORWARD)
       );
     }
 
@@ -1462,7 +1462,7 @@ describe("Package", function () {
 
     commitLayout(root);
 
-    root.forEachPaintGroup((pg) => {
+    root.paintGroup().forEach((pg) => {
       assert(!pg.layout().needsAbsolutePos());
     });
     assert(!root.layout().needsAbsolutePos());
