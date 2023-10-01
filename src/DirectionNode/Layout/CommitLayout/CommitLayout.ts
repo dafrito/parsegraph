@@ -31,7 +31,9 @@ import { LayoutPhase } from "..";
 
 import { BaseCommitLayout } from "./BaseCommitLayout";
 import { LayoutPainter } from "./LayoutPainter";
+import { findConsecutiveLength } from "./findConsecutiveLength";
 import { combineExtents } from "./CombineExtents";
+import { AddLineBounds } from "./AddLineBounds";
 import { positionChild } from "./positionChild";
 import { getAlignment } from "./getAlignment";
 
@@ -46,8 +48,7 @@ export const LINE_THICKNESS = 12;
  * @see {@link LayoutPainter}
  */
 export class CommitLayout extends BaseCommitLayout {
-  private lineBounds: Size;
-  private bv: [number, number, number];
+  private _lineBounds: AddLineBounds;
 
   /**
    * Creates a new run of the layout algorithm.
@@ -57,188 +58,7 @@ export class CommitLayout extends BaseCommitLayout {
    */
   constructor(node: DirectionNode, painter: LayoutPainter) {
     super(node, painter);
-    this.lineBounds = [NaN, NaN];
-    this.bv = [NaN, NaN, NaN];
-  }
-
-  private findConsecutiveLength(node: DirectionNode, inDirection: Direction) {
-    // Exclude some directions that cannot be calculated.
-    if (!isCardinalDirection(inDirection)) {
-      throw createException(BAD_NODE_DIRECTION);
-    }
-
-    const directionAxis: Axis = getDirectionAxis(inDirection);
-    if (directionAxis === Axis.NULL) {
-      // This should be impossible.
-      throw createException(BAD_NODE_DIRECTION);
-    }
-
-    // Calculate the length, starting from the center of this node.
-    let total: number = 0;
-    let scale: number = 1.0;
-
-    // Iterate in the given direction.
-    if (node.neighbors().hasNode(inDirection)) {
-      total += node.neighbors().separationAt(inDirection);
-
-      scale *= node.neighbors().nodeAt(inDirection).scale();
-      let thisNode: DirectionNode = node.neighbors().nodeAt(inDirection);
-      let nextNode: DirectionNode = thisNode.neighbors().nodeAt(inDirection);
-      while (nextNode) {
-        total += thisNode.neighbors().separationAt(inDirection) * scale;
-        scale *= thisNode.neighbors().nodeAt(inDirection).scale();
-
-        thisNode = nextNode;
-        nextNode = nextNode.neighbors().nodeAt(inDirection);
-      }
-    }
-
-    return total;
-  }
-
-  /**
-   * Returns the offset of the child's center in the given direction from
-   * this node's center.
-   *
-   * This offset is in a direction perpendicular to the given direction
-   * and is positive to indicate a negative offset.
-   *
-   * The result is in this node's space.
-   *
-   * @param {DirectionNode} node the node to retrieve alignment offset
-   * @param {Direction} childDirection the direction where alignment offset is retrieved
-   * @return {number} the alignment offset
-   */
-  private getAlignment(node: DirectionNode, childDirection: Direction): number {
-    // Calculate the alignment adjustment for both nodes.
-    const child = node.neighbors().nodeAt(childDirection);
-    const axis = getPerpendicularAxis(getDirectionAxis(childDirection));
-
-    let rv;
-
-    const alignmentMode = node.neighbors().getAlignment(childDirection);
-    switch (alignmentMode) {
-      case Alignment.NULL:
-        throw createException(BAD_NODE_ALIGNMENT);
-      case Alignment.NONE:
-        // Unaligned nodes have no alignment offset.
-        rv = 0;
-        break;
-      case Alignment.NEGATIVE:
-        rv = this.findConsecutiveLength(child, getNegativeDirection(axis));
-        break;
-      case Alignment.CENTER: {
-        const negativeLength: number = this.findConsecutiveLength(
-          child,
-          getNegativeDirection(axis)
-        );
-
-        const positiveLength: number = this.findConsecutiveLength(
-          child,
-          getPositiveDirection(axis)
-        );
-
-        const halfLength: number = (negativeLength + positiveLength) / 2;
-
-        if (negativeLength > positiveLength) {
-          // The child's negative neighbors extend
-          // more than their positive neighbors.
-          rv = negativeLength - halfLength;
-        } else if (negativeLength < positiveLength) {
-          rv = -(positiveLength - halfLength);
-        } else {
-          rv = 0;
-        }
-        break;
-      }
-      case Alignment.POSITIVE:
-        rv = -this.findConsecutiveLength(child, getPositiveDirection(axis));
-        break;
-    }
-    return rv * node.neighbors().nodeAt(childDirection).scale();
-  }
-
-  /**
-   * Positions a child.
-   *
-   * The alignment is positive in the positive direction.
-   *
-   * The separation is positive in the direction of the child.
-   *
-   * These values should in this node's space.
-   *
-   * The child's position is in this node's space.
-   *
-   * @param {DirectionNode} node the node to position
-   * @param {Direction} childDirection the direction to position
-   * @param {Alignment} alignment the alignment used for the given direction
-   * @param {number} separation the separation used for the given child
-   */
-  private positionChild(
-    node: DirectionNode,
-    childDirection: Direction,
-    alignment: Alignment,
-    separation: number
-  ): void {
-    // Validate arguments.
-    if (separation < 0) {
-      throw new Error("separation must always be positive.");
-    }
-    if (!isCardinalDirection(childDirection)) {
-      throw createException(BAD_NODE_DIRECTION);
-    }
-    const child: DirectionNode = node.neighbors().nodeAt(childDirection);
-    const reversedDirection: Direction = reverseDirection(childDirection);
-
-    // Save alignment parameters.
-    node.neighbors().at(childDirection).alignmentOffset = alignment;
-    // console.log("Alignment = " + alignment);
-    node.neighbors().at(childDirection).separation = separation;
-
-    // Determine the line length.
-    let extentSize: number;
-    if (node.neighbors().getAlignment(childDirection) === Alignment.NONE) {
-      child.layout().size(this.firstSize);
-      if (isVerticalDirection(childDirection)) {
-        extentSize = this.firstSize[1] / 2;
-      } else {
-        extentSize = this.firstSize[0] / 2;
-      }
-    } else {
-      extentSize = child
-        .layout()
-        .extentsAt(reversedDirection)
-        .sizeAt(
-          child.layout().extentOffsetAt(reversedDirection) -
-            alignment / node.neighbors().nodeAt(childDirection).scale()
-        );
-    }
-    const lineLength =
-      separation - node.neighbors().nodeAt(childDirection).scale() * extentSize;
-    node.neighbors().at(childDirection).lineLength = lineLength;
-    // console.log(
-    //   "Line length: " + lineLength + ",
-    //   separation: " + separation + ",
-    //   extentSize: " + extentSize);
-
-    // Set the position.
-    const dirSign = directionSign(childDirection);
-    if (isVerticalDirection(childDirection)) {
-      // The child is positioned vertically.
-      node
-        .neighbors()
-        .setPosAt(childDirection, alignment, dirSign * separation);
-    } else {
-      node
-        .neighbors()
-        .setPosAt(childDirection, dirSign * separation, alignment);
-    }
-    /* console.log(
-              nameDirection(childDirection) + " " +
-              nameType(child.type()) + "'s position set to (" +
-              this.neighbors().at(childDirection).xPos + ", " +
-              this.neighbors().at(childDirection).yPos + ")"
-          );*/
+    this._lineBounds = new AddLineBounds();
   }
 
   protected override initExtent(
@@ -284,7 +104,7 @@ export class CommitLayout extends BaseCommitLayout {
 
     // Set our extents, combined with non-point neighbors.
     forEachCardinalDirection((dir: Direction) => {
-      this.addLineBounds(node, dir);
+      this._lineBounds.addLineBounds(node, dir, this.bodySize);
     });
 
     if (this.commitInwardLayout(node) === true) {
@@ -1130,65 +950,4 @@ export class CommitLayout extends BaseCommitLayout {
     return false;
   }
 
-  private sizeIn(
-    node: DirectionNode,
-    direction: Direction,
-    bodySize: Size
-  ): number {
-    node.layout().size(bodySize);
-    if (isVerticalDirection(direction)) {
-      return bodySize[1] / 2;
-    } else {
-      return bodySize[0] / 2;
-    }
-  }
-
-  private addLineBounds(node: DirectionNode, given: Direction) {
-    if (!node.neighbors().hasChild(given)) {
-      return;
-    }
-
-    const perpAxis: Axis = getPerpendicularAxis(given);
-    const dirSign: number = directionSign(given);
-
-    let positiveOffset: number = node
-      .layout()
-      .extentOffsetAt(getPositiveDirection(perpAxis));
-    let negativeOffset: number = node
-      .layout()
-      .extentOffsetAt(getNegativeDirection(perpAxis));
-
-    if (dirSign < 0) {
-      const lineSize: number = this.sizeIn(node, given, this.lineBounds);
-      positiveOffset -= lineSize + node.neighbors().lineLengthAt(given);
-      negativeOffset -= lineSize + node.neighbors().lineLengthAt(given);
-    }
-
-    if (node.nodeFit() == Fit.EXACT) {
-      // Append the line-shaped bound.
-      let lineSize: number;
-      if (perpAxis === Axis.VERTICAL) {
-        lineSize = this.bodySize[1] / 2;
-      } else {
-        lineSize = this.bodySize[0] / 2;
-      }
-      // lineSize = this.neighbors().nodeAt(given).scale() * LINE_THICKNESS / 2;
-      node
-        .layout()
-        .extentsAt(getPositiveDirection(perpAxis))
-        .combineBound(
-          positiveOffset,
-          node.neighbors().lineLengthAt(given),
-          lineSize
-        );
-      node
-        .layout()
-        .extentsAt(getNegativeDirection(perpAxis))
-        .combineBound(
-          negativeOffset,
-          node.neighbors().lineLengthAt(given),
-          lineSize
-        );
-    }
-  }
 }
