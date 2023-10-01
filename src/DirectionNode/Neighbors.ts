@@ -170,6 +170,18 @@ export class Neighbors {
     );
   }
 
+  setPosAt(inDirection: Direction, x: number, y: number): void {
+    this.at(inDirection).xPos = x;
+    this.at(inDirection).yPos = y;
+  }
+
+  lineLengthAt(direction: Direction): number {
+    if (!this.hasNode(direction)) {
+      return 0;
+    }
+    return this.at(direction).lineLength;
+  }
+
   separationAt(inDirection: Direction): number {
     // Exclude some directions that cannot be calculated.
     if (!isCardinalDirection(inDirection)) {

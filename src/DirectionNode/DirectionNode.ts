@@ -249,18 +249,6 @@ export class DirectionNode<Value = any> {
     return this.neighbors().parent()?.yPos ?? NaN;
   }
 
-  setPosAt(inDirection: Direction, x: number, y: number): void {
-    this.neighbors().at(inDirection).xPos = x;
-    this.neighbors().at(inDirection).yPos = y;
-  }
-
-  lineLengthAt(direction: Direction): number {
-    if (!this.neighbors().hasNode(direction)) {
-      return 0;
-    }
-    return this.neighbors().at(direction).lineLength;
-  }
-
   // ///////////////////////////////////////////////////////////////////////////
   //
   // Siblings
