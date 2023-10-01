@@ -3,34 +3,19 @@ import { Extent } from "../Extent";
 import {
   Direction,
   Axis,
-  getPerpendicularAxis,
-  getPositiveDirection,
-  getNegativeDirection,
   getDirectionAxis,
   reverseDirection,
-  forEachCardinalDirection,
 } from "../../../Direction";
 
 import {
-  Alignment,
   DirectionNode,
-  Fit,
-  PreferredAxis,
   AxisOverlap,
 } from "../..";
 
-import createException, {
-  BAD_NODE_DIRECTION,
-  BAD_NODE_ALIGNMENT,
-} from "../../../Exception";
-
 import { LayoutPhase } from "..";
 
-import { BaseCommitLayout } from "./BaseCommitLayout";
 import { LayoutPainter } from "./LayoutPainter";
-import { findConsecutiveLength } from "./findConsecutiveLength";
 import { combineExtents } from "./CombineExtents";
-import { AddLineBounds } from "./AddLineBounds";
 import { positionChild } from "./positionChild";
 import { getAlignment } from "./getAlignment";
 import { Size } from "../../../Size";
