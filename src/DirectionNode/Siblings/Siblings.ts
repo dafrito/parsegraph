@@ -159,7 +159,7 @@ export class Siblings {
           candidate &&
           candidate != excludeThisNode &&
           deeplyLinked.neighbors().parent()?.reverseDirection() !== dir &&
-          !candidate.localPaintGroup()
+          !candidate.isPaintGroup()
         ) {
           deeplyLinked = candidate;
           foundOne = true;
@@ -191,7 +191,7 @@ export class Siblings {
       }
       if (this.node().neighbors().hasNode(dir)) {
         const candidate = this.node().neighbors().nodeAt(dir);
-        if (candidate && !candidate.localPaintGroup()) {
+        if (candidate && !candidate.isPaintGroup()) {
           layoutBefore = candidate;
           break;
         }
@@ -219,7 +219,7 @@ export class Siblings {
       }
       if (this.node().neighbors().hasNode(dir)) {
         const candidate = this.node().neighbors().nodeAt(dir);
-        if (candidate && !candidate.localPaintGroup()) {
+        if (candidate && !candidate.isPaintGroup()) {
           layoutAfter = candidate;
           break;
         }

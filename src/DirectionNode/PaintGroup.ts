@@ -44,7 +44,7 @@ export class PaintGroup {
       this.connect(prevNode, this.node());
       this.connect(this.node(), nextNode);
     }
-    this.node().layoutChanged();
+    this.node().invalidate();
     this.node()
       .siblings()
       .forEachNode((n) => n.setPaintGroupRoot(this.node()));
@@ -57,7 +57,7 @@ export class PaintGroup {
 
   firstAndLast(): [DirectionNode | null, DirectionNode | null] {
     const pg = findPaintGroup(this.node());
-    if (!pg.localPaintGroup()) {
+    if (!pg.isPaintGroup()) {
       return [null, null];
     }
     let lastPaintGroup: DirectionNode | null = null;
@@ -82,8 +82,8 @@ export class PaintGroup {
       lastPaintGroup = this.node();
     }
     return [
-      firstPaintGroup?.localPaintGroup() ? firstPaintGroup : null,
-      lastPaintGroup.localPaintGroup() ? lastPaintGroup : null,
+      firstPaintGroup?.isPaintGroup() ? firstPaintGroup : null,
+      lastPaintGroup.isPaintGroup() ? lastPaintGroup : null,
     ];
   }
 
@@ -92,12 +92,12 @@ export class PaintGroup {
   }
 
   private connect(a: DirectionNode, b: DirectionNode): void {
-    const aPG = a === this.node() ? this : a.localPaintGroup();
+    const aPG = a === this.node() ? this : a.paintGroup();
     if (!aPG) {
       throw new Error("a paint group is missing");
     }
     aPG._next = b;
-    const bPG = b === this.node() ? this : b.localPaintGroup();
+    const bPG = b === this.node() ? this : b.paintGroup();
     if (!bPG) {
       throw new Error("b paint group is missing");
     }
@@ -192,14 +192,14 @@ export class PaintGroup {
     const pg = findPaintGroup(par.node());
     pg.siblings().forEachNode((n) => n.setPaintGroupRoot(pg));
     this.node().clearPaintGroup();
-    this.node().layoutChanged();
+    this.node().invalidate();
     this.verify();
   }
 
   last(): DirectionNode {
     let candidate = this.node().siblings().prev();
     while (candidate !== this.node()) {
-      if (candidate.localPaintGroup()) {
+      if (candidate.isPaintGroup()) {
         break;
       }
       candidate = candidate.siblings().prev();

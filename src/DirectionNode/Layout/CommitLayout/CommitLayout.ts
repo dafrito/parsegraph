@@ -224,9 +224,9 @@ export class CommitLayout extends BaseCommitLayout {
     const dirSign = directionSign(childDirection);
     if (isVerticalDirection(childDirection)) {
       // The child is positioned vertically.
-      node.setPosAt(childDirection, alignment, dirSign * separation);
+      node.neighbors().setPosAt(childDirection, alignment, dirSign * separation);
     } else {
-      node.setPosAt(childDirection, dirSign * separation, alignment);
+      node.neighbors().setPosAt(childDirection, dirSign * separation, alignment);
     }
     /* console.log(
               nameDirection(childDirection) + " " +
@@ -417,7 +417,7 @@ export class CommitLayout extends BaseCommitLayout {
     }
     const nestedSize: Size = nestedNode.layout().extentSize(this.firstSize);
     if (node.getAlignment(Direction.INWARD) === Alignment.INWARD_VERTICAL) {
-      node.setPosAt(
+      node.neighbors().setPosAt(
         Direction.INWARD,
         nestedNode.scale() *
           (nestedNode.layout().extentOffsetAt(Direction.DOWNWARD) -
@@ -431,7 +431,7 @@ export class CommitLayout extends BaseCommitLayout {
       );
     } else {
       // console.log(this.horizontalPadding(), this.borderThickness());
-      node.setPosAt(
+      node.neighbors().setPosAt(
         Direction.INWARD,
         this.bodySize.width() / 2 -
           this.painter().getSeparation(node, Axis.Z, Direction.INWARD, false) /
@@ -1125,8 +1125,8 @@ export class CommitLayout extends BaseCommitLayout {
 
     if (dirSign < 0) {
       const lineSize: number = this.sizeIn(node, given, this.lineBounds);
-      positiveOffset -= lineSize + node.lineLengthAt(given);
-      negativeOffset -= lineSize + node.lineLengthAt(given);
+      positiveOffset -= lineSize + node.neighbors().lineLengthAt(given);
+      negativeOffset -= lineSize + node.neighbors().lineLengthAt(given);
     }
 
     if (node.nodeFit() == Fit.EXACT) {
@@ -1141,11 +1141,11 @@ export class CommitLayout extends BaseCommitLayout {
       node
         .layout()
         .extentsAt(getPositiveDirection(perpAxis))
-        .combineBound(positiveOffset, node.lineLengthAt(given), lineSize);
+        .combineBound(positiveOffset, node.neighbors().lineLengthAt(given), lineSize);
       node
         .layout()
         .extentsAt(getNegativeDirection(perpAxis))
-        .combineBound(negativeOffset, node.lineLengthAt(given), lineSize);
+        .combineBound(negativeOffset, node.neighbors().lineLengthAt(given), lineSize);
     }
   }
 }

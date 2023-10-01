@@ -266,12 +266,12 @@ export class DirectionNode<Value = any> {
   // ///////////////////////////////////////////////////////////////////////////
 
   /**
-   * Gets this node's paint group, if it is a paint group.
+   * Returns whether this node is a paint group root.
    *
-   * @return {PaintGroup | undefined} this node's paint group, or undefined if it is not a paint group.
+   * @return {boolean} true if this node is a paint group root.
    */
-  localPaintGroup(): PaintGroup | undefined {
-    return this._paintGroup;
+  isPaintGroup(): boolean {
+    return !!this._paintGroup;
   }
 
   /**
@@ -326,7 +326,7 @@ export class DirectionNode<Value = any> {
   }
 
   crease() {
-    if (this.localPaintGroup()) {
+    if (this.isPaintGroup()) {
       this.paintGroup().crease();
     } else {
       this._paintGroup = new PaintGroup(this, true);
@@ -422,8 +422,8 @@ export class DirectionNode<Value = any> {
     const neighbor = this.neighbors().at(inDirection);
     const disconnected = neighbor.neighbor() as this;
 
-    const clearExplicit = !disconnected.localPaintGroup();
-    if (!disconnected.localPaintGroup()) {
+    const clearExplicit = !disconnected.isPaintGroup();
+    if (!disconnected.isPaintGroup()) {
       disconnected.crease();
     }
     neighbor.leave();

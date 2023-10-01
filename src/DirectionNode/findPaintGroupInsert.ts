@@ -8,7 +8,7 @@ export const findPaintGroupInsert = (
   node: DirectionNode,
   inserted: DirectionNode
 ): [DirectionNode, DirectionNode] => {
-  if (!node.localPaintGroup()) {
+  if (!node.isPaintGroup()) {
     return findPaintGroupInsert(node.paintGroup().node(), inserted);
   }
 

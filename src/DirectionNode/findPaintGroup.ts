@@ -12,7 +12,7 @@ export const findPaintGroup = (origin: DirectionNode): DirectionNode => {
   if (!origin.paintGroupRoot()) {
     let node: DirectionNode = origin;
     while (!node.neighbors().isRoot()) {
-      if (node.localPaintGroup()) {
+      if (node.isPaintGroup()) {
         break;
       }
       if (node.paintGroupRoot()) {

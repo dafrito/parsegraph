@@ -151,11 +151,11 @@ describe("DirectionNode", function () {
     caret.spawnMove(Direction.FORWARD);
     creased.uncrease();
 
-    expect(creased.localPaintGroup()).to.equal(undefined);
-    expect(creased.localPaintGroup()).to.equal(undefined);
-    expect(root.localPaintGroup()).to.not.equal(undefined);
-    expect(root.localPaintGroup()?.next()).to.equal(root);
-    expect(root.localPaintGroup()?.prev()).to.equal(root);
+    expect(creased.isPaintGroup()).to.equal(false);
+    expect(creased.isPaintGroup()).to.equal(false);
+    expect(root.isPaintGroup()).to.not.equal(false);
+    expect(root.paintGroup()?.next()).to.equal(root);
+    expect(root.paintGroup()?.prev()).to.equal(root);
   });
 
   it("Viewport - Block with forward bud, removed", function () {
@@ -164,23 +164,22 @@ describe("DirectionNode", function () {
     const root = caret.root();
     const child = caret.spawnMove(Direction.FORWARD);
     caret.spawnMove(Direction.FORWARD);
-    expect(child.localPaintGroup()).to.equal(undefined);
-    expect(root.localPaintGroup()?.next()).to.not.equal(child);
-    expect(root.localPaintGroup()?.next()).to.equal(root);
+    expect(child.isPaintGroup()).to.equal(false);
+    expect(root.paintGroup()?.next()).to.not.equal(child);
+    expect(root.paintGroup()?.next()).to.equal(root);
 
     child.disconnectNode();
-    expect(child.localPaintGroup()).to.not.equal(undefined);
-    expect(child.localPaintGroup()).to.equal(child.paintGroup());
+    expect(child.isPaintGroup()).to.not.equal(false);
 
-    expect(root.localPaintGroup()).to.not.equal(undefined);
+    expect(root.isPaintGroup()).to.not.equal(false);
     expect(
-      root.localPaintGroup()?.next(),
+      root.paintGroup()?.next(),
       "Root's paint group should not be child"
     ).to.not.equal(child);
 
-    expect(root.localPaintGroup()?.next()).to.equal(root);
-    expect(root.localPaintGroup()?.prev()).to.not.equal(child);
-    expect(root.localPaintGroup()?.prev()).to.equal(root);
+    expect(root.paintGroup()?.next()).to.equal(root);
+    expect(root.paintGroup()?.prev()).to.not.equal(child);
+    expect(root.paintGroup()?.prev()).to.equal(root);
   });
 
   it("Node Morris world threading spawned", function () {

@@ -140,7 +140,7 @@ export class DirectionCaret<Value> {
       node = this.node().neighbors().nodeAt(readDirection(inDirection));
     }
 
-    return !!node.localPaintGroup();
+    return !!node.isPaintGroup();
   }
 
   creased(inDirection?: Direction | string): boolean {

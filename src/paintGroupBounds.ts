@@ -4,7 +4,7 @@ import { DirectionNode } from "./DirectionNode";
 import { findPaintGroup } from "./DirectionNode/findPaintGroup";
 
 export function paintGroupBounds(nodeRoot: DirectionNode) {
-  if (!nodeRoot.neighbors().isRoot() && !nodeRoot.localPaintGroup()) {
+  if (!nodeRoot.neighbors().isRoot() && !nodeRoot.isPaintGroup()) {
     throw new Error("Node must be a paint group");
   }
   let node = nodeRoot;

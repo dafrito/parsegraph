@@ -1343,7 +1343,7 @@ describe("Package", function () {
     const increase = 100;
     ns.minWidth += increase;
     bnode.setValue(ns);
-    bnode.layoutChanged();
+    bnode.invalidate();
     commitLayout(car.root());
     if (ax === anode.layout().groupX()) {
       // simpleGraph(out, car);
