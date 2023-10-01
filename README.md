@@ -8,14 +8,10 @@ import {
   paintNodeLines,
 } from "parsegraph";
 
-const buildGraph = () => {
-  // TODO Build a graph.
-  return new DirectionNode("Hello, world");
-};
+// TODO Build a graph.
+const rootNode = new DirectionNode("Hello, world");
 
-const rootNode = buildGraph();
-
-const cld = new CommitLayout(rootNode, {
+const layout = new CommitLayout(rootNode, {
   size: (node: DirectionNode, size: number[]) => {
     // TODO Provide the size of the node to the size object.
     // This will be called for every DirectionNode.
@@ -24,8 +20,8 @@ const cld = new CommitLayout(rootNode, {
   }
 });
 
-// Paint the graph and build the scene.
-while (cld.crank());
+// Commit the layout.
+while (layout.crank());
 
 // Render the graph.
 rootNode.paintGroup().forEach((pg: DirectionNode) => {
