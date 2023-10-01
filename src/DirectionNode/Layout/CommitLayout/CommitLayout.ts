@@ -213,8 +213,7 @@ export class CommitLayout extends BaseCommitLayout {
         );
     }
     const lineLength =
-      separation -
-      node.neighbors().nodeAt(childDirection).scale() * extentSize;
+      separation - node.neighbors().nodeAt(childDirection).scale() * extentSize;
     node.neighbors().at(childDirection).lineLength = lineLength;
     // console.log(
     //   "Line length: " + lineLength + ",
@@ -417,9 +416,7 @@ export class CommitLayout extends BaseCommitLayout {
       return true;
     }
     const nestedSize: Size = nestedNode.layout().extentSize(this.firstSize);
-    if (
-      node.getAlignment(Direction.INWARD) === Alignment.INWARD_VERTICAL
-    ) {
+    if (node.getAlignment(Direction.INWARD) === Alignment.INWARD_VERTICAL) {
       node.setPosAt(
         Direction.INWARD,
         nestedNode.scale() *
@@ -482,10 +479,7 @@ export class CommitLayout extends BaseCommitLayout {
             console.log("Scaled child ExtentOffset : " +
             (node.neighbors().nodeAt(childDirection).scale() * child.extentOffsetAt(direction))); */
     const e: Extent = node.layout().extentsAt(direction);
-    const scale: number = node
-      .neighbors()
-      .nodeAt(childDirection)
-      .scale();
+    const scale: number = node.neighbors().nodeAt(childDirection).scale();
     if (node.nodeFit() == Fit.LOOSE) {
       e.combineExtentAndSimplify(
         child.layout().extentsAt(direction),
@@ -1101,7 +1095,11 @@ export class CommitLayout extends BaseCommitLayout {
     return false;
   }
 
-  private sizeIn(node: DirectionNode, direction: Direction, bodySize: Size): number {
+  private sizeIn(
+    node: DirectionNode,
+    direction: Direction,
+    bodySize: Size
+  ): number {
     node.layout().size().copyTo(bodySize);
     if (isVerticalDirection(direction)) {
       return bodySize.height() / 2;

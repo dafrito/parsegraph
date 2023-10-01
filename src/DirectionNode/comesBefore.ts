@@ -10,7 +10,10 @@ import { pathToRoot } from "./pathToRoot";
  *
  * @see {@link comesAfter}
  */
-export const comesBefore = (node: DirectionNode, other: DirectionNode): boolean => {
+export const comesBefore = (
+  node: DirectionNode,
+  other: DirectionNode
+): boolean => {
   if (node === other) {
     return false;
   }
@@ -24,43 +27,43 @@ export const comesBefore = (node: DirectionNode, other: DirectionNode): boolean 
     return false;
   }
 
-    const nodePath = pathToRoot(node).reverse();
-    const otherPath = pathToRoot(other).reverse();
+  const nodePath = pathToRoot(node).reverse();
+  const otherPath = pathToRoot(other).reverse();
 
-    // Find count in common
-    let numCommon = 0;
-    for (
-      numCommon = 0;
-      numCommon < Math.min(otherPath.length, nodePath.length);
-      ++numCommon
-    ) {
-      if (otherPath[numCommon] !== nodePath[numCommon]) {
-        break;
-      }
+  // Find count in common
+  let numCommon = 0;
+  for (
+    numCommon = 0;
+    numCommon < Math.min(otherPath.length, nodePath.length);
+    ++numCommon
+  ) {
+    if (otherPath[numCommon] !== nodePath[numCommon]) {
+      break;
     }
-    --numCommon;
-
-    if (numCommon < 0) {
-      return false;
-    }
-
-    const lastCommonParent = nodePath[numCommon];
-    if (lastCommonParent === node) {
-      return true;
-    }
-    if (lastCommonParent === other) {
-      return false;
-    }
-
-    const paintOrdering = lastCommonParent.siblings().layoutOrder();
-
-    const findPaintIndex = (nodes: DirectionNode[]) => {
-      return paintOrdering.indexOf(
-        reverseDirection(nodes[numCommon + 1].parentDirection())
-      );
-    };
-    const nodePaintIndex = findPaintIndex(nodePath);
-    const otherPaintIndex = findPaintIndex(otherPath);
-
-    return nodePaintIndex < otherPaintIndex;
   }
+  --numCommon;
+
+  if (numCommon < 0) {
+    return false;
+  }
+
+  const lastCommonParent = nodePath[numCommon];
+  if (lastCommonParent === node) {
+    return true;
+  }
+  if (lastCommonParent === other) {
+    return false;
+  }
+
+  const paintOrdering = lastCommonParent.siblings().layoutOrder();
+
+  const findPaintIndex = (nodes: DirectionNode[]) => {
+    return paintOrdering.indexOf(
+      reverseDirection(nodes[numCommon + 1].parentDirection())
+    );
+  };
+  const nodePaintIndex = findPaintIndex(nodePath);
+  const otherPaintIndex = findPaintIndex(otherPath);
+
+  return nodePaintIndex < otherPaintIndex;
+};

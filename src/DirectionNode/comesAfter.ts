@@ -9,9 +9,12 @@ import { DirectionNode } from "..";
  *
  * @see {@link comesBefore}
  */
-export const comesAfter = (node: DirectionNode, other: DirectionNode): boolean => {
+export const comesAfter = (
+  node: DirectionNode,
+  other: DirectionNode
+): boolean => {
   if (node === other) {
     return false;
   }
   return !comesBefore(node, other);
-}
+};

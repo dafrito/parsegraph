@@ -26,4 +26,4 @@ export const findClosestPaintGroup = (
   );
 
   return paintGroupCandidates[closestPaintGroupIndex];
-}
+};

@@ -80,8 +80,8 @@ export class Layout {
     let scale = 1.0;
     let neededVersion;
     if (!node.neighbors().isRoot()) {
-      neededVersion = findPaintGroup(node.parentNode())
-        .layout()._absoluteVersion;
+      neededVersion = findPaintGroup(node.parentNode()).layout()
+        ._absoluteVersion;
     }
     while (true) {
       if (node.neighbors().isRoot()) {
@@ -124,7 +124,9 @@ export class Layout {
         layout._absoluteScale = scale;
         layout._absoluteDirty = false;
         if (!node.neighbors().isRoot()) {
-          layout._absoluteVersion = findPaintGroup(node.parentNode()).layout()._absoluteVersion;
+          layout._absoluteVersion = findPaintGroup(
+            node.parentNode()
+          ).layout()._absoluteVersion;
         }
       }
       scale *= node.neighbors().nodeAt(directionToChild).scale();
@@ -136,8 +138,9 @@ export class Layout {
     this._absoluteScale = scale;
     this._absoluteDirty = false;
     if (!this.node().neighbors().isRoot()) {
-      this._absoluteVersion = findPaintGroup(this.node().parentNode())
-        .layout()._absoluteVersion;
+      this._absoluteVersion = findPaintGroup(
+        this.node().parentNode()
+      ).layout()._absoluteVersion;
     }
   }
 

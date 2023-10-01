@@ -1,7 +1,10 @@
 import { pathToRoot } from "./pathToRoot";
 import { DirectionNode } from "./DirectionNode";
 
-export const findDistance = (node: DirectionNode, other: DirectionNode): number => {
+export const findDistance = (
+  node: DirectionNode,
+  other: DirectionNode
+): number => {
   if (node === other) {
     return 0;
   }

@@ -37,7 +37,10 @@ export class PaintGroup {
 
       // Connect this node's first and last paint groups to this node.
       const parentsPaintGroup = par.node().paintGroup();
-      const [prevNode, nextNode] = findPaintGroupInsert(parentsPaintGroup.node(), this.node());
+      const [prevNode, nextNode] = findPaintGroupInsert(
+        parentsPaintGroup.node(),
+        this.node()
+      );
       this.connect(prevNode, this.node());
       this.connect(this.node(), nextNode);
     }
@@ -89,12 +92,12 @@ export class PaintGroup {
   }
 
   private connect(a: DirectionNode, b: DirectionNode): void {
-    const aPG = (a === this.node() ? this : a.localPaintGroup());
+    const aPG = a === this.node() ? this : a.localPaintGroup();
     if (!aPG) {
       throw new Error("a paint group is missing");
     }
     aPG._next = b;
-    const bPG = (b === this.node() ? this : b.localPaintGroup());
+    const bPG = b === this.node() ? this : b.localPaintGroup();
     if (!bPG) {
       throw new Error("b paint group is missing");
     }
@@ -203,7 +206,6 @@ export class PaintGroup {
     }
     return candidate;
   }
-
 
   forEach(func: (node: DirectionNode) => void): void {
     let node: DirectionNode = this.node();

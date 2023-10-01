@@ -15,4 +15,4 @@ export const pathToRoot = (n: DirectionNode) => {
   nodes.push(n);
 
   return nodes;
-}
+};

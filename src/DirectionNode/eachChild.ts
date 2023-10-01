@@ -1,4 +1,4 @@
-import { DirectionNode} from "./DirectionNode";
+import { DirectionNode } from "./DirectionNode";
 import { Direction } from "../Direction";
 
 export const eachChild = (
@@ -17,4 +17,4 @@ export const eachChild = (
       visitor.call(visitorThisArg, node, dir);
     }
   }
-}
+};

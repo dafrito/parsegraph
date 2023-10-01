@@ -6,11 +6,7 @@ import createException, {
 } from "../Exception";
 import { Fit } from "./Fit";
 
-import {
-  Direction,
-  reverseDirection,
-  forEachDirection,
-} from "../Direction";
+import { Direction, reverseDirection, forEachDirection } from "../Direction";
 
 import { Layout } from "./Layout";
 
@@ -18,9 +14,7 @@ import { LayoutPhase } from "./Layout";
 import Alignment from "./Alignment";
 import AxisOverlap from "./AxisOverlap";
 import { Siblings } from "./Siblings";
-import {
-  PaintGroup,
-} from "./PaintGroup";
+import { PaintGroup } from "./PaintGroup";
 
 import { Neighbors } from "./Neighbors";
 import { findPaintGroup } from "./findPaintGroup";
@@ -32,9 +26,7 @@ export class DirectionNode<Value = any> {
   private _neighbors: Neighbors;
 
   private _siblings: Siblings;
-  private _paintGroup:
-    | PaintGroup
-    | undefined;
+  private _paintGroup: PaintGroup | undefined;
   private _paintGroupRoot: DirectionNode;
   private _id: string | number | undefined;
   private _nodeFit: Fit;
@@ -55,10 +47,7 @@ export class DirectionNode<Value = any> {
     // Layout
     this._siblings = new Siblings(this);
     this._paintGroupRoot = this;
-    this._paintGroup = new PaintGroup(
-      this,
-      false
-    );
+    this._paintGroup = new PaintGroup(this, false);
 
     if (value !== undefined) {
       this.setValue(value);
@@ -124,7 +113,6 @@ export class DirectionNode<Value = any> {
     this._scale = scale;
     this.layoutChanged();
   }
-
 
   getAlignment(inDirection: Direction): Alignment {
     if (this.neighbors().hasNode(inDirection)) {
@@ -347,10 +335,7 @@ export class DirectionNode<Value = any> {
     if (this.localPaintGroup()) {
       this.paintGroup().crease();
     } else {
-      this._paintGroup = new PaintGroup(
-        this,
-        true
-      );
+      this._paintGroup = new PaintGroup(this, true);
     }
   }
 

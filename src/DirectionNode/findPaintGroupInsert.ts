@@ -5,9 +5,9 @@ import { comesBefore } from ".";
 import { getLastPaintGroup } from "./getLastPaintGroup";
 
 export const findPaintGroupInsert = (
-    node: DirectionNode,
-    inserted: DirectionNode
-  ): [DirectionNode, DirectionNode] => {
+  node: DirectionNode,
+  inserted: DirectionNode
+): [DirectionNode, DirectionNode] => {
   if (!node.localPaintGroup()) {
     return findPaintGroupInsert(node.paintGroup().node(), inserted);
   }

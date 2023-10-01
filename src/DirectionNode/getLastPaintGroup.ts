@@ -22,4 +22,4 @@ export const getLastPaintGroup = (node: DirectionNode): DirectionNode => {
     lim();
   }
   return candidate === node ? candidate.paintGroup().prev() : candidate;
-}
+};

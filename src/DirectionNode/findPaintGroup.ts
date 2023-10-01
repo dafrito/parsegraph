@@ -24,4 +24,4 @@ export const findPaintGroup = (origin: DirectionNode): DirectionNode => {
     origin.setPaintGroupRoot(node);
   }
   return origin.paintGroupRoot();
-}
+};
