@@ -11,7 +11,7 @@ import {
 import { LayoutPhase, commitAxisBasedLayout } from "..";
 
 import { LayoutPainter } from "./LayoutPainter";
-import { AddLineBounds } from "./AddLineBounds";
+import { addLineBounds } from "./AddLineBounds";
 import { commitInwardLayout } from "./commitInwardLayout";
 import { commitRootlikeLayout } from "./commitRootlikeLayout";
 import createException, { BAD_LAYOUT_STATE } from "../../../Exception";
@@ -28,7 +28,6 @@ export const LINE_THICKNESS = 12;
  * @see {@link LayoutPainter}
  */
 export class CommitLayout {
-  private _lineBounds: AddLineBounds;
   protected bodySize: Size;
   protected firstSize: Size;
   protected secondSize: Size;
@@ -48,7 +47,6 @@ export class CommitLayout {
    * @param {LayoutPainter} painter - the painter used for sizing and painting information.
    */
   constructor(node: DirectionNode, painter: LayoutPainter) {
-    this._lineBounds = new AddLineBounds();
     this._painter = painter;
     this.bodySize = [NaN, NaN];
     this.firstSize = [NaN, NaN];
@@ -189,7 +187,7 @@ export class CommitLayout {
 
     // Set our extents, combined with non-point neighbors.
     forEachCardinalDirection((dir: Direction) => {
-      this._lineBounds.addLineBounds(node, dir, this.bodySize);
+      addLineBounds(node, dir, this.bodySize);
     });
 
     if (commitInwardLayout(this.painter(), node, this.bodySize, this.firstSize) === true) {
