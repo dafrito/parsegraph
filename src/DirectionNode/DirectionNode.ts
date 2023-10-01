@@ -282,23 +282,6 @@ export class DirectionNode<Value = any> {
     return this._siblings;
   }
 
-  eachChild(
-    visitor: (node: DirectionNode, dir: Direction) => void,
-    visitorThisArg?: object
-  ): void {
-    const dirs = this.siblings().layoutOrder();
-    for (let i = 0; i < dirs.length; ++i) {
-      const dir = dirs[i];
-      if (!this.neighbors().isRoot() && dir === this.parentDirection()) {
-        continue;
-      }
-      const node = this.neighbors().nodeAt(dir);
-      if (node) {
-        visitor.call(visitorThisArg, node, dir);
-      }
-    }
-  }
-
   // ///////////////////////////////////////////////////////////////////////////
   //
   // Paint groups
@@ -442,26 +425,6 @@ export class DirectionNode<Value = any> {
     return node;
   }
 
-  disconnectChildren(): DirectionNode[] {
-    const nodes: DirectionNode[] = [];
-    forEachDirection((dir: Direction) => {
-      if (dir === Direction.OUTWARD) {
-        return;
-      }
-      if (this.parentDirection() === dir) {
-        return;
-      }
-      if (this.neighbors().hasNode(dir)) {
-        const removed = this.disconnectNode(dir);
-        if (!removed) {
-          throw new Error("removed no node in a direction that has a node?");
-        }
-        nodes.push(removed);
-      }
-    });
-    return nodes;
-  }
-
   disconnectNode(inDirection?: Direction): DirectionNode | undefined {
     if (arguments.length === 0 || inDirection === undefined) {
       if (this.neighbors().isRoot()) {
@@ -501,5 +464,25 @@ export class DirectionNode<Value = any> {
     this.layoutChanged();
 
     return disconnected;
+  }
+
+  disconnectChildren(): DirectionNode[] {
+    const nodes: DirectionNode[] = [];
+    forEachDirection((dir: Direction) => {
+      if (dir === Direction.OUTWARD) {
+        return;
+      }
+      if (this.parentDirection() === dir) {
+        return;
+      }
+      if (this.neighbors().hasNode(dir)) {
+        const removed = this.disconnectNode(dir);
+        if (!removed) {
+          throw new Error("removed no node in a direction that has a node?");
+        }
+        nodes.push(removed);
+      }
+    });
+    return nodes;
   }
 }
