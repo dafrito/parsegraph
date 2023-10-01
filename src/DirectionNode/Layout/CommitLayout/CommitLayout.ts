@@ -239,7 +239,7 @@ export class CommitLayout {
           this.commitLayout(this.node);
           this.node.layout().invalidateGroupPos();
           this.node.layout().invalidateAbsolutePos();
-          this.node.setPaintGroupNode(this.paintGroup);
+          this.node.paintGroups().setPaintGroupNode(this.paintGroup);
           return true;
         }
       } while (this.node !== this.root);

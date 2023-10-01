@@ -9,7 +9,7 @@ that is still a descendent of this node.
   * @return {DirectionNode} The first paint group to be drawn that is a child of this paint group.
   */
 export const getLastPaintGroup = (node: DirectionNode): DirectionNode => {
-  let candidate: DirectionNode = node.isPaintGroup()
+  let candidate: DirectionNode = node.paintGroups().isPaintGroup()
     ? node.paintGroup().next()
     : node;
   const lim = makeLimit();

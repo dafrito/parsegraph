@@ -149,11 +149,11 @@ describe("DirectionNode", function () {
     const creased = caret.spawnMove(Direction.FORWARD);
     caret.crease();
     caret.spawnMove(Direction.FORWARD);
-    creased.uncrease();
+    creased.paintGroups().uncrease();
 
-    expect(creased.isPaintGroup()).to.equal(false);
-    expect(creased.isPaintGroup()).to.equal(false);
-    expect(root.isPaintGroup()).to.not.equal(false);
+    expect(creased.paintGroups().isPaintGroup()).to.equal(false);
+    expect(creased.paintGroups().isPaintGroup()).to.equal(false);
+    expect(root.paintGroups().isPaintGroup()).to.not.equal(false);
     expect(root.paintGroup()?.next()).to.equal(root);
     expect(root.paintGroup()?.prev()).to.equal(root);
   });
@@ -164,14 +164,14 @@ describe("DirectionNode", function () {
     const root = caret.root();
     const child = caret.spawnMove(Direction.FORWARD);
     caret.spawnMove(Direction.FORWARD);
-    expect(child.isPaintGroup()).to.equal(false);
+    expect(child.paintGroups().isPaintGroup()).to.equal(false);
     expect(root.paintGroup()?.next()).to.not.equal(child);
     expect(root.paintGroup()?.next()).to.equal(root);
 
     child.disconnect();
-    expect(child.isPaintGroup()).to.not.equal(false);
+    expect(child.paintGroups().isPaintGroup()).to.not.equal(false);
 
-    expect(root.isPaintGroup()).to.not.equal(false);
+    expect(root.paintGroups().isPaintGroup()).to.not.equal(false);
     expect(
       root.paintGroup()?.next(),
       "Root's paint group should not be child"
@@ -249,9 +249,9 @@ describe("DirectionCaret", function () {
     fourth.setId("fourth");
     const fifth = caret.spawnMove(Direction.DOWNWARD);
     fifth.setId("fifth");
-    first.crease();
+    first.paintGroups().crease();
     assert.equal(caret.root().paintGroup().dump()[1].id(), first.id());
-    third.crease();
+    third.paintGroups().crease();
     const pgs = caret.root().paintGroup().dump();
     if (pgs[1] !== first) {
       // console.log(pgs);
@@ -290,10 +290,10 @@ describe("DirectionCaret", function () {
     caret.pop();
     let n = caret.node();
     while (n) {
-      n.crease();
+      n.paintGroups().crease();
       n = n.neighbors().nodeAt(Direction.DOWNWARD);
     }
-    second.uncrease();
+    second.paintGroups().uncrease();
     caret.moveToRoot();
     // console.log(paintGroup().dump(caret.root()));
   });
@@ -636,7 +636,7 @@ describe("DirectionCaret", function () {
     const n = new DirectionNode();
     const b = new DirectionNode();
     n.connect(Direction.FORWARD, b);
-    b.crease();
+    b.paintGroups().crease();
     if (b.siblings().next() !== b) {
       throw new Error(
         "Crease must remove that node" +
@@ -654,7 +654,7 @@ describe("DirectionCaret", function () {
   it("Node Morris world threading connected with creased child", function () {
     const n = new DirectionNode();
     const b = new DirectionNode();
-    b.crease();
+    b.paintGroups().crease();
     n.connect(Direction.FORWARD, b);
     if (b.siblings().next() !== b) {
       throw new Error(
@@ -712,12 +712,12 @@ describe("DirectionCaret", function () {
   it("Disconnect parent test", function () {
     const n = new DirectionNode().setId("n");
     const b = new DirectionNode().setId("b");
-    b.crease();
+    b.paintGroups().crease();
     n.connect(Direction.INWARD, b);
 
     const a = new DirectionNode().setId("a");
     const r = new DirectionNode().setId("r");
-    r.crease();
+    r.paintGroups().crease();
     a.connect(Direction.INWARD, r);
     r.connect(Direction.INWARD, b);
 
@@ -764,7 +764,7 @@ describe("DirectionCaret", function () {
     let pgs = originalRoot.paintGroup().dump();
     assert.deepEqual(pgs, [originalRoot, midRoot]);
     const newNode = makeCaret().spawnMove("i", "b");
-    newNode.crease();
+    newNode.paintGroups().crease();
     originalRoot.connect(Direction.INWARD, newNode);
     if (originalRoot.neighbors().nodeAt(Direction.INWARD) !== newNode) {
       throw new Error("Unexpected node");
@@ -786,7 +786,7 @@ describe("DirectionCaret", function () {
     car.crease();
     const newNode = makeCaret().spawnMove("i", "b");
     newNode.setId("newNode");
-    newNode.crease();
+    newNode.paintGroups().crease();
     midRoot.connect(Direction.INWARD, newNode);
     // assert.isTrue(newNode.comesBefore(midRoot));
   });
@@ -802,7 +802,7 @@ describe("DirectionCaret", function () {
     assert.deepEqual(pgs, [originalRoot, midRoot]);
     const newNode = makeCaret().spawnMove("i", "b");
     newNode.setId("newNode");
-    newNode.crease();
+    newNode.paintGroups().crease();
     midRoot.connect(Direction.INWARD, newNode);
     pgs = originalRoot.paintGroup().dump();
     assert.deepEqual(
@@ -822,7 +822,7 @@ describe("DirectionCaret", function () {
     assert.deepEqual(pgs, [originalRoot, midRoot]);
     const newNode = makeCaret().spawnMove("i", "b");
     newNode.setId("newNode");
-    newNode.crease();
+    newNode.paintGroups().crease();
     newNode.neighbors().root().setId("newNode-root");
     midRoot.connect(Direction.INWARD, newNode.neighbors().root());
     pgs = originalRoot.paintGroup().dump();
@@ -843,7 +843,7 @@ describe("DirectionCaret", function () {
       car.pull("f");
       const newNode = makeCaret().spawnMove("i", "b");
       newNode.setId("newNode-" + i);
-      newNode.crease();
+      newNode.paintGroups().crease();
       newNode
         .neighbors()
         .root()
@@ -1246,7 +1246,7 @@ describe("DirectionCaret", function () {
 
     const c = car.spawnMove("f", "b");
     c.setId("c");
-    c.crease();
+    c.paintGroups().crease();
 
     car.spawnMove("f", "b");
 

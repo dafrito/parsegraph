@@ -122,7 +122,7 @@ export class DirectionCaret<Value> {
     }
 
     // Create a new paint group for the connection.
-    node.crease();
+    node.paintGroups().crease();
   }
 
   uncrease(inDirection?: Direction | string) {
@@ -132,7 +132,7 @@ export class DirectionCaret<Value> {
     }
 
     // Remove the paint group.
-    node.uncrease();
+    node.paintGroups().uncrease();
   }
 
   isCreased(inDirection?: Direction | string): boolean {
@@ -141,7 +141,7 @@ export class DirectionCaret<Value> {
       node = this.node().neighbors().nodeAt(readDirection(inDirection));
     }
 
-    return !!node.isPaintGroup();
+    return !!node.paintGroups().isPaintGroup();
   }
 
   creased(inDirection?: Direction | string): boolean {

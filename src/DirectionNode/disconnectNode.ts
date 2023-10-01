@@ -42,16 +42,16 @@ export const disconnectNode = (
   const neighbor = parent.neighbors().at(inDirection);
   const disconnected = neighbor.neighbor() as DirectionNode;
 
-  const clearExplicit = !disconnected.isPaintGroup();
-  if (!disconnected.isPaintGroup()) {
-    disconnected.crease();
+  const clearExplicit = !disconnected.paintGroups().isPaintGroup();
+  if (!disconnected.paintGroups().isPaintGroup()) {
+    disconnected.paintGroups().crease();
   }
   neighbor.leave();
   disconnected.neighbors().assignParent(undefined);
-  disconnected.paintGroup().disconnect();
+  disconnected.paintGroups().paintGroup().disconnect();
 
   if (clearExplicit) {
-    disconnected.paintGroup().clearExplicit();
+    disconnected.paintGroups().paintGroup().clearExplicit();
   }
 
   disconnected.siblings().convertLayoutPreference(inDirection);

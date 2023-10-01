@@ -618,7 +618,7 @@ describe("CommitLayout", () => {
     let paints = 0;
     let renders = 0;
     for (let i = 0; i < 10; ++i) {
-      root.crease();
+      root.paintGroups().crease();
       const newRoot = new DirectionNode();
       root.connect(Direction.BACKWARD, newRoot);
       root = newRoot;
@@ -655,7 +655,7 @@ describe("CommitLayout", () => {
     let paints = 0;
     let renders = 0;
     for (let i = 0; i < 10; ++i) {
-      root.crease();
+      root.paintGroups().crease();
       const newRoot = new DirectionNode();
       newRoot.connect(Direction.BACKWARD, root);
       root = newRoot;
@@ -694,7 +694,7 @@ describe("CommitLayout", () => {
     let renders = 0;
     let paintedNodes = 0;
     for (let i = 0; i < 10; ++i) {
-      root.crease();
+      root.paintGroups().crease();
       const newRoot = new DirectionNode();
       newRoot.connect(Direction.BACKWARD, root);
       root = newRoot;

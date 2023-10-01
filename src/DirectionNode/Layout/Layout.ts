@@ -195,7 +195,7 @@ export class Layout {
     let parentScale = 1.0;
     let scale = 1.0;
     while (true) {
-      if (node.neighbors().isRoot() || node.isPaintGroup()) {
+      if (node.neighbors().isRoot() || node.paintGroups().isPaintGroup()) {
         this._groupXPos = 0;
         this._groupYPos = 0;
         break;
@@ -235,7 +235,7 @@ export class Layout {
     }
     this._groupScale = scale;
 
-    if (!this.node().isPaintGroup()) {
+    if (!this.node().paintGroups().isPaintGroup()) {
       this._groupXPos += node.neighbors().parentX() * parentScale;
       this._groupYPos += node.neighbors().parentY() * parentScale;
     }

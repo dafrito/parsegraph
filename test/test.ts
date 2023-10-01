@@ -1417,7 +1417,7 @@ describe("Package", function () {
     for (let i = 0; i < 100; ++i) {
       const inner = makeNode(BUD);
       if (i % 5 === 0) {
-        inner.crease();
+        inner.paintGroups().crease();
       }
       node.connect(Direction.INWARD, inner);
       node = inner;
@@ -1452,7 +1452,7 @@ describe("Package", function () {
       n.connect(i % 2 ? Direction.FORWARD : Direction.DOWNWARD, child);
       n = child;
       if (i == 5) {
-        n.crease();
+        n.paintGroups().crease();
         n.setScale(0.5);
         creased = n;
       }

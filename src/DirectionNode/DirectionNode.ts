@@ -7,6 +7,7 @@ import { Layout } from "./Layout";
 import { LayoutPhase } from "./Layout";
 import { Siblings } from "./Siblings";
 import { PaintGroup } from "./PaintGroup";
+import { PaintGroups } from "./PaintGroups";
 
 import { Neighbors } from "./Neighbors/Neighbors";
 import { connectNode } from "./connectNode";
@@ -19,8 +20,7 @@ export class DirectionNode<Value = any> {
   private _neighbors: Neighbors;
 
   private _siblings: Siblings;
-  private _paintGroup: PaintGroup | undefined;
-  private _paintGroupNode: DirectionNode;
+  private _paintGroups: PaintGroups;
   private _id: string | number | undefined;
   private _nodeFit: Fit;
   private _rightToLeft: boolean;
@@ -34,13 +34,8 @@ export class DirectionNode<Value = any> {
     this._rightToLeft = false;
     this._scale = 1.0;
 
-    // Neighbors
-    this._neighbors = new Neighbors(this);
-
-    // Layout
-    this._siblings = new Siblings(this);
-    this._paintGroupNode = this;
-    this._paintGroup = new PaintGroup(this, false);
+    this._paintGroups = new PaintGroups(this);
+    this._paintGroups.setPaintGroup(new PaintGroup(this, false));
 
     if (value !== undefined) {
       this.setValue(value);
@@ -61,6 +56,9 @@ export class DirectionNode<Value = any> {
   }
 
   neighbors(): Neighbors {
+    if (!this._neighbors) {
+      this._neighbors = new Neighbors(this);
+    }
     return this._neighbors;
   }
 
@@ -155,93 +153,21 @@ export class DirectionNode<Value = any> {
   // ///////////////////////////////////////////////////////////////////////////
 
   siblings(): Siblings {
+    if (!this._siblings) {
+      this._siblings = new Siblings(this);
+    }
     return this._siblings;
   }
 
-  /**
-   * Returns whether this node is a paint group root.
-   *
-   * @return {boolean} true if this node is a paint group root.
-   */
-  isPaintGroup(): boolean {
-    return !!this._paintGroup;
+  paintGroups(): PaintGroups {
+    return this._paintGroups;
   }
 
   /**
-   * Clears this node's local paint group, if any.
-   *
-   * Called by the paint group when it is being removed.
-   *
-   * This is an internal method and does not trigger invalidation.
-   */
-  clearPaintGroup(): void {
-    this._paintGroup = undefined;
-  }
-
-  /**
-   * Gets the DirectionNode that is the paint group root for this DirectionNode.
-   *
-   * @return {DirectionNode} the paint group root for this DirectionNode.
-   */
-  paintGroupNode(): DirectionNode {
-    return this._paintGroupNode;
-  }
-
-  /**
-   * Changes the paint group root.
-   *
-   * This is an internal method and does not trigger invalidation.
-   *
-   * @param {DirectionNode} pg - the new paint group root
-   */
-  setPaintGroupNode(pg: DirectionNode) {
-    if (!pg) {
-      throw new Error("Refusing to set paint group root to null");
-    }
-    this._paintGroupNode = pg;
-  }
-
-  /**
-   * Gets the paint group used for this DirectionNode.
-   *
-   * @return {PaintGroup} the paint group used for this DirectionNode.
+   * @returns {PaintGroup} this node's current paint group.
    */
   paintGroup(): PaintGroup {
-    if (!this._paintGroup) {
-      const node = this.paintGroupNode();
-      if (!node) {
-        throw new Error("Paint group root is null");
-      }
-      if (node === this) {
-        throw new Error(
-          "This root paint group doesn't have a paint group object"
-        );
-      }
-      return node.paintGroup();
-    }
-    return this._paintGroup;
-  }
-
-  /**
-   * Creates a paint group for this node, and makes it explicit
-   * so it will persist once connecting to a parent node.
-   */
-  crease() {
-    if (this.isPaintGroup()) {
-      this.paintGroup().crease();
-    } else {
-      this._paintGroup = new PaintGroup(this, true);
-    }
-  }
-
-  /**
-   * Removes the paint group from this node, unless it is a root
-   * node.
-   */
-  uncrease() {
-    if (this.paintGroup()) {
-      this.paintGroup().uncrease();
-    }
+    return this.paintGroups().paintGroup();
   }
 
   /**

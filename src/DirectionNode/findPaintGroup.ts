@@ -10,19 +10,19 @@ import { DirectionNode } from "./DirectionNode";
  * @return {DirectionNode} the paint group root
  */
 export const findPaintGroup = (origin: DirectionNode): DirectionNode => {
-  if (!origin.paintGroupNode()) {
+  if (!origin.paintGroups().paintGroupNode()) {
     let node: DirectionNode = origin;
     while (!node.neighbors().isRoot()) {
-      if (node.isPaintGroup()) {
+      if (node.paintGroups().isPaintGroup()) {
         break;
       }
-      if (node.paintGroupNode()) {
-        origin.setPaintGroupNode(node.paintGroupNode());
-        return origin.paintGroupNode();
+      if (node.paintGroups().paintGroupNode()) {
+        origin.paintGroups().setPaintGroupNode(node.paintGroups().paintGroupNode());
+        return origin.paintGroups().paintGroupNode();
       }
       node = node.neighbors().parentNode();
     }
-    origin.setPaintGroupNode(node);
+    origin.paintGroups().setPaintGroupNode(node);
   }
-  return origin.paintGroupNode();
+  return origin.paintGroups().paintGroupNode();
 };

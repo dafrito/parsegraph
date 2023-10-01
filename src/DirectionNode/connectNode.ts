@@ -60,20 +60,20 @@ export const connectNode = (
   neighbor.meet(node);
   node.neighbors().assignParent(parent, inDirection);
 
-  if (node.paintGroup().explicit()) {
+  if (node.paintGroups().paintGroup().explicit()) {
     const pg = findPaintGroup(parent);
-    pg.paintGroup().append(node);
+    pg.paintGroups().paintGroup().append(node);
   } else {
     parent.siblings().insertIntoLayout(inDirection);
-    node.setPaintGroupNode(parent.paintGroupNode());
+    node.paintGroups().setPaintGroupNode(parent.paintGroups().paintGroupNode());
     node
       .siblings()
-      .forEachNode((n) => n.setPaintGroupNode(parent.paintGroupNode()));
-    if (node.paintGroup().next() !== node) {
+      .forEachNode((n) => n.paintGroups().setPaintGroupNode(parent.paintGroups().paintGroupNode()));
+    if (node.paintGroups().paintGroup().next() !== node) {
       const pg = findPaintGroup(parent);
-      pg.paintGroup().merge(node);
+      pg.paintGroups().paintGroup().merge(node);
     }
-    node.clearPaintGroup();
+    node.paintGroups().clearPaintGroup();
   }
 
   parent.invalidate();

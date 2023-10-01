@@ -47,7 +47,7 @@ export class PaintGroup {
     this.node().invalidate();
     this.node()
       .siblings()
-      .forEachNode((n) => n.setPaintGroupNode(this.node()));
+      .forEachNode((n) => n.paintGroups().setPaintGroupNode(this.node()));
     this.verify();
   }
 
@@ -57,7 +57,7 @@ export class PaintGroup {
 
   firstAndLast(): [DirectionNode | null, DirectionNode | null] {
     const pg = findPaintGroup(this.node());
-    if (!pg.isPaintGroup()) {
+    if (!pg.paintGroups().isPaintGroup()) {
       return [null, null];
     }
     let lastPaintGroup: DirectionNode | null = null;
@@ -82,8 +82,8 @@ export class PaintGroup {
       lastPaintGroup = this.node();
     }
     return [
-      firstPaintGroup?.isPaintGroup() ? firstPaintGroup : null,
-      lastPaintGroup.isPaintGroup() ? lastPaintGroup : null,
+      firstPaintGroup?.paintGroups().isPaintGroup() ? firstPaintGroup : null,
+      lastPaintGroup.paintGroups().isPaintGroup() ? lastPaintGroup : null,
     ];
   }
 
@@ -190,8 +190,8 @@ export class PaintGroup {
     this._prev = this.node();
 
     const pg = findPaintGroup(par.node());
-    pg.siblings().forEachNode((n) => n.setPaintGroupNode(pg));
-    this.node().clearPaintGroup();
+    pg.siblings().forEachNode((n) => n.paintGroups().setPaintGroupNode(pg));
+    this.node().paintGroups().clearPaintGroup();
     this.node().invalidate();
     this.verify();
   }
@@ -199,7 +199,7 @@ export class PaintGroup {
   last(): DirectionNode {
     let candidate = this.node().siblings().prev();
     while (candidate !== this.node()) {
-      if (candidate.isPaintGroup()) {
+      if (candidate.paintGroups().isPaintGroup()) {
         break;
       }
       candidate = candidate.siblings().prev();
