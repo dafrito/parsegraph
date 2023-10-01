@@ -70,6 +70,129 @@ export class DirectionNode<Value = any> {
     }
   }
 
+  // ///////////////////////////////////////////////////////////////////////////
+  //
+  // Node state
+  //
+  // ///////////////////////////////////////////////////////////////////////////
+
+  id(): string | number | undefined {
+    return this._id;
+  }
+
+  setId(id: string | number | undefined) {
+    this._id = id;
+    return this;
+  }
+
+  value(): Value | undefined {
+    return this._value;
+  }
+
+  setValue(newValue: Value | undefined, report?: boolean): Value | undefined {
+    // console.log("Setting value to ", newValue);
+    const orig = this.value();
+    if (orig === newValue) {
+      return orig;
+    }
+    const oldVal = this._value;
+    this._value = newValue;
+    if (arguments.length === 1 || report) {
+      this.layoutChanged();
+    }
+    return this._value;
+  }
+
+  rightToLeft(): boolean {
+    return this._rightToLeft;
+  }
+
+  setRightToLeft(val: boolean): void {
+    this._rightToLeft = !!val;
+    this.layoutChanged();
+  }
+
+  nodeFit(): Fit {
+    return this._nodeFit;
+  }
+
+  setNodeFit(nodeFit: Fit): void {
+    this._nodeFit = nodeFit;
+    this.layoutChanged();
+  }
+
+  scale(): number {
+    return this._scale;
+  }
+
+  setScale(scale: number): void {
+    this._scale = scale;
+    this.layoutChanged();
+  }
+
+
+  getAlignment(inDirection: Direction): Alignment {
+    if (this.neighbors().hasNode(inDirection)) {
+      return this.neighbors().at(inDirection).alignmentMode;
+    }
+    return Alignment.NULL;
+  }
+
+  align(
+    inDirection: Direction | Alignment,
+    newAlignmentMode?: Alignment
+  ): void {
+    if (newAlignmentMode === undefined) {
+      return this.parentNode().align(
+        reverseDirection(this.parentDirection()),
+        inDirection as Alignment
+      );
+    }
+    this.neighbors().ensure(inDirection as Direction).alignmentMode =
+      newAlignmentMode;
+    this.layoutChanged();
+  }
+
+  axisOverlap(inDirection?: Direction): AxisOverlap {
+    if (inDirection === undefined) {
+      return this.parentNode().axisOverlap(
+        reverseDirection(this.parentDirection())
+      );
+    }
+    if (this.neighbors().hasNode(inDirection)) {
+      return this.neighbors().at(inDirection).allowAxisOverlap;
+    }
+    return AxisOverlap.NULL;
+  }
+
+  setAxisOverlap(
+    inDirection: Direction | AxisOverlap,
+    newAxisOverlap?: AxisOverlap
+  ): void {
+    if (newAxisOverlap === undefined) {
+      return this.parentNode().setAxisOverlap(
+        reverseDirection(this.parentDirection()),
+        inDirection as AxisOverlap
+      );
+    }
+    this.neighbors().ensure(inDirection as Direction).allowAxisOverlap =
+      newAxisOverlap;
+    this.layoutChanged();
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+  //
+  // Layout state
+  //
+  // ///////////////////////////////////////////////////////////////////////////
+
+  layout(): Layout {
+    if (!this._layout) {
+      this._layout = new Layout(this);
+    }
+    return this._layout;
+  }
+
   layoutChanged(): void {
     let node: DirectionNode = this;
     while (node !== null) {
@@ -99,16 +222,6 @@ export class DirectionNode<Value = any> {
     return this._neighbors;
   }
 
-  neighbors().at(dir: Direction): Neighbor {
-    return this.neighbors().at(dir);
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-  //
-  // Node parent
-  //
-  // ///////////////////////////////////////////////////////////////////////////
-
   parentDirection(): Direction {
     if (this.neighbors().isRoot()) {
       return Direction.NULL;
@@ -129,9 +242,35 @@ export class DirectionNode<Value = any> {
 
   // ///////////////////////////////////////////////////////////////////////////
   //
-  // Node root
+  // Position
   //
   // ///////////////////////////////////////////////////////////////////////////
+
+  x(): number {
+    if (this.neighbors().isRoot()) {
+      return 0;
+    }
+    return this.neighbors().parent()?.xPos ?? NaN;
+  }
+
+  y(): number {
+    if (this.neighbors().isRoot()) {
+      return 0;
+    }
+    return this.neighbors().parent()?.yPos ?? NaN;
+  }
+
+  setPosAt(inDirection: Direction, x: number, y: number): void {
+    this.neighbors().at(inDirection).xPos = x;
+    this.neighbors().at(inDirection).yPos = y;
+  }
+
+  lineLengthAt(direction: Direction): number {
+    if (!this.neighbors().hasNode(direction)) {
+      return 0;
+    }
+    return this.neighbors().at(direction).lineLength;
+  }
 
   // ///////////////////////////////////////////////////////////////////////////
   //
@@ -241,19 +380,6 @@ export class DirectionNode<Value = any> {
     if (this.paintGroup()) {
       this.paintGroup().uncrease();
     }
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-  //
-  // Layout state
-  //
-  // ///////////////////////////////////////////////////////////////////////////
-
-  layout(): Layout {
-    if (!this._layout) {
-      this._layout = new Layout(this);
-    }
-    return this._layout;
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -396,147 +522,5 @@ export class DirectionNode<Value = any> {
     }
     this.neighbors().destroy();
     this.layout().setPhase(LayoutPhase.NULL);
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-  //
-  // Node state
-  //
-  // ///////////////////////////////////////////////////////////////////////////
-
-  id(): string | number | undefined {
-    return this._id;
-  }
-
-  setId(id: string | number | undefined) {
-    this._id = id;
-    return this;
-  }
-
-  value(): Value | undefined {
-    return this._value;
-  }
-
-  setValue(newValue: Value | undefined, report?: boolean): Value | undefined {
-    // console.log("Setting value to ", newValue);
-    const orig = this.value();
-    if (orig === newValue) {
-      return orig;
-    }
-    const oldVal = this._value;
-    this._value = newValue;
-    if (arguments.length === 1 || report) {
-      this.layoutChanged();
-    }
-    return this._value;
-  }
-
-  rightToLeft(): boolean {
-    return this._rightToLeft;
-  }
-
-  setRightToLeft(val: boolean): void {
-    this._rightToLeft = !!val;
-    this.layoutChanged();
-  }
-
-  nodeFit(): Fit {
-    return this._nodeFit;
-  }
-
-  setNodeFit(nodeFit: Fit): void {
-    this._nodeFit = nodeFit;
-    this.layoutChanged();
-  }
-
-  scale(): number {
-    return this._scale;
-  }
-
-  setScale(scale: number): void {
-    this._scale = scale;
-    this.layoutChanged();
-  }
-
-
-  getAlignment(inDirection: Direction): Alignment {
-    if (this.neighbors().hasNode(inDirection)) {
-      return this.neighbors().at(inDirection).alignmentMode;
-    }
-    return Alignment.NULL;
-  }
-
-  align(
-    inDirection: Direction | Alignment,
-    newAlignmentMode?: Alignment
-  ): void {
-    if (newAlignmentMode === undefined) {
-      return this.parentNode().align(
-        reverseDirection(this.parentDirection()),
-        inDirection as Alignment
-      );
-    }
-    this.neighbors().ensure(inDirection as Direction).alignmentMode =
-      newAlignmentMode;
-    this.layoutChanged();
-  }
-
-  axisOverlap(inDirection?: Direction): AxisOverlap {
-    if (inDirection === undefined) {
-      return this.parentNode().axisOverlap(
-        reverseDirection(this.parentDirection())
-      );
-    }
-    if (this.neighbors().hasNode(inDirection)) {
-      return this.neighbors().at(inDirection).allowAxisOverlap;
-    }
-    return AxisOverlap.NULL;
-  }
-
-  setAxisOverlap(
-    inDirection: Direction | AxisOverlap,
-    newAxisOverlap?: AxisOverlap
-  ): void {
-    if (newAxisOverlap === undefined) {
-      return this.parentNode().setAxisOverlap(
-        reverseDirection(this.parentDirection()),
-        inDirection as AxisOverlap
-      );
-    }
-    this.neighbors().ensure(inDirection as Direction).allowAxisOverlap =
-      newAxisOverlap;
-    this.layoutChanged();
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-  //
-  // Position
-  //
-  // ///////////////////////////////////////////////////////////////////////////
-
-  x(): number {
-    if (this.neighbors().isRoot()) {
-      return 0;
-    }
-    return this.neighbors().parent()?.xPos ?? NaN;
-  }
-
-  y(): number {
-    if (this.neighbors().isRoot()) {
-      return 0;
-    }
-    return this.neighbors().parent()?.yPos ?? NaN;
-  }
-
-  setPosAt(inDirection: Direction, x: number, y: number): void {
-    this.neighbors().at(inDirection).xPos = x;
-    this.neighbors().at(inDirection).yPos = y;
-  }
-
-  lineLengthAt(direction: Direction): number {
-    if (!this.neighbors().hasNode(direction)) {
-      return 0;
-    }
-    return this.neighbors().at(direction).lineLength;
   }
 }
