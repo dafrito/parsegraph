@@ -1,6 +1,7 @@
 import { Size } from "./Size";
 import { Direction, nameDirection } from "./Direction";
 import { DirectionNode } from "./DirectionNode";
+import { findPaintGroup } from "./DirectionNode/findPaintGroup";
 
 export function paintGroupBounds(nodeRoot: DirectionNode) {
   if (!nodeRoot.neighbors().isRoot() && !nodeRoot.localPaintGroup()) {
@@ -31,7 +32,7 @@ export function paintGroupBounds(nodeRoot: DirectionNode) {
         continue;
       }
       const child = node.neighbors().nodeAt(dir);
-      if (child.findPaintGroup() === nodeRoot) {
+      if (findPaintGroup(child) === nodeRoot) {
         // Node is part of the same paint group.
         const childBounds = groupBounds[child.state().id() as number];
         if (!childBounds) {

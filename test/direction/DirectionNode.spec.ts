@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import { Direction } from "../../src/Direction";
 import { PreferredAxis, DirectionNode } from "../../src/DirectionNode";
+import { findDistance } from "../../src/DirectionNode";
 
 describe("DirectionNode", function () {
   it("can be constructed without a Type param", () => {
@@ -85,7 +86,7 @@ describe("DirectionNode", function () {
       next = bud;
     }
 
-    expect(last.findDistance(next)).toEqual(1);
+    expect(findDistance(last, next)).toEqual(1);
 
     expect(
       root

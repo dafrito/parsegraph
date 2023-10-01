@@ -5,7 +5,8 @@ import { Size } from "../../Size";
 import { Extent } from "./Extent";
 
 import { Direction, reverseDirection } from "../../Direction";
-import { DirectionNode } from "../..";
+import { findPaintGroup } from "../../DirectionNode/findPaintGroup";
+import { DirectionNode } from "../../DirectionNode/DirectionNode";
 import { LayoutPhase } from "./LayoutPhase";
 
 export class Layout {
@@ -79,9 +80,7 @@ export class Layout {
     let scale = 1.0;
     let neededVersion;
     if (!node.neighbors().isRoot()) {
-      neededVersion = node
-        .parentNode()
-        .findPaintGroup()
+      neededVersion = findPaintGroup(node.parentNode())
         .layout()._absoluteVersion;
     }
     while (true) {
@@ -125,10 +124,7 @@ export class Layout {
         layout._absoluteScale = scale;
         layout._absoluteDirty = false;
         if (!node.neighbors().isRoot()) {
-          layout._absoluteVersion = node
-            .parentNode()
-            .findPaintGroup()
-            .layout()._absoluteVersion;
+          layout._absoluteVersion = findPaintGroup(node.parentNode()).layout()._absoluteVersion;
         }
       }
       scale *= node.neighbors().nodeAt(directionToChild).state().scale();
@@ -140,9 +136,7 @@ export class Layout {
     this._absoluteScale = scale;
     this._absoluteDirty = false;
     if (!this.node().neighbors().isRoot()) {
-      this._absoluteVersion = this.node()
-        .parentNode()
-        .findPaintGroup()
+      this._absoluteVersion = findPaintGroup(this.node().parentNode())
         .layout()._absoluteVersion;
     }
   }
@@ -156,7 +150,7 @@ export class Layout {
     }
     return (
       this._absoluteVersion !==
-      this.node().parentNode().findPaintGroup().layout()._absoluteVersion
+      findPaintGroup(this.node().parentNode()).layout()._absoluteVersion
     );
   }
 

@@ -2,9 +2,14 @@ import { expect, assert } from "chai";
 import { Direction, readDirection } from "../../src/Direction";
 
 import {
+  findPaintGroupInsert,
+} from "../../src/DirectionNode/findPaintGroupInsert"
+import {
   DirectionNode,
+  comesBefore,
   PreferredAxis,
   namePreferredAxis,
+  findPaintGroup,
 } from "../../src/DirectionNode";
 
 import { DirectionCaret } from "../../src/DirectionCaret";
@@ -780,7 +785,7 @@ describe("DirectionCaret", function () {
     originalRoot.setId("originalRoot");
     const midRoot = car.spawnMove("i", "b");
     midRoot.setId("midRoot");
-    assert.isTrue(originalRoot.comesBefore(midRoot));
+    assert.isTrue(comesBefore(originalRoot, midRoot));
     car.crease();
     const newNode = makeCaret().spawnMove("i", "b");
     newNode.setId("newNode");
@@ -928,7 +933,7 @@ describe("DirectionCaret", function () {
     );
     assert.deepEqual(
       [containerBlock, containerBlock],
-      containerBlock.findPaintGroupInsert(icar.node())
+      findPaintGroupInsert(containerBlock, icar.node())
     );
     assert.deepEqual(icar.node().neighbors().root().id(), containerBlock.id());
 
@@ -1158,16 +1163,16 @@ describe("DirectionCaret", function () {
     // car is now [car.root()]-[ccar.root()]-[[n]]
 
     assert.notEqual(
-      ccar.root().findPaintGroup().id(),
+      findPaintGroup(ccar.root()).id(),
       ccar.root().id(),
       "ccar's paint group is not itself"
     );
     assert.equal(
-      ccar.root().findPaintGroup().id(),
+      findPaintGroup(ccar.root()).id(),
       car.root().id(),
       "ccar's paint group is root"
     );
-    assert.equal(n.findPaintGroup().id(), n.id());
+    assert.equal(findPaintGroup(n).id(), n.id());
 
     assert.deepEqual(
       car

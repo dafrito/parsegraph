@@ -1,6 +1,5 @@
 import createException, {
   BAD_NODE_DIRECTION,
-  BAD_AXIS,
   NODE_IS_ROOT,
   CANNOT_AFFECT_PARENT,
   NO_NODE_FOUND,
@@ -10,23 +9,15 @@ import createException, {
 } from "../Exception";
 
 import {
-  Axis,
-  getNegativeDirection,
-  getPositiveDirection,
-  getDirectionAxis,
   Direction,
   isCardinalDirection,
-  NUM_DIRECTIONS,
   reverseDirection,
   forEachDirection,
 } from "../Direction";
 
 import { Layout } from "./Layout";
 
-import { SiblingNode } from "./DirectionNodeSiblings";
-
 import { LayoutPhase } from "./Layout";
-import { PreferredAxis } from "./DirectionNodeSiblings";
 import Alignment from "./Alignment";
 import AxisOverlap from "./AxisOverlap";
 import { NeighborData } from "./NeighborData";
@@ -37,10 +28,8 @@ import {
 } from "./DirectionNodePaintGroup";
 import { DirectionNodeState } from "./DirectionNodeState";
 
-import makeLimit from "./makeLimit";
-import { pathToRoot } from "./pathToRoot";
-
 import { Neighbors } from "./Neighbors";
+import { findPaintGroup } from "./findPaintGroup";
 
 export class DirectionNode<Value = any>
   implements PaintGroupNode<DirectionNode<Value>>
@@ -246,215 +235,6 @@ export class DirectionNode<Value = any>
     } while (node !== this);
   }
 
-  /**
-   * Finds the paint group root.
-   *
-   * This iterates up the parent neighbors until a paint group root is
-   * found. If none is found, then the root is used.
-   *
-   * @return {DirectionNode} the paint group root
-   */
-  findPaintGroup(): DirectionNode<Value> {
-    if (!this.paintGroupRoot()) {
-      let node: DirectionNode = this;
-      while (!node.neighbors().isRoot()) {
-        if (node.localPaintGroup()) {
-          break;
-        }
-        if (node.paintGroupRoot()) {
-          this.setPaintGroupRoot(node.paintGroupRoot());
-          return this.paintGroupRoot();
-        }
-        node = node.parentNode();
-      }
-      this.setPaintGroupRoot(node);
-    }
-    return this.paintGroupRoot();
-  }
-
-  /**
-   * Returns true if the given other node comes before this node in layout order.
-   *
-   * @param {DirectionNode} given - other DirectionNode.
-   * @return {boolean} true if this node comes before the given node.
-   *
-   * @see {@link comesAfter}
-   */
-  comesBefore(other: DirectionNode): boolean {
-    if (this === other) {
-      return false;
-    }
-    if (this.neighbors().isRoot()) {
-      // Root comes before all nodes.
-      return true;
-    }
-    if (other.neighbors().isRoot()) {
-      // If we are not root, but other is, then other
-      // is assumed to come after us.
-      return false;
-    }
-
-    const nodePath = pathToRoot(this).reverse();
-    const otherPath = pathToRoot(other).reverse();
-
-    // Find count in common
-    let numCommon = 0;
-    for (
-      numCommon = 0;
-      numCommon < Math.min(otherPath.length, nodePath.length);
-      ++numCommon
-    ) {
-      if (otherPath[numCommon] !== nodePath[numCommon]) {
-        break;
-      }
-    }
-    --numCommon;
-
-    if (numCommon < 0) {
-      return false;
-    }
-
-    const lastCommonParent = nodePath[numCommon];
-    if (lastCommonParent === this) {
-      return true;
-    }
-    if (lastCommonParent === other) {
-      return false;
-    }
-
-    const paintOrdering = lastCommonParent.siblings().layoutOrder();
-
-    const findPaintIndex = (nodes: DirectionNode<Value>[]) => {
-      return paintOrdering.indexOf(
-        reverseDirection(nodes[numCommon + 1].parentDirection())
-      );
-    };
-    const nodePaintIndex = findPaintIndex(nodePath);
-    const otherPaintIndex = findPaintIndex(otherPath);
-
-    return nodePaintIndex < otherPaintIndex;
-  }
-
-  /**
-   * Returns true if the given other node comes after this node in layout order.
-   *
-   * @param {DirectionNode} given - other DirectionNode.
-   * @return {boolean} true if this node comes after the given node.
-   *
-   * @see {@link comesBefore}
-   */
-  comesAfter(other: DirectionNode<Value>): boolean {
-    if (this === other) {
-      return false;
-    }
-    return !this.comesBefore(other);
-  }
-
-  findDistance(other: DirectionNode<Value>): number {
-    if (this === other) {
-      return 0;
-    }
-    const nodePath = pathToRoot(this).reverse();
-    const otherPath = pathToRoot(other).reverse();
-
-    // Find count in common
-    let numCommon = 0;
-    for (
-      numCommon = 0;
-      numCommon < Math.min(otherPath.length, nodePath.length);
-      ++numCommon
-    ) {
-      if (otherPath[numCommon] !== nodePath[numCommon]) {
-        break;
-      }
-    }
-
-    if (numCommon === 0) {
-      return Infinity;
-    }
-
-    const rv = nodePath.length - numCommon + (otherPath.length - numCommon);
-    return rv;
-  }
-
-  findClosestPaintGroup(
-    inserted: DirectionNode<Value>,
-    paintGroupCandidates: DirectionNode[]
-  ) {
-    // Compute distances from the inserted node
-    const paintGroupDistances = paintGroupCandidates.map((candidateNode) =>
-      inserted.findDistance(candidateNode)
-    );
-
-    const closestPaintGroupIndex = paintGroupDistances.reduce(
-      (lowestDistanceIndex, candDistance, index) => {
-        if (lowestDistanceIndex === -1) {
-          return index;
-        }
-
-        if (candDistance <= paintGroupDistances[lowestDistanceIndex]) {
-          return index;
-        }
-
-        return lowestDistanceIndex;
-      },
-      -1
-    );
-
-    return paintGroupCandidates[closestPaintGroupIndex];
-  }
-
-  findPaintGroupInsert(
-    inserted: DirectionNode
-  ): [DirectionNode, DirectionNode] {
-    if (!this.localPaintGroup()) {
-      return this.paintGroup().node().findPaintGroupInsert(inserted);
-    }
-
-    // Gather possible insertion points; exclude this node.
-    const paintGroupCandidates: DirectionNode[] = [];
-    const lim = makeLimit();
-    let n = this.paintGroup().next();
-    while (n !== this) {
-      paintGroupCandidates.push(n);
-      lim();
-      n = n.paintGroup().next();
-    }
-    paintGroupCandidates.push(this.getLastPaintGroup());
-
-    const closestPaintGroup = this.findClosestPaintGroup(
-      inserted,
-      paintGroupCandidates
-    );
-
-    if (closestPaintGroup.comesBefore(inserted)) {
-      const endOfPaintGroup = closestPaintGroup.getLastPaintGroup();
-      return [endOfPaintGroup, endOfPaintGroup.paintGroup().next()];
-    }
-    return [closestPaintGroup.paintGroup().prev(), closestPaintGroup];
-  }
-
-  /**
-   * Finds the last paint group to be painted and rendered
-that is still a descendent of this node.
-   *
-   * @return {this} The first paint group to be drawn that is a child of this paint group.
-   */
-  getLastPaintGroup(): DirectionNode {
-    let candidate: DirectionNode = this.localPaintGroup()
-      ? this.paintGroup().next()
-      : this;
-    const lim = makeLimit();
-    while (candidate !== this) {
-      if (!candidate.neighbors().hasAncestor(this)) {
-        const rv = candidate.paintGroup().prev();
-        return rv;
-      }
-      candidate = candidate.paintGroup().next();
-      lim();
-    }
-    return candidate === this ? candidate.paintGroup().prev() : candidate;
-  }
 
   crease() {
     if (this.localPaintGroup()) {
@@ -526,7 +306,7 @@ that is still a descendent of this node.
     node.neighbors().assignParent(this, inDirection);
 
     if (node.paintGroup().explicit()) {
-      const pg = this.findPaintGroup();
+      const pg = findPaintGroup(this);
       pg.paintGroup().append(node);
     } else {
       this.siblings().insertIntoLayout(inDirection);
@@ -535,7 +315,7 @@ that is still a descendent of this node.
         .siblings()
         .forEachNode((n) => n.setPaintGroupRoot(this.paintGroupRoot()));
       if (node.paintGroup().next() !== node) {
-        const pg = this.findPaintGroup();
+        const pg = findPaintGroup(this);
         pg.paintGroup().merge(node);
       }
       node.clearPaintGroup();

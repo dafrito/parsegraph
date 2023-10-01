@@ -724,10 +724,10 @@ export class CommitLayout extends BaseCommitLayout {
 
     if (child.layout().phase() !== LayoutPhase.COMMITTED) {
       node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
-      // console.log(Node.getLayoutNodes(child.findPaintGroup()));
+      // console.log(Node.getLayoutNodes(findPaintGroup(child)));
       // console.log(namePreferredAxis(child.getLayoutPreference()));
       // console.log("Child's paint group is dirty: " +
-      //   child.findPaintGroup().isDirty());
+      //   findPaintGroup(child).isDirty());
       // console.log(nameDirection(direction) + " Child " +
       //   nameType(child.type()) + " " + (child.id()) +
       //   " does not have a committed layout.
