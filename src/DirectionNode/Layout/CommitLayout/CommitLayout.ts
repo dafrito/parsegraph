@@ -190,9 +190,9 @@ export class CommitLayout extends BaseCommitLayout {
     const reversedDirection: Direction = reverseDirection(childDirection);
 
     // Save alignment parameters.
-    node.neighborAt(childDirection).alignmentOffset = alignment;
+    node.neighbors().at(childDirection).alignmentOffset = alignment;
     // console.log("Alignment = " + alignment);
-    node.neighborAt(childDirection).separation = separation;
+    node.neighbors().at(childDirection).separation = separation;
 
     // Determine the line length.
     let extentSize: number;
@@ -215,7 +215,7 @@ export class CommitLayout extends BaseCommitLayout {
     const lineLength =
       separation -
       node.neighbors().nodeAt(childDirection).scale() * extentSize;
-    node.neighborAt(childDirection).lineLength = lineLength;
+    node.neighbors().at(childDirection).lineLength = lineLength;
     // console.log(
     //   "Line length: " + lineLength + ",
     //   separation: " + separation + ",
@@ -232,8 +232,8 @@ export class CommitLayout extends BaseCommitLayout {
     /* console.log(
               nameDirection(childDirection) + " " +
               nameType(child.type()) + "'s position set to (" +
-              this.neighborAt(childDirection).xPos + ", " +
-              this.neighborAt(childDirection).yPos + ")"
+              this.neighbors().at(childDirection).xPos + ", " +
+              this.neighbors().at(childDirection).yPos + ")"
           );*/
   }
 
@@ -478,7 +478,7 @@ export class CommitLayout extends BaseCommitLayout {
             console.log("Length offset: " + lengthOffset);
             console.log("Size adjustment: " + sizeAdjustment);
             console.log("ExtentOffset : " +
-              node.neighborAt(direction).extentOffset);
+              node.neighbors().at(direction).extentOffset);
             console.log("Scaled child ExtentOffset : " +
             (node.neighbors().nodeAt(childDirection).scale() * child.extentOffsetAt(direction))); */
     const e: Extent = node.layout().extentsAt(direction);

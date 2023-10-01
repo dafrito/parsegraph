@@ -99,7 +99,7 @@ export class DirectionNode<Value = any> {
     return this._neighbors;
   }
 
-  neighborAt(dir: Direction): Neighbor {
+  neighbors().at(dir: Direction): Neighbor {
     return this.neighbors().at(dir);
   }
 
@@ -356,7 +356,7 @@ export class DirectionNode<Value = any> {
       );
     }
     // Disconnect the node.
-    const neighbor = this.neighborAt(inDirection);
+    const neighbor = this.neighbors().at(inDirection);
     const disconnected = neighbor.neighbor() as this;
 
     const clearExplicit = !disconnected.localPaintGroup();
@@ -461,7 +461,7 @@ export class DirectionNode<Value = any> {
 
   getAlignment(inDirection: Direction): Alignment {
     if (this.neighbors().hasNode(inDirection)) {
-      return this.neighborAt(inDirection).alignmentMode;
+      return this.neighbors().at(inDirection).alignmentMode;
     }
     return Alignment.NULL;
   }
@@ -488,7 +488,7 @@ export class DirectionNode<Value = any> {
       );
     }
     if (this.neighbors().hasNode(inDirection)) {
-      return this.neighborAt(inDirection).allowAxisOverlap;
+      return this.neighbors().at(inDirection).allowAxisOverlap;
     }
     return AxisOverlap.NULL;
   }
@@ -529,14 +529,14 @@ export class DirectionNode<Value = any> {
   }
 
   setPosAt(inDirection: Direction, x: number, y: number): void {
-    this.neighborAt(inDirection).xPos = x;
-    this.neighborAt(inDirection).yPos = y;
+    this.neighbors().at(inDirection).xPos = x;
+    this.neighbors().at(inDirection).yPos = y;
   }
 
   lineLengthAt(direction: Direction): number {
     if (!this.neighbors().hasNode(direction)) {
       return 0;
     }
-    return this.neighborAt(direction).lineLength;
+    return this.neighbors().at(direction).lineLength;
   }
 }

@@ -22,7 +22,7 @@ const drawLine = (
     // Do not draw lines unless there is a node.
     return;
   }
-  const directionData = node.neighborAt(direction);
+  const directionData = node.neighbors().at(direction);
 
   const layout = node.layout();
   const parentScale = layout.groupScale();

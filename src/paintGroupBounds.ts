@@ -44,7 +44,7 @@ export function paintGroupBounds(nodeRoot: DirectionNode) {
         if (Number.isNaN(childBounds.left)) {
           throw new Error("Bounds must not be NaN");
         }
-        const neighbor = node.neighborAt(dir);
+        const neighbor = node.neighbors().at(dir);
         switch (dir) {
           case Direction.UPWARD:
             parentBounds.top = Math.max(
@@ -123,7 +123,7 @@ export function paintGroupBounds(nodeRoot: DirectionNode) {
         }
       } else {
         // Node is part of a different paint group.
-        const neighbor = node.neighborAt(dir);
+        const neighbor = node.neighbors().at(dir);
         switch (dir) {
           case Direction.UPWARD:
             parentBounds.top = Math.max(
