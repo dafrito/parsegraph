@@ -1,3 +1,17 @@
+## version 3.0.0
+
+October 1, 2023 release
+
+Major internal refactors from prior versions. The external API changed a bit,
+enough to warrant a major version bump.
+
+ - forEachPaintGroup is now paintGroup().forEach
+ - DirectionNodeState is merged into DirectionNode
+ - many methods relating to neighbors have been moved into Neighbors class
+ - NeighborData renamed to Neighbor
+ - DirectionNodePaintGroup renamed to PaintGroup
+
+
 ## version 2.0.20 
 
 This is a fork of parsegraph-layout that is designed to be as
@@ -13,14 +27,3 @@ natural boundary.
 This API provides DirectionNodes and a way for you to draw them. It achieves
 platform-independence because it does not rely on any external APIs, including
 timing or graphics APIs. It is left entirely to the caller to provide these.
-
-TODOs:
-
-- Flesh out documentation
-- Ports to Swift, C, C++, Java
-
-MAYBEs:
-
-- Remove Exception
-- Remove makeLimit
-
