@@ -24,6 +24,7 @@ jobs:
     - run: yarn build
     - run: yarn doc
     - run: mv ./dist/docs ./docs
+    - run: mv ./dist/coverage ./coverage
     - run: yarn tar
     - run: yarn deploy
       env:
@@ -33,8 +34,13 @@ jobs:
       with:
         name: parsegraph-${{ github.run_number }}
         path: parsegraph.tgz
-    - run: tar cvzf parsegraph-doc.tgz ./docs
+    - run: tar cvzf parsegraph-docs.tgz ./docs
     - uses: actions/upload-artifact@v2
       with:
         name: parsegraph-docs-${{ github.run_number }}
         path: parsegraph-docs.tgz
+    - run: tar cvzf parsegraph-coverage.tgz ./coverage
+    - uses: actions/upload-artifact@v2
+      with:
+        name: parsegraph-coverage-${{ github.run_number }}
+        path: parsegraph-coverage.tgz
