@@ -36,7 +36,7 @@ describe("Extent", function () {
     const forwardExtent = new Extent();
     const backwardExtent = new Extent();
 
-    const testSeparation = function (expected) {
+    const testSeparation = function (expected: number) {
       return (
         forwardExtent.separation(backwardExtent) ==
           backwardExtent.separation(forwardExtent) &&

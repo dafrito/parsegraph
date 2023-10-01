@@ -5,7 +5,7 @@ import {
   CommitLayout,
   DirectionNode,
   paintNodeBounds,
-  Size,
+  paintNodeLines,
 } from "parsegraph";
 
 const buildGraph = () => {
@@ -16,11 +16,11 @@ const buildGraph = () => {
 const rootNode = buildGraph();
 
 const cld = new CommitLayout(rootNode, {
-  size: (node: DirectionNode, size: Size) => {
+  size: (node: DirectionNode, size: number[]) => {
     // TODO Provide the size of the node to the size object.
     // This will be called for every DirectionNode.
-    size.setWidth(24);
-    size.setHeight(80);
+    size[0] = 24;
+    size[1] = 80;
   }
 });
 
