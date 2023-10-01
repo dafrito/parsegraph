@@ -224,7 +224,7 @@ export class DirectionCaret<Value> {
   }
 
   /**
-   * Returns to this caret's original node.
+   * Returns to this caret's original root node.
    */
   moveToRoot(): void {
     this.setNode(this._nodeRoot);
@@ -234,6 +234,11 @@ export class DirectionCaret<Value> {
     this._nodes[this._nodes.length - 1] = node;
   }
 
+  /**
+   * Moves the caret to the current node's parent. 
+   * 
+   * @throws if the current node is root.
+   */
   moveToParent(): void {
     if (this.node().neighbors().isRoot()) {
       throw new Error(

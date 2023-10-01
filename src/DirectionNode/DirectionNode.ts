@@ -16,6 +16,8 @@ import { PaintGroup } from "./PaintGroup";
 
 import { Neighbors } from "./Neighbors/Neighbors";
 import { findPaintGroup } from "./findPaintGroup";
+import { connectNode } from "./connectNode";
+import { disconnectNode } from "./disconnectNode";
 
 let nodeCount = 0;
 export class DirectionNode<Value = any> {
@@ -177,7 +179,7 @@ export class DirectionNode<Value = any> {
    *
    * Called by the paint group when it is being removed.
    *
-   * This does not trigger invalidation.
+   * This is an internal method and does not trigger invalidation.
    */
   clearPaintGroup(): void {
     this._paintGroup = undefined;
@@ -195,7 +197,7 @@ export class DirectionNode<Value = any> {
   /**
    * Changes the paint group root.
    *
-   * This does not trigger invalidation.
+   * This is an internal method and does not trigger invalidation.
    *
    * @param {DirectionNode} pg - the new paint group root
    */
@@ -249,101 +251,38 @@ export class DirectionNode<Value = any> {
     }
   }
 
+  /**
+   * Connects the given node to this node in the specified direction.
+   * 
+   * If the node already has a parent, it will be disconnected. If this node already
+   * has a child in the specified direction, that child will be disconected.
+   * 
+   * This will invalidate the layout of this node.
+   * 
+   * @param {Direction} inDirection - the direction to attach the given node
+   * @param {DirectionNode<Value>} node - the node to attach
+   * @returns the givn node
+   * 
+   * @see {@link connectNode}
+   */
   connect(
     inDirection: Direction,
     node: DirectionNode<Value>
   ): DirectionNode<Value> {
-    // Ensure the node can be connected in the given direction.
-    if (inDirection == Direction.OUTWARD) {
-      throw createException(NO_OUTWARD_CONNECT);
-    }
-    if (inDirection == Direction.NULL) {
-      throw createException(BAD_NODE_DIRECTION);
-    }
-    if (inDirection == this.neighbors().parentDirection()) {
-      throw createException(NO_PARENT_CONNECT);
-    }
-    if (this.neighbors().hasNode(inDirection)) {
-      this.disconnect(inDirection);
-    }
-    if (!node.neighbors().isRoot()) {
-      node.disconnect();
-    }
-    if (node.neighbors().hasNode(reverseDirection(inDirection))) {
-      node.disconnect(reverseDirection(inDirection));
-    }
-
-    // Connect the node.
-    const neighbor = this.neighbors().ensure(inDirection);
-    // Allow alignments to be set before children are spawned.
-    if (neighbor.alignmentMode == Alignment.NULL) {
-      neighbor.alignmentMode = Alignment.NONE;
-    }
-    neighbor.meet(node);
-    node.neighbors().assignParent(this, inDirection);
-
-    if (node.paintGroup().explicit()) {
-      const pg = findPaintGroup(this);
-      pg.paintGroup().append(node);
-    } else {
-      this.siblings().insertIntoLayout(inDirection);
-      node.setPaintGroupNode(this.paintGroupNode());
-      node
-        .siblings()
-        .forEachNode((n) => n.setPaintGroupNode(this.paintGroupNode()));
-      if (node.paintGroup().next() !== node) {
-        const pg = findPaintGroup(this);
-        pg.paintGroup().merge(node);
-      }
-      node.clearPaintGroup();
-    }
-
-    this.invalidate();
-
-    return node;
+    return connectNode(this, inDirection, node);
   }
 
+  /**
+   * Removes the child in the specified direction.
+   * 
+   * @param {Direction | undefined} inDirection - the direction of the child. If undefined, the node to remove
+   * is this node from its parent.
+   * @returns {DirectionNode | undefined} the disconnected node, or undefined if no node was disconnected.
+   * If this node was to be removed and this node is a root node, this node is returned.
+   * 
+   * @see {@link disconnectNode}
+   */
   disconnect(inDirection?: Direction): DirectionNode | undefined {
-    if (arguments.length === 0 || inDirection === undefined) {
-      if (this.neighbors().isRoot()) {
-        return this;
-      }
-      return this.neighbors()
-        .parentNode()
-        .disconnect(reverseDirection(this.neighbors().parentDirection()));
-    }
-
-    if (!this.neighbors().hasNode(inDirection)) {
-      return undefined;
-    }
-
-    if (
-      !this.neighbors().isRoot() &&
-      this.neighbors().parentDirection() === inDirection
-    ) {
-      return this.neighbors()
-        .parentNode()
-        .disconnect(reverseDirection(this.neighbors().parentDirection()));
-    }
-    // Disconnect the node.
-    const neighbor = this.neighbors().at(inDirection);
-    const disconnected = neighbor.neighbor() as this;
-
-    const clearExplicit = !disconnected.isPaintGroup();
-    if (!disconnected.isPaintGroup()) {
-      disconnected.crease();
-    }
-    neighbor.leave();
-    disconnected.neighbors().assignParent(undefined);
-    disconnected.paintGroup().disconnect();
-
-    if (clearExplicit) {
-      disconnected.paintGroup().clearExplicit();
-    }
-
-    disconnected.siblings().convertLayoutPreference(inDirection);
-    this.invalidate();
-
-    return disconnected;
+    return disconnectNode(this, inDirection);
   }
 }

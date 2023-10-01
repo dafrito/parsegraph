@@ -13,3 +13,5 @@ export * from "./findPaintGroup";
 export * from "./findPaintGroupInsert";
 export * from "./getLastPaintGroup";
 export * from "./disconnectChildren";
+export * from "./connectNode";
+export * from "./disconnectNode";
