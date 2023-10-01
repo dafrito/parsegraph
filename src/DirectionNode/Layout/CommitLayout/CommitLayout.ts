@@ -31,7 +31,7 @@ import { LayoutPhase } from "..";
 
 import { Size } from "../../../Size";
 
-import { BaseCommitLayoutData } from "./BaseCommitLayoutData";
+import { BaseCommitLayout } from "./BaseCommitLayout";
 import { LayoutPainter } from "./LayoutPainter";
 
 /**
@@ -44,7 +44,7 @@ export const LINE_THICKNESS = 12;
  *
  * @see {@link LayoutPainter}
  */
-export class CommitLayoutData extends BaseCommitLayoutData {
+export class CommitLayout extends BaseCommitLayout {
   lineBounds: Size;
   bv: [number, number, number];
 

@@ -12,7 +12,7 @@ import {
   readDirection,
 } from "../../..";
 
-import { CommitLayoutData } from "./CommitLayoutData";
+import { CommitLayout } from "./CommitLayout";
 
 interface Metrics {
   paintGroupRenders: number;
@@ -36,7 +36,7 @@ const demo = (rootNode: DirectionNode): Metrics => {
     renders: 0,
     paintGroupRenders: 0,
   };
-  const cld = new CommitLayoutData(rootNode, {
+  const cld = new CommitLayout(rootNode, {
     size: (node: DirectionNode, size: Size) => {
       // TODO Provide the size of the node to the size object.
       // This will be called for every DirectionNode.
@@ -87,7 +87,7 @@ const demo2 = (rootNode: DirectionNode): Metrics2 => {
     paintedNodes: 0,
     paintGroupRenders: 0,
   };
-  const cld = new CommitLayoutData(rootNode, {
+  const cld = new CommitLayout(rootNode, {
     size: (node: DirectionNode, size: Size) => {
       // TODO Provide the size of the node to the size object.
       // This will be called for every DirectionNode.
@@ -140,7 +140,7 @@ const demoMultiple = (rootNode: DirectionNode): (() => Metrics) => {
     renders: 0,
     paintGroupRenders: 0,
   };
-  const cld = new CommitLayoutData(rootNode, {
+  const cld = new CommitLayout(rootNode, {
     size: (node: DirectionNode, size: Size) => {
       // TODO Provide the size of the node to the size object.
       // This will be called for every DirectionNode.
@@ -190,7 +190,7 @@ const demoMultiple = (rootNode: DirectionNode): (() => Metrics) => {
   };
 };
 
-describe("CommitLayoutData", () => {
+describe("CommitLayout", () => {
   it("single node ", () => {
     const buildGraph = () => {
       // TODO Build a graph.
@@ -202,7 +202,7 @@ describe("CommitLayoutData", () => {
     let paintCount = 0;
     let sizeCount = 0;
     let sepCount = 0;
-    const cld = new CommitLayoutData(rootNode, {
+    const cld = new CommitLayout(rootNode, {
       size: (node: DirectionNode, size: Size) => {
         // TODO Provide the size of the node to the size object.
         // This will be called for every DirectionNode.
@@ -260,7 +260,7 @@ describe("CommitLayoutData", () => {
     let paintCount = 0;
     let sizeCount = 0;
     let sepCount = 0;
-    const cld = new CommitLayoutData(rootNode, {
+    const cld = new CommitLayout(rootNode, {
       size: (node: DirectionNode, size: Size) => {
         // TODO Provide the size of the node to the size object.
         // This will be called for every DirectionNode.
@@ -320,7 +320,7 @@ describe("CommitLayoutData", () => {
     let paintCount = 0;
     let sizeCount = 0;
     let sepCount = 0;
-    const cld = new CommitLayoutData(rootNode, {
+    const cld = new CommitLayout(rootNode, {
       size: (node: DirectionNode, size: Size) => {
         // TODO Provide the size of the node to the size object.
         // This will be called for every DirectionNode.
@@ -860,7 +860,7 @@ describe("CommitLayoutData", () => {
 
     const rootNode = buildGraph();
 
-    const cld = new CommitLayoutData(rootNode, {
+    const cld = new CommitLayout(rootNode, {
       size: (node: DirectionNode, size: Size) => {
         // TODO Provide the size of the node to the size object.
         // This will be called for every DirectionNode.

@@ -81,7 +81,7 @@ allows traversal to other paint groups in a larger graph.
 
 # What is commit layout?
 
-CommitLayoutData is the algorithm that computes and populates the Layout for a
+CommitLayout is the algorithm that computes and populates the Layout for a
 given DirectionNode and its neighbors.
 
 ### Axis
@@ -166,5 +166,5 @@ You can hook into the CommitLayout's LayoutPainter paint(pg: DirectionNode)
 callback and render the every node in the paint group into a single render call
 using their group position. Then, at render time, you pass a world matrix to
 your render call that is the absolute position of that paint group. Both the
-group and the absolute position are computed using the CommitLayoutData
+group and the absolute position are computed using the CommitLayout
 algorithm.

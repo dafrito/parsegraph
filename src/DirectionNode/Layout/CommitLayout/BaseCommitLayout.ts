@@ -5,7 +5,7 @@ import createException, { BAD_LAYOUT_STATE } from "../../../Exception";
 import { Size } from "../../../Size";
 import { LayoutPainter } from "./LayoutPainter";
 
-export class BaseCommitLayoutData {
+export class BaseCommitLayout {
   protected bodySize: Size;
   protected firstSize: Size;
   protected secondSize: Size;

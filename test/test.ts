@@ -11,7 +11,7 @@ import { DirectionNode } from "../src/DirectionNode";
 
 import { DirectionCaret } from "../src/DirectionCaret";
 
-import { CommitLayoutData } from "../src";
+import { CommitLayout } from "../src";
 import { Extent, checkExtentsEqual } from "../src/DirectionNode/Layout/Extent";
 import { Size } from "../src/Size";
 
@@ -157,7 +157,7 @@ const layoutPainter = {
 };
 
 const commitLayout = (node: DirectionNode) => {
-  const cld = new CommitLayoutData(node, layoutPainter);
+  const cld = new CommitLayout(node, layoutPainter);
 
   const count = 0;
   while (cld.crank()) {
