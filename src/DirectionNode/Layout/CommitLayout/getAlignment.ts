@@ -1,41 +1,21 @@
-import { Extent } from "../Extent";
-
 import {
   Direction,
-  Axis,
   getPerpendicularAxis,
   getPositiveDirection,
   getNegativeDirection,
-  directionSign,
   getDirectionAxis,
-  isCardinalDirection,
-  reverseDirection,
-  isVerticalDirection,
-  forEachCardinalDirection,
 } from "../../../Direction";
 
 import {
   Alignment,
   DirectionNode,
-  Fit,
-  PreferredAxis,
-  AxisOverlap,
 } from "../..";
 
 import createException, {
-  BAD_NODE_DIRECTION,
   BAD_NODE_ALIGNMENT,
 } from "../../../Exception";
 
-import { LayoutPhase } from "..";
-
-import { Size } from "../../../Size";
-
-import { BaseCommitLayout } from "./BaseCommitLayout";
-import { LayoutPainter } from "./LayoutPainter";
 import { findConsecutiveLength } from "./findConsecutiveLength";
-import { combineExtents } from "./CombineExtents";
-import { AddLineBounds } from "./AddLineBounds";
 
 /**
  * Returns the offset of the child's center in the given direction from

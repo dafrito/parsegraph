@@ -2,24 +2,12 @@ import { Extent } from "../Extent";
 
 import {
   Direction,
-  Axis,
-  getPerpendicularAxis,
-  getPositiveDirection,
-  getNegativeDirection,
-  directionSign,
-  getDirectionAxis,
-  isCardinalDirection,
-  reverseDirection,
-  isVerticalDirection,
-  forEachCardinalDirection,
-} from "../../../Direction";
+ } from "../../../Direction";
 
 import {
   Alignment,
   DirectionNode,
   Fit,
-  PreferredAxis,
-  AxisOverlap,
 } from "../..";
 
 import createException, {
