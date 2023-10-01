@@ -164,7 +164,7 @@ export class DirectionNode<Value = any> {
   }
 
   /**
-   * @returns {PaintGroup} this node's current paint group.
+   * @return {PaintGroup} this node's current paint group.
    */
   paintGroup(): PaintGroup {
     return this.paintGroups().paintGroup();

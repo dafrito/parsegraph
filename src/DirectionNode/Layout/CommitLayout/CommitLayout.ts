@@ -168,24 +168,14 @@ export class CommitLayout {
 
     if (node.neighbors().isRootlike()) {
       if (
-        commitRootlikeLayout(
-          this.painter(),
-          node,
-          thickness,
-          this.bodySize
-        )
+        commitRootlikeLayout(this.painter(), node, thickness, this.bodySize)
       ) {
         node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
         return true;
       }
     } else {
       if (
-        commitAxisBasedLayout(
-          this.painter(),
-          node,
-          thickness,
-          this.bodySize
-        )
+        commitAxisBasedLayout(this.painter(), node, thickness, this.bodySize)
       ) {
         node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
         return true;

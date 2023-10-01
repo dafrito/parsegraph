@@ -68,7 +68,9 @@ export const connectNode = (
     node.paintGroups().setPaintGroupNode(parent.paintGroups().paintGroupNode());
     node
       .siblings()
-      .forEachNode((n) => n.paintGroups().setPaintGroupNode(parent.paintGroups().paintGroupNode()));
+      .forEachNode((n) =>
+        n.paintGroups().setPaintGroupNode(parent.paintGroups().paintGroupNode())
+      );
     if (node.paintGroups().paintGroup().next() !== node) {
       const pg = findPaintGroup(parent);
       pg.paintGroups().paintGroup().merge(node);
