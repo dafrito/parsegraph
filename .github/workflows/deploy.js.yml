@@ -33,7 +33,7 @@ jobs:
       with:
         name: parsegraph-${{ github.run_number }}
         path: parsegraph.tgz
-    - run: tar cvzf parsegraph-doc.tgz parsegraph/dist/docs
+    - run: tar cvzf parsegraph-doc.tgz ./docs
     - uses: actions/upload-artifact@v2
       with:
         name: parsegraph-docs-${{ github.run_number }}
