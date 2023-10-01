@@ -38,6 +38,7 @@ import {
 import { DirectionNodeState } from "./DirectionNodeState";
 
 import makeLimit from "./makeLimit";
+import { pathToRoot } from "./pathToRoot";
 
 import { Neighbors } from "./Neighbors";
 
@@ -271,23 +272,6 @@ export class DirectionNode<Value = any>
     return this.paintGroupRoot();
   }
 
-  pathToRoot(): DirectionNode<Value>[] {
-    const nodes: DirectionNode[] = [];
-    let n: DirectionNode = this;
-
-    const lim = makeLimit();
-    while (!n.neighbors().isRoot()) {
-      nodes.push(n);
-      n = n.parentNode();
-      lim();
-    }
-
-    // Push root, too.
-    nodes.push(n);
-
-    return nodes;
-  }
-
   /**
    * Returns true if the given other node comes before this node in layout order.
    *
@@ -310,8 +294,8 @@ export class DirectionNode<Value = any>
       return false;
     }
 
-    const nodePath = this.pathToRoot().reverse();
-    const otherPath = other.pathToRoot().reverse();
+    const nodePath = pathToRoot(this).reverse();
+    const otherPath = pathToRoot(other).reverse();
 
     // Find count in common
     let numCommon = 0;
@@ -370,8 +354,8 @@ export class DirectionNode<Value = any>
     if (this === other) {
       return 0;
     }
-    const nodePath = this.pathToRoot().reverse();
-    const otherPath = other.pathToRoot().reverse();
+    const nodePath = pathToRoot(this).reverse();
+    const otherPath = pathToRoot(other).reverse();
 
     // Find count in common
     let numCommon = 0;
