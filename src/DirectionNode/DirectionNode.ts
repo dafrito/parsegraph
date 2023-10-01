@@ -22,7 +22,7 @@ import { LayoutPhase } from "./Layout";
 import Alignment from "./Alignment";
 import AxisOverlap from "./AxisOverlap";
 import { Neighbor } from "./Neighbor";
-import { DirectionNodeSiblings } from "./DirectionNodeSiblings";
+import { DirectionNodeSiblings } from "./Siblings";
 import {
   DirectionNodePaintGroup,
 } from "./DirectionNodePaintGroup";

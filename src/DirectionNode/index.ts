@@ -1,6 +1,6 @@
 export * from "./DirectionNode";
 export * from "./Neighbor";
-export * from "./DirectionNodeSiblings";
+export * from "./Siblings";
 export * from "./DirectionNodePaintGroup";
 export * from "./Fit";
 export * from "./AxisOverlap";
