@@ -21,16 +21,6 @@ const cld = new CommitLayout(rootNode, {
     // This will be called for every DirectionNode.
     size.setWidth(24);
     size.setHeight(80);
-  },
-  getSeparation: () => {
-    // TODO return the minimum separation between two DirectionNodes.
-    // The same value can be called for every neighbor.
-    return 0;
-  },
-  paint: (pg: DirectionNode): boolean => {
-    // TODO pre-render content as necessary
-    // This is optional.
-    return false;
   }
 });
 
