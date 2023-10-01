@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { Direction, DirectionNode, PreferredAxis } from "../..";
 
-describe("DirectionNodeSiblings", () => {
+describe("Siblings", () => {
   it("keeps non-root PreferredAxis when connecting or disconnecting", () => {
     const n = new DirectionNode();
     n.siblings().pull(Direction.DOWNWARD);

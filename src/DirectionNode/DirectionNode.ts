@@ -22,7 +22,7 @@ import { LayoutPhase } from "./Layout";
 import Alignment from "./Alignment";
 import AxisOverlap from "./AxisOverlap";
 import { Neighbor } from "./Neighbor";
-import { DirectionNodeSiblings } from "./Siblings";
+import { Siblings } from "./Siblings";
 import {
   PaintGroup,
 } from "./PaintGroup";
@@ -36,7 +36,7 @@ export class DirectionNode<Value = any> {
 
   private _neighbors: Neighbors;
 
-  private _siblings: DirectionNodeSiblings;
+  private _siblings: Siblings;
   private _paintGroup:
     | PaintGroup
     | undefined;
@@ -58,7 +58,7 @@ export class DirectionNode<Value = any> {
     this._neighbors = new Neighbors(this);
 
     // Layout
-    this._siblings = new DirectionNodeSiblings(this);
+    this._siblings = new Siblings(this);
     this._paintGroupRoot = this;
     this._paintGroup = new PaintGroup(
       this,
@@ -139,7 +139,7 @@ export class DirectionNode<Value = any> {
   //
   // ///////////////////////////////////////////////////////////////////////////
 
-  siblings(): DirectionNodeSiblings {
+  siblings(): Siblings {
     return this._siblings;
   }
 

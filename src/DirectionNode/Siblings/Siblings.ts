@@ -31,7 +31,7 @@ const VERTICAL_ORDER: Direction[] = [
   Direction.OUTWARD,
 ];
 
-export class DirectionNodeSiblings {
+export class Siblings {
   _prev: DirectionNode;
   _next: DirectionNode;
   _node: DirectionNode;
