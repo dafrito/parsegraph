@@ -12,3 +12,4 @@ export * from "./findDistance";
 export * from "./findPaintGroup";
 export * from "./findPaintGroupInsert";
 export * from "./getLastPaintGroup";
+export * from "./disconnectChildren";

@@ -346,23 +346,4 @@ export class DirectionNode<Value = any> {
     return disconnected;
   }
 
-  disconnectChildren(): DirectionNode[] {
-    const nodes: DirectionNode[] = [];
-    forEachDirection((dir: Direction) => {
-      if (dir === Direction.OUTWARD) {
-        return;
-      }
-      if (this.neighbors().parentDirection() === dir) {
-        return;
-      }
-      if (this.neighbors().hasNode(dir)) {
-        const removed = this.disconnect(dir);
-        if (!removed) {
-          throw new Error("removed no node in a direction that has a node?");
-        }
-        nodes.push(removed);
-      }
-    });
-    return nodes;
-  }
 }
