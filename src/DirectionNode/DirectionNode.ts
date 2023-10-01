@@ -1,17 +1,13 @@
 import createException, {
   BAD_NODE_DIRECTION,
   NODE_IS_ROOT,
-  CANNOT_AFFECT_PARENT,
-  NO_NODE_FOUND,
   NO_OUTWARD_CONNECT,
   NO_PARENT_CONNECT,
-  NOT_PAINT_GROUP,
 } from "../Exception";
 import { Fit } from "./Fit";
 
 import {
   Direction,
-  isCardinalDirection,
   reverseDirection,
   forEachDirection,
 } from "../Direction";
@@ -21,7 +17,6 @@ import { Layout } from "./Layout";
 import { LayoutPhase } from "./Layout";
 import Alignment from "./Alignment";
 import AxisOverlap from "./AxisOverlap";
-import { Neighbor } from "./Neighbor";
 import { Siblings } from "./Siblings";
 import {
   PaintGroup,
