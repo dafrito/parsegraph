@@ -215,7 +215,7 @@ describe("DirectionCaret", function () {
       throw new Error("Graph must not add nodes in incorrect directions.");
     }
 
-    caret.erase(Direction.FORWARD);
+    caret.disconnect(Direction.FORWARD);
     if (
       caret.has(Direction.FORWARD) ||
       caret.has(Direction.BACKWARD) ||
