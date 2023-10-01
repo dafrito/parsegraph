@@ -4,12 +4,11 @@
 import { 
   CommitLayoutData,
   DirectionNode,
-  paintNodeLines,
   paintNodeBounds,
   Size,
 } from "parsegraph";
 
-const buildGraph: () => {
+const buildGraph = () => {
   // TODO Build a graph.
   return new DirectionNode("Hello, world");
 };
@@ -20,14 +19,18 @@ const cld = new CommitLayoutData(rootNode, {
   size: (node: DirectionNode, size: Size) => {
     // TODO Provide the size of the node to the size object.
     // This will be called for every DirectionNode.
+    size.setWidth(24);
+    size.setHeight(80);
   },
   getSeparation: () => {
     // TODO return the minimum separation between two DirectionNodes.
     // The same value can be called for every neighbor.
+    return 0;
   },
   paint: (pg: DirectionNode): boolean => {
     // TODO pre-render content as necessary
     // This is optional.
+    return false;
   }
 });
 
@@ -37,7 +40,12 @@ while (cld.crank());
 // Render the graph.
 rootNode.forEachPaintGroup((pg: DirectionNode) => {
 	pg.forEachNode(node => {
-		// TODO Render one node.
+    paintNodeLines(node, (x, y, w, h) => {
+      // TODO Draw lines from node to neighbor.
+    })
+    paintNodeBounds(node, (x, y, w, h) => {
+      // TODO Draw node.
+    })
 	});
 });
 

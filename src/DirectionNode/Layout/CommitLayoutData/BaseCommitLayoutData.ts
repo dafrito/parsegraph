@@ -6,7 +6,9 @@ import { Size } from "../../../Size";
 import { LayoutPainter } from "./LayoutPainter";
 
 export class BaseCommitLayoutData {
-  bodySize: Size;
+  protected bodySize: Size;
+  protected firstSize: Size;
+  protected secondSize: Size;
   needsPosition: boolean;
 
   rootPaintGroup: DirectionNode;
@@ -19,6 +21,8 @@ export class BaseCommitLayoutData {
   constructor(node: DirectionNode, painter: LayoutPainter) {
     this._painter = painter;
     this.bodySize = new Size();
+    this.firstSize = new Size();
+    this.secondSize = new Size();
     this.reset(node);
   }
 
@@ -43,7 +47,9 @@ export class BaseCommitLayoutData {
     this.root = undefined;
     this.node = undefined;
     this.paintGroup = undefined;
-    this.bodySize.setSize(0, 0);
+    this.bodySize.setSize(NaN, NaN);
+    this.firstSize.setSize(NaN, NaN);
+    this.secondSize.setSize(NaN, NaN);
   }
 
   startingNode(): DirectionNode {
@@ -70,9 +76,9 @@ export class BaseCommitLayoutData {
     // Begin the layout.
     node.layout().setPhase(LayoutPhase.IN_COMMIT);
 
+    // Set the node's size.
     const bodySize = this.bodySize;
     this.painter().size(node, bodySize);
-
     node.layout().setSize(bodySize);
 
     // This node's horizontal bottom, used with downward nodes.
@@ -164,19 +170,21 @@ export class BaseCommitLayoutData {
         this.needsPosition || this.root?.layout().needsPosition()
       );
 
-      do {
-        if (!this.node) {
-          throw new Error("Node must not be undefined");
-        }
-        const layout = this.node.layout();
-        layout._absoluteDirty = true;
-        layout._hasGroupPos = false;
-        layout.commitGroupPos();
-        this.node = this.node.siblings().prev() as DirectionNode;
-      } while (this.node !== this.root);
+      if (this.needsPosition) {
+        do {
+          if (!this.node) {
+            throw new Error("Node must not be undefined");
+          }
+          const layout = this.node.layout();
+          layout._absoluteDirty = true;
+          layout._hasGroupPos = false;
+          layout.commitGroupPos();
+          this.node = this.node.siblings().prev() as DirectionNode;
+        } while (this.node !== this.root);
+      }
     }
 
-    if (this.painter().paint(this.paintGroup)) {
+    if (this.needsPosition && this.painter().paint(this.paintGroup)) {
       return true;
     }
 
@@ -261,14 +269,19 @@ export class BaseCommitLayoutData {
 
   /**
    * Traverse the graph depth-first, committing each node's layout in turn.
-   * @param {number} timeout milliseconds to run layout, optional
-   * @return {Function} A function to resume layout where stopped, if applicable. Otherwise null
+   * 
+   * @return {boolean} true if the algorithm needs more cranks.
    */
   crank(): boolean {
-    return (
+    if (
       this.commitLayoutPhaseOne() ||
       this.commitLayoutPhaseTwo() ||
       this.commitLayoutPhaseThree()
-    );
+    ) {
+      return true;
+    }
+
+    this.reset(this.rootPaintGroup);
+    return false;
   }
 }

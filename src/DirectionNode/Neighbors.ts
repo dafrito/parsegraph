@@ -7,12 +7,12 @@ export interface NeighborNode<T extends NeighborNode<T>> {
 }
 
 export class Neighbors<T extends NeighborNode<T>> {
-  private _owner: T;
+  private _node: T;
   private _neighbors: NeighborData<T>[];
   private _parentNeighbor: NeighborData<T> | undefined;
 
-  constructor(owner: T) {
-      this._owner = owner;
+  constructor(node: T) {
+      this._node = node;
       this._neighbors = new Array(NUM_DIRECTIONS);
   }
 
@@ -37,8 +37,8 @@ export class Neighbors<T extends NeighborNode<T>> {
     return this._parentNeighbor;
   }
 
-  owner() {
-    return this._owner;
+  node() {
+    return this._node;
   }
 
   at(dir: Direction): NeighborData<T> {
@@ -49,7 +49,7 @@ export class Neighbors<T extends NeighborNode<T>> {
     inDirection: Direction
   ): NeighborData<T> {
     if (!this.at(inDirection)) {
-      this._neighbors[inDirection] = new NeighborData(this.owner(), inDirection);
+      this._neighbors[inDirection] = new NeighborData(this.node(), inDirection);
     }
     return this.at(inDirection);
   }
@@ -90,7 +90,7 @@ export class Neighbors<T extends NeighborNode<T>> {
   }
 
   hasAncestor(parent: T): boolean {
-    let candidate: T | undefined = this.owner();
+    let candidate: T | undefined = this.node();
     while (!candidate.neighbors().isRoot()) {
       if (candidate == parent) {
         return true;
@@ -126,7 +126,7 @@ export class Neighbors<T extends NeighborNode<T>> {
       if (this.parent()?.reverseDirection() === atDirection) {
         const par = this.parent()?.node();
         if (!par) {
-          throw new Error("Parent neighbor has no owner");
+          throw new Error("Parent neighbor has no node");
         }
         return par;
       }
@@ -148,7 +148,7 @@ export class Neighbors<T extends NeighborNode<T>> {
   }
 
   root(): T {
-    let p: T = this.owner();
+    let p: T = this.node();
     while (!p.neighbors().isRoot()) {
       const par = p.neighbors().parent()?.node();
       if (!par) {

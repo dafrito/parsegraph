@@ -223,12 +223,17 @@ export class DirectionNode<Value = any> implements PaintGroupNode<DirectionNode<
 
   forEachPaintGroup(func: (node: DirectionNode<Value>) => void): void {
     let node: DirectionNode<Value> = this;
+    let prev = node;
     do {
       if (!node.paintGroup()) {
         throw createException(NOT_PAINT_GROUP);
       }
       func(node);
       node = node.paintGroup().prev();
+      if (prev === node && node !== this) {
+        throw new Error("loop detected");
+      }
+      prev = node;
     } while (node !== this);
   }
 
@@ -599,24 +604,7 @@ that is still a descendent of this node.
       disconnected.paintGroup().clearExplicit();
     }
 
-    if (
-      disconnected.siblings().getLayoutPreference() === PreferredAxis.PARENT
-    ) {
-      if (Axis.VERTICAL === getDirectionAxis(inDirection)) {
-        disconnected.siblings()._layoutPreference = PreferredAxis.VERTICAL;
-      } else {
-        disconnected.siblings()._layoutPreference = PreferredAxis.HORIZONTAL;
-      }
-    } else if (
-      disconnected.siblings().getLayoutPreference() ===
-      PreferredAxis.PERPENDICULAR
-    ) {
-      if (Axis.VERTICAL === getDirectionAxis(inDirection)) {
-        disconnected.siblings()._layoutPreference = PreferredAxis.HORIZONTAL;
-      } else {
-        disconnected.siblings()._layoutPreference = PreferredAxis.VERTICAL;
-      }
-    }
+    disconnected.siblings().convertLayoutPreference(inDirection);
     this.layoutChanged();
 
     return disconnected;

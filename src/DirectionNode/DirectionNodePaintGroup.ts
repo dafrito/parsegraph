@@ -46,7 +46,7 @@ export class DirectionNodePaintGroup<T extends PaintGroupNode<T>> {
       );
 
       // Connect this node's first and last paint groups to this node.
-      const parentsPaintGroup = this.node().neighbors().parent().node().paintGroup();
+      const parentsPaintGroup = par.node().paintGroup();
       const [prevNode, nextNode] = parentsPaintGroup
         .node()
         .findPaintGroupInsert(this.node());
@@ -170,11 +170,12 @@ export class DirectionNodePaintGroup<T extends PaintGroupNode<T>> {
       // Retain the paint groups for this implied paint group.
       return;
     }
+    const par = this.node().neighbors().parent();
+    if (!par) {
+      throw new Error("Node is root but has no parent");
+    }
     const paintGroupLast = this.node().paintGroup().last();
-    this.node()
-      .neighbors().parent()?.node()
-      .siblings()
-      .insertIntoLayout(this.node().neighbors().parent().direction());
+    par.node().siblings().insertIntoLayout(par.direction());
 
     // Remove the paint group's entry in the parent.
     // console.log("Node " + this +
@@ -187,7 +188,7 @@ export class DirectionNodePaintGroup<T extends PaintGroupNode<T>> {
     this._next = this.node();
     this._prev = this.node();
 
-    const pg = this.node().neighbors().parent().node().findPaintGroup();
+    const pg = par.node().findPaintGroup();
     pg.siblings().forEachNode((n) => n.setPaintGroupRoot(pg));
     this.node().clearPaintGroup();
     this.node().layoutChanged();

@@ -364,6 +364,28 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
     return this._layoutPreference;
   }
 
+  convertLayoutPreference(inDirection: Direction): void {
+    const disconnected = this.node();
+    if (
+      disconnected.siblings().getLayoutPreference() === PreferredAxis.PARENT
+    ) {
+      if (Axis.VERTICAL === getDirectionAxis(inDirection)) {
+        disconnected.siblings()._layoutPreference = PreferredAxis.VERTICAL;
+      } else {
+        disconnected.siblings()._layoutPreference = PreferredAxis.HORIZONTAL;
+      }
+    } else if (
+      disconnected.siblings().getLayoutPreference() ===
+      PreferredAxis.PERPENDICULAR
+    ) {
+      if (Axis.VERTICAL === getDirectionAxis(inDirection)) {
+        disconnected.siblings()._layoutPreference = PreferredAxis.HORIZONTAL;
+      } else {
+        disconnected.siblings()._layoutPreference = PreferredAxis.VERTICAL;
+      }
+    }
+  }
+
   canonicalLayoutPreference(): PreferredAxis {
     // Root nodes do not have a canonical layout preference.
     if (this.node().neighbors().isRoot()) {

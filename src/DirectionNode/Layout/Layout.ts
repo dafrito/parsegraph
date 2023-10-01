@@ -19,12 +19,12 @@ export class Layout {
   _groupXPos: number;
   _groupYPos: number;
   _groupScale: number;
-  _owner: DirectionNode;
+  _node: DirectionNode;
   _size: Size;
   _layoutPhase: LayoutPhase;
 
-  constructor(owner: DirectionNode) {
-    this._owner = owner;
+  constructor(node: DirectionNode) {
+    this._node = node;
 
     // Layout
     this._extents = [new Extent(), new Extent(), new Extent(), new Extent()];
@@ -56,12 +56,12 @@ export class Layout {
     return this.phase() === LayoutPhase.NEEDS_COMMIT;
   }
 
-  setOwner(owner: DirectionNode): void {
-    this._owner = owner;
+  setNode(node: DirectionNode): void {
+    this._node = node;
   }
 
-  owner() {
-    return this._owner;
+  node() {
+    return this._node;
   }
 
   commitAbsolutePos(): void {
@@ -73,7 +73,7 @@ export class Layout {
     this._absoluteScale = NaN;
 
     // Retrieve a stack of nodes to determine the absolute position.
-    let node: DirectionNode = this.owner();
+    let node: DirectionNode = this.node();
     const nodeList: Direction[] = [];
     let parentScale = 1.0;
     let scale = 1.0;
@@ -139,8 +139,8 @@ export class Layout {
     this._absoluteYPos += node.y() * parentScale;
     this._absoluteScale = scale;
     this._absoluteDirty = false;
-    if (!this.owner().neighbors().isRoot()) {
-      this._absoluteVersion = this.owner()
+    if (!this.node().neighbors().isRoot()) {
+      this._absoluteVersion = this.node()
         .parentNode()
         .findPaintGroup()
         .layout()._absoluteVersion;
@@ -151,17 +151,17 @@ export class Layout {
     if (this._absoluteDirty) {
       return true;
     }
-    if (this.owner().neighbors().isRoot()) {
+    if (this.node().neighbors().isRoot()) {
       return false;
     }
     return (
       this._absoluteVersion !==
-      this.owner().parentNode().findPaintGroup().layout()._absoluteVersion
+      this.node().parentNode().findPaintGroup().layout()._absoluteVersion
     );
   }
 
   needsPosition(): boolean {
-    return this.owner().layout().needsCommit() || !this._hasGroupPos;
+    return this.node().layout().needsCommit() || !this._hasGroupPos;
   }
 
   absoluteX(): number {
@@ -190,7 +190,7 @@ export class Layout {
     }
 
     // Retrieve a stack of nodes to determine the group position.
-    let node: DirectionNode = this.owner();
+    let node: DirectionNode = this.node();
     const nodeList: Direction[] = [];
     let parentScale = 1.0;
     let scale = 1.0;
@@ -235,7 +235,7 @@ export class Layout {
     }
     this._groupScale = scale;
 
-    if (!this.owner().localPaintGroup()) {
+    if (!this.node().localPaintGroup()) {
       this._groupXPos += node.x() * parentScale;
       this._groupYPos += node.y() * parentScale;
     }
@@ -426,7 +426,7 @@ export class Layout {
     }
 
     const extentSize: Size = new Size();
-    const candidates: DirectionNode[] = [this.owner()];
+    const candidates: DirectionNode[] = [this.node()];
 
     const addCandidate = (node: DirectionNode, direction: Direction) => {
       if (direction !== undefined) {

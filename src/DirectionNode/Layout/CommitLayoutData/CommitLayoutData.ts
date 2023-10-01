@@ -47,8 +47,6 @@ export const LINE_THICKNESS = 12;
 export class CommitLayoutData extends BaseCommitLayoutData {
   lineBounds: Size;
   bv: [number, number, number];
-  firstSize: Size;
-  secondSize: Size;
 
   /**
    * Creates a new run of the layout algorithm.
@@ -60,8 +58,6 @@ export class CommitLayoutData extends BaseCommitLayoutData {
     super(node, painter);
     this.lineBounds = new Size();
     this.bv = [NaN, NaN, NaN];
-    this.firstSize = new Size();
-    this.secondSize = new Size();
   }
 
   private findConsecutiveLength(node: DirectionNode, inDirection: Direction) {
@@ -201,7 +197,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
     // Determine the line length.
     let extentSize: number;
     if (node.nodeAlignmentMode(childDirection) === Alignment.NONE) {
-      this.painter().size(child, this.firstSize);
+      child.layout().size(this.firstSize);
       if (isVerticalDirection(childDirection)) {
         extentSize = this.firstSize.height() / 2;
       } else {
@@ -752,7 +748,8 @@ export class CommitLayoutData extends BaseCommitLayoutData {
 
     // Add padding and ensure the child is not separated less than
     // it would be if the node was not offset by alignment.
-    this.painter().size(child, this.firstSize);
+    child.layout().size().copyTo(this.firstSize);
+
     if (getDirectionAxis(direction) == Axis.VERTICAL) {
       separationFromChild = Math.max(
         separationFromChild,
@@ -1001,8 +998,8 @@ export class CommitLayoutData extends BaseCommitLayoutData {
       // the separation values.
     }
 
-    this.painter().size(firstNode, this.firstSize);
-    this.painter().size(secondNode, this.secondSize);
+    firstNode.layout().size(this.firstSize);
+    secondNode.layout().size(this.secondSize);
     if (getDirectionAxis(firstDirection) === Axis.VERTICAL) {
       separationFromFirst = Math.max(
         separationFromFirst,
@@ -1093,7 +1090,7 @@ export class CommitLayoutData extends BaseCommitLayoutData {
   }
 
   sizeIn(node: DirectionNode, direction: Direction, bodySize: Size): number {
-    this.painter().size(node, bodySize);
+    node.layout().size().copyTo(bodySize);
     if (isVerticalDirection(direction)) {
       return bodySize.height() / 2;
     } else {
