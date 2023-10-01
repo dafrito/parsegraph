@@ -1,5 +1,6 @@
 # Build directory
 parsegraph/
+.DS_Store
 
 # Logs
 logs
