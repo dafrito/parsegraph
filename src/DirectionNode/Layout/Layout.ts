@@ -362,12 +362,12 @@ export class Layout {
     x: number,
     y: number,
     userScale: number,
-    extentSize?: Size
+    extentSize: Size
   ): boolean {
     const ax = this.absoluteX();
     const ay = this.absoluteY();
     const aScale = this.absoluteScale();
-    extentSize = this.extentSize(extentSize);
+    this.extentSize(extentSize);
 
     const forwardMin =
       userScale * ax -

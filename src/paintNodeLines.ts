@@ -9,6 +9,8 @@ import { DirectionNode } from "./DirectionNode";
 
 export type LinePainter = (x: number, y: number, w: number, h: number) => void;
 
+const size = [NaN, NaN];
+
 const drawLine = (
   lineThickness: number,
   painter: LinePainter,
@@ -37,18 +39,18 @@ const drawLine = (
   const thickness = lineThickness * scale;
   const x = layout.groupX();
   const y = layout.groupY();
-  const size = layout.size();
+  layout.size(size);
   const length =
     directionSign(direction) *
     parentScale *
     (directionData.lineLength -
-      (isVerticalDirection(direction) ? size.height() : size.width()) / 2);
+      (isVerticalDirection(direction) ? size[1] : size[0]) / 2);
   if (isVerticalDirection(direction)) {
     painter(
       x,
       y +
         length / 2 +
-        (parentScale * directionSign(direction) * size.height()) / 2,
+        (parentScale * directionSign(direction) * size[1]) / 2,
       thickness,
       Math.abs(length)
     );
@@ -57,7 +59,7 @@ const drawLine = (
     painter(
       x +
         length / 2 +
-        (parentScale * directionSign(direction) * size.width()) / 2,
+        (parentScale * directionSign(direction) * size[0]) / 2,
       y,
       Math.abs(length),
       thickness

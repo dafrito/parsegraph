@@ -8,7 +8,7 @@ export function paintGroupBounds(nodeRoot: DirectionNode) {
     throw new Error("Node must be a paint group");
   }
   let node = nodeRoot;
-  const parentSize = new Size();
+  const parentSize = [NaN, NaN];
   const groupBounds: { [id: number]: any } = {};
   // let numNodes = 0;
   do {
@@ -16,10 +16,10 @@ export function paintGroupBounds(nodeRoot: DirectionNode) {
     node = node.siblings().next() as DirectionNode;
     node.value().size(parentSize);
     const parentBounds = {
-      left: parentSize.width() / 2,
-      top: parentSize.height() / 2,
-      right: parentSize.width() / 2,
-      bottom: parentSize.height() / 2,
+      left: parentSize[0] / 2,
+      top: parentSize[1] / 2,
+      right: parentSize[0] / 2,
+      bottom: parentSize[1] / 2,
     };
     groupBounds[node.id() as number] = parentBounds;
     const order = node.siblings().layoutOrder();
@@ -128,25 +128,25 @@ export function paintGroupBounds(nodeRoot: DirectionNode) {
           case Direction.UPWARD:
             parentBounds.top = Math.max(
               parentBounds.top,
-              parentSize.height() / 2 + neighbor.lineLength
+              parentSize[1] / 2 + neighbor.lineLength
             );
             break;
           case Direction.DOWNWARD:
             parentBounds.bottom = Math.max(
               parentBounds.bottom,
-              parentSize.height() / 2 + neighbor.lineLength
+              parentSize[1] / 2 + neighbor.lineLength
             );
             break;
           case Direction.FORWARD:
             parentBounds.right = Math.max(
               parentBounds.right,
-              parentSize.width() / 2 + neighbor.lineLength
+              parentSize[0] / 2 + neighbor.lineLength
             );
             break;
           case Direction.BACKWARD:
             parentBounds.left = Math.max(
               parentBounds.left,
-              parentSize.width() / 2 + neighbor.lineLength
+              parentSize[0] / 2 + neighbor.lineLength
             );
             break;
           default:
