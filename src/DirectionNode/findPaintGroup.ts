@@ -16,12 +16,12 @@ export const findPaintGroup = (origin: DirectionNode): DirectionNode => {
         break;
       }
       if (node.paintGroupNode()) {
-        origin.setpaintGroupNode(node.paintGroupNode());
+        origin.setPaintGroupNode(node.paintGroupNode());
         return origin.paintGroupNode();
       }
       node = node.parentNode();
     }
-    origin.setpaintGroupNode(node);
+    origin.setPaintGroupNode(node);
   }
   return origin.paintGroupNode();
 };

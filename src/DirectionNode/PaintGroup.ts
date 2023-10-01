@@ -47,7 +47,7 @@ export class PaintGroup {
     this.node().invalidate();
     this.node()
       .siblings()
-      .forEachNode((n) => n.setpaintGroupNode(this.node()));
+      .forEachNode((n) => n.setPaintGroupNode(this.node()));
     this.verify();
   }
 
@@ -190,7 +190,7 @@ export class PaintGroup {
     this._prev = this.node();
 
     const pg = findPaintGroup(par.node());
-    pg.siblings().forEachNode((n) => n.setpaintGroupNode(pg));
+    pg.siblings().forEachNode((n) => n.setPaintGroupNode(pg));
     this.node().clearPaintGroup();
     this.node().invalidate();
     this.verify();

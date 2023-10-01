@@ -297,7 +297,7 @@ export class DirectionNode<Value = any> {
    *
    * @param {DirectionNode} pg - the new paint group root
    */
-  setpaintGroupNode(pg: DirectionNode) {
+  setPaintGroupNode(pg: DirectionNode) {
     if (!pg) {
       throw new Error("Refusing to set paint group root to null");
     }
@@ -383,10 +383,10 @@ export class DirectionNode<Value = any> {
       pg.paintGroup().append(node);
     } else {
       this.siblings().insertIntoLayout(inDirection);
-      node.setpaintGroupNode(this.paintGroupNode());
+      node.setPaintGroupNode(this.paintGroupNode());
       node
         .siblings()
-        .forEachNode((n) => n.setpaintGroupNode(this.paintGroupNode()));
+        .forEachNode((n) => n.setPaintGroupNode(this.paintGroupNode()));
       if (node.paintGroup().next() !== node) {
         const pg = findPaintGroup(this);
         pg.paintGroup().merge(node);
