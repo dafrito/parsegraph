@@ -2,7 +2,7 @@
 
 ```
 import { 
-  CommitLayoutData,
+  CommitLayout,
   DirectionNode,
   paintNodeBounds,
   Size,
@@ -15,7 +15,7 @@ const buildGraph = () => {
 
 const rootNode = buildGraph();
 
-const cld = new CommitLayoutData(rootNode, {
+const cld = new CommitLayout(rootNode, {
   size: (node: DirectionNode, size: Size) => {
     // TODO Provide the size of the node to the size object.
     // This will be called for every DirectionNode.
@@ -34,7 +34,7 @@ const cld = new CommitLayoutData(rootNode, {
   }
 });
 
-// Paint the graph; build the scene.
+// Paint the graph and build the scene.
 while (cld.crank());
 
 // Render the graph.
@@ -151,7 +151,7 @@ be skipped altogether.
 
 Sometimes many sections of the graph are not changing. In these cases, paint
 groups that did not change are not repainted and the paint() callback is not
-called when the CommitLayoutData algorithm is run.
+called when the CommitLayout algorithm is run.
 
 * `DirectionNode.crease` - make the current node a PaintGroup
 * `DirectionNode.uncrease` - merge the current node into the parent's paint group
@@ -162,7 +162,7 @@ called when the CommitLayoutData algorithm is run.
 At render-time, the scale of each paint group can also be used to determine if
 or how it is rendered.
 
-You can hook into the CommitLayoutData's LayoutPainter paint(pg: DirectionNode)
+You can hook into the CommitLayout's LayoutPainter paint(pg: DirectionNode)
 callback and render the every node in the paint group into a single render call
 using their group position. Then, at render time, you pass a world matrix to
 your render call that is the absolute position of that paint group. Both the
