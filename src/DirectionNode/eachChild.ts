@@ -9,7 +9,7 @@ export const eachChild = (
   const dirs = root.siblings().layoutOrder();
   for (let i = 0; i < dirs.length; ++i) {
     const dir = dirs[i];
-    if (!root.neighbors().isRoot() && dir === root.parentDirection()) {
+    if (!root.neighbors().isRoot() && dir === root.neighbors().parentDirection()) {
       continue;
     }
     const node = root.neighbors().nodeAt(dir);

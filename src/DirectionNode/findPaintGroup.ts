@@ -19,7 +19,7 @@ export const findPaintGroup = (origin: DirectionNode): DirectionNode => {
         origin.setPaintGroupNode(node.paintGroupNode());
         return origin.paintGroupNode();
       }
-      node = node.parentNode();
+      node = node.neighbors().parentNode();
     }
     origin.setPaintGroupNode(node);
   }

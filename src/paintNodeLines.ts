@@ -15,7 +15,7 @@ const drawLine = (
   direction: Direction,
   node: DirectionNode
 ) => {
-  if (node.parentDirection() == direction) {
+  if (node.neighbors().parentDirection() == direction) {
     return;
   }
   if (!node.neighbors().hasChild(direction)) {

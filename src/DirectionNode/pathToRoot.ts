@@ -7,7 +7,7 @@ export const pathToRoot = (n: DirectionNode) => {
   const lim = makeLimit();
   while (!n.neighbors().isRoot()) {
     nodes.push(n);
-    n = n.parentNode();
+    n = n.neighbors().parentNode();
     lim();
   }
 

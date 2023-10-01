@@ -110,8 +110,8 @@ export class DirectionCaret<Value> {
     }
 
     return this.node()
-      .parentNode()
-      .disconnect(reverseDirection(this.node().parentDirection()));
+      .neighbors().parentNode()
+      .disconnect(reverseDirection(this.node().neighbors().parentDirection()));
   }
 
   crease(inDirection?: Direction | string): void {
@@ -239,7 +239,7 @@ export class DirectionCaret<Value> {
         "cannot move to parent of root (node is " + this.node().id() + ")"
       );
     }
-    this.setNode(this.node().parentNode());
+    this.setNode(this.node().neighbors().parentNode());
   }
 
   /**
@@ -277,7 +277,7 @@ export class DirectionCaret<Value> {
     inDirection: Direction | string,
     newAlignmentMode: Alignment | string
   ): void {
-    this.node().align(
+    this.node().neighbors().align(
       readDirection(inDirection),
       readAlignment(newAlignmentMode)
     );
@@ -288,16 +288,16 @@ export class DirectionCaret<Value> {
 
   overlapAxis(...args: any[]): void {
     if (args.length === 0) {
-      this.node().setAxisOverlap(AxisOverlap.ALLOWED);
+      this.node().neighbors().setAxisOverlap(AxisOverlap.ALLOWED);
       return;
     }
     if (args.length === 1) {
-      this.node().setAxisOverlap(readAxisOverlap(args[0]));
+      this.node().neighbors().setAxisOverlap(readAxisOverlap(args[0]));
       return;
     }
     const inDirection: Direction = readDirection(args[0]);
     const newAxisOverlap: AxisOverlap = readAxisOverlap(args[1]);
-    this.node().setAxisOverlap(inDirection, newAxisOverlap);
+    this.node().neighbors().setAxisOverlap(inDirection, newAxisOverlap);
   }
 
   axisOverlap(...args: any[]): void {

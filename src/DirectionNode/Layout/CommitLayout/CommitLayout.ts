@@ -115,7 +115,7 @@ export class CommitLayout extends BaseCommitLayout {
 
     let rv;
 
-    const alignmentMode = node.getAlignment(childDirection);
+    const alignmentMode = node.neighbors().getAlignment(childDirection);
     switch (alignmentMode) {
       case Alignment.NULL:
         throw createException(BAD_NODE_ALIGNMENT);
@@ -196,7 +196,7 @@ export class CommitLayout extends BaseCommitLayout {
 
     // Determine the line length.
     let extentSize: number;
-    if (node.getAlignment(childDirection) === Alignment.NONE) {
+    if (node.neighbors().getAlignment(childDirection) === Alignment.NONE) {
       child.layout().size(this.firstSize);
       if (isVerticalDirection(childDirection)) {
         extentSize = this.firstSize.height() / 2;
@@ -301,14 +301,14 @@ export class CommitLayout extends BaseCommitLayout {
     if (
       node.siblings().canonicalLayoutPreference() == PreferredAxis.PERPENDICULAR
     ) {
-      const firstAxis: Axis = getPerpendicularAxis(node.parentDirection());
+      const firstAxis: Axis = getPerpendicularAxis(node.neighbors().parentDirection());
 
       // Check for nodes perpendicular to parent's direction
       const hasFirstAxisNodes: [Direction, Direction] = node
         .neighbors()
         .hasNodes(firstAxis);
       const oppositeFromParent: Direction = reverseDirection(
-        node.parentDirection()
+        node.neighbors().parentDirection()
       );
       if (
         this.layoutAxis(node, hasFirstAxisNodes[0], hasFirstAxisNodes[1], false)
@@ -326,13 +326,13 @@ export class CommitLayout extends BaseCommitLayout {
     } else {
       // Layout this node's second-axis child, if that child exists.
       const oppositeFromParent: Direction = reverseDirection(
-        node.parentDirection()
+        node.neighbors().parentDirection()
       );
 
       // Check for nodes perpendicular to parent's direction
       const perpendicularNodes: [Direction, Direction] = node
         .neighbors()
-        .hasNodes(getPerpendicularAxis(node.parentDirection()));
+        .hasNodes(getPerpendicularAxis(node.neighbors().parentDirection()));
 
       if (node.neighbors().hasNode(oppositeFromParent)) {
         // Layout the second-axis child.
@@ -420,7 +420,7 @@ export class CommitLayout extends BaseCommitLayout {
       return true;
     }
     const nestedSize: Size = nestedNode.layout().extentSize(this.firstSize);
-    if (node.getAlignment(Direction.INWARD) === Alignment.INWARD_VERTICAL) {
+    if (node.neighbors().getAlignment(Direction.INWARD) === Alignment.INWARD_VERTICAL) {
       node
         .neighbors()
         .setPosAt(
@@ -706,7 +706,7 @@ export class CommitLayout extends BaseCommitLayout {
       return false;
     }
 
-    switch (node.axisOverlap(direction)) {
+    switch (node.neighbors().axisOverlap(direction)) {
       case AxisOverlap.PREVENTED:
         allowAxisOverlap = false;
         break;
@@ -928,7 +928,7 @@ export class CommitLayout extends BaseCommitLayout {
           );*/
 
     let firstAxisOverlap: boolean = allowAxisOverlap;
-    switch (node.neighbors().nodeAt(firstDirection).axisOverlap()) {
+    switch (node.neighbors().nodeAt(firstDirection).neighbors().axisOverlap()) {
       case AxisOverlap.PREVENTED:
         firstAxisOverlap = false;
         break;
@@ -937,7 +937,7 @@ export class CommitLayout extends BaseCommitLayout {
         break;
     }
     let secondAxisOverlap: boolean = allowAxisOverlap;
-    switch (node.neighbors().nodeAt(secondDirection).axisOverlap()) {
+    switch (node.neighbors().nodeAt(secondDirection).neighbors().axisOverlap()) {
       case AxisOverlap.PREVENTED:
         secondAxisOverlap = false;
         break;

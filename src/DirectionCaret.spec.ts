@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { DirectionCaret } from "./DirectionCaret";
 import { Direction } from "./Direction/constants";
-import { DirectionNode } from ".";
+import { DirectionNode } from "./DirectionNode/DirectionNode";
 
 describe("Caret", function () {
   it("spawnMove", () => {

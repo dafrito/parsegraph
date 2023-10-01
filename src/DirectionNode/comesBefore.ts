@@ -59,7 +59,7 @@ export const comesBefore = (
 
   const findPaintIndex = (nodes: DirectionNode[]) => {
     return paintOrdering.indexOf(
-      reverseDirection(nodes[numCommon + 1].parentDirection())
+      reverseDirection(nodes[numCommon + 1].neighbors().parentDirection())
     );
   };
   const nodePaintIndex = findPaintIndex(nodePath);

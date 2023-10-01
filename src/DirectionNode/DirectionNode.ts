@@ -71,24 +71,6 @@ export class DirectionNode<Value = any> {
     return this._neighbors;
   }
 
-  parentDirection(): Direction {
-    if (this.neighbors().isRoot()) {
-      return Direction.NULL;
-    }
-    const n = this.neighbors().parent();
-    if (n === undefined) {
-      return Direction.NULL;
-    }
-    return reverseDirection(n.direction());
-  }
-
-  parentNode(): DirectionNode {
-    if (this.neighbors().isRoot()) {
-      throw createException(NODE_IS_ROOT);
-    }
-    return this.neighbors().parent()?.node() as this;
-  }
-
   invalidate(): void {
     let node: DirectionNode = this;
     while (node !== null) {
@@ -101,7 +83,7 @@ export class DirectionNode<Value = any> {
         break;
       } else if (oldLayoutPhase === LayoutPhase.COMMITTED) {
         // Notify our parent, if we were previously committed.
-        node = node.parentNode();
+        node = node.neighbors().parentNode();
       } else {
         break;
       }
@@ -171,55 +153,6 @@ export class DirectionNode<Value = any> {
 
   setScale(scale: number): void {
     this._scale = scale;
-    this.invalidate();
-  }
-
-  getAlignment(inDirection: Direction): Alignment {
-    if (this.neighbors().hasNode(inDirection)) {
-      return this.neighbors().at(inDirection).alignmentMode;
-    }
-    return Alignment.NULL;
-  }
-
-  align(
-    inDirection: Direction | Alignment,
-    newAlignmentMode?: Alignment
-  ): void {
-    if (newAlignmentMode === undefined) {
-      return this.parentNode().align(
-        reverseDirection(this.parentDirection()),
-        inDirection as Alignment
-      );
-    }
-    this.neighbors().ensure(inDirection as Direction).alignmentMode =
-      newAlignmentMode;
-    this.invalidate();
-  }
-
-  axisOverlap(inDirection?: Direction): AxisOverlap {
-    if (inDirection === undefined) {
-      return this.parentNode().axisOverlap(
-        reverseDirection(this.parentDirection())
-      );
-    }
-    if (this.neighbors().hasNode(inDirection)) {
-      return this.neighbors().at(inDirection).allowAxisOverlap;
-    }
-    return AxisOverlap.NULL;
-  }
-
-  setAxisOverlap(
-    inDirection: Direction | AxisOverlap,
-    newAxisOverlap?: AxisOverlap
-  ): void {
-    if (newAxisOverlap === undefined) {
-      return this.parentNode().setAxisOverlap(
-        reverseDirection(this.parentDirection()),
-        inDirection as AxisOverlap
-      );
-    }
-    this.neighbors().ensure(inDirection as Direction).allowAxisOverlap =
-      newAxisOverlap;
     this.invalidate();
   }
 
@@ -332,7 +265,7 @@ export class DirectionNode<Value = any> {
     if (inDirection == Direction.NULL) {
       throw createException(BAD_NODE_DIRECTION);
     }
-    if (inDirection == this.parentDirection()) {
+    if (inDirection == this.neighbors().parentDirection()) {
       throw createException(NO_PARENT_CONNECT);
     }
     if (this.neighbors().hasNode(inDirection)) {
@@ -380,8 +313,8 @@ export class DirectionNode<Value = any> {
       if (this.neighbors().isRoot()) {
         return this;
       }
-      return this.parentNode().disconnect(
-        reverseDirection(this.parentDirection())
+      return this.neighbors().parentNode().disconnect(
+        reverseDirection(this.neighbors().parentDirection())
       );
     }
 
@@ -389,9 +322,9 @@ export class DirectionNode<Value = any> {
       return undefined;
     }
 
-    if (!this.neighbors().isRoot() && this.parentDirection() === inDirection) {
-      return this.parentNode().disconnect(
-        reverseDirection(this.parentDirection())
+    if (!this.neighbors().isRoot() && this.neighbors().parentDirection() === inDirection) {
+      return this.neighbors().parentNode().disconnect(
+        reverseDirection(this.neighbors().parentDirection())
       );
     }
     // Disconnect the node.
@@ -422,7 +355,7 @@ export class DirectionNode<Value = any> {
       if (dir === Direction.OUTWARD) {
         return;
       }
-      if (this.parentDirection() === dir) {
+      if (this.neighbors().parentDirection() === dir) {
         return;
       }
       if (this.neighbors().hasNode(dir)) {

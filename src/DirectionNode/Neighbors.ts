@@ -12,8 +12,10 @@ import createException, {
   BAD_NODE_DIRECTION,
   BAD_AXIS,
   NO_NODE_FOUND,
+  NODE_IS_ROOT,
 } from "../Exception";
 import { DirectionNode } from "./DirectionNode";
+import { Alignment, AxisOverlap } from "..";
 
 export class Neighbors {
   private _node: DirectionNode;
@@ -39,8 +41,25 @@ export class Neighbors {
     }
   }
 
-  parent(): Neighbor | undefined {
+  parent(): Neighbor {
+    if (!this._parentNeighbor) {
+      throw createException(NODE_IS_ROOT);
+    }
     return this._parentNeighbor;
+  }
+
+  parentDirection(): Direction {
+    if (this.isRoot()) {
+      return Direction.NULL;
+    }
+    return reverseDirection(this.parent().direction());
+  }
+
+  parentNode(): DirectionNode {
+    if (this.isRoot()) {
+      throw createException(NODE_IS_ROOT);
+    }
+    return this.parent().node();
   }
 
   node() {
@@ -86,8 +105,11 @@ export class Neighbors {
   }
 
   hasChildAt(direction: Direction): boolean {
+    if (this.isRoot()) {
+      return this.hasNode(direction);
+    }
     return (
-      this.hasNode(direction) && this.parent()?.reverseDirection() !== direction
+      this.hasNode(direction) && this.parentDirection() !== direction
     );
   }
 
@@ -129,7 +151,7 @@ export class Neighbors {
   nodeAt(atDirection: Direction): DirectionNode {
     const n = this.at(atDirection);
     if (!n) {
-      if (this.parent()?.reverseDirection() === atDirection) {
+      if (!this.isRoot() && this.parent().reverseDirection() === atDirection) {
         const par = this.parent()?.node();
         if (!par) {
           throw new Error("Parent neighbor has no node");
@@ -190,9 +212,8 @@ export class Neighbors {
 
     // If the given direction is the parent's direction, use
     // their measurement instead.
-    if (!this.isRoot() && inDirection == this.node().parentDirection()) {
-      return this.node()
-        .parentNode()
+    if (!this.isRoot() && inDirection == this.parentDirection()) {
+      return this.parentNode()
         .neighbors()
         .separationAt(reverseDirection(inDirection));
     }
@@ -203,4 +224,54 @@ export class Neighbors {
 
     return this.at(inDirection).separation;
   }
+
+  getAlignment(inDirection: Direction): Alignment {
+    if (this.hasNode(inDirection)) {
+      return this.at(inDirection).alignmentMode;
+    }
+    return Alignment.NULL;
+  }
+
+  align(
+    inDirection: Direction | Alignment,
+    newAlignmentMode?: Alignment
+  ): void {
+    if (newAlignmentMode === undefined) {
+      return this.parentNode().neighbors().align(
+        reverseDirection(this.parentDirection()),
+        inDirection as Alignment
+      );
+    }
+    this.ensure(inDirection as Direction).alignmentMode =
+      newAlignmentMode;
+    this.node().invalidate();
+  }
+
+  axisOverlap(inDirection?: Direction): AxisOverlap {
+    if (inDirection === undefined) {
+      return this.parentNode().neighbors().axisOverlap(
+        reverseDirection(this.parentDirection())
+      );
+    }
+    if (this.hasNode(inDirection)) {
+      return this.at(inDirection).allowAxisOverlap;
+    }
+    return AxisOverlap.NULL;
+  }
+
+  setAxisOverlap(
+    inDirection: Direction | AxisOverlap,
+    newAxisOverlap?: AxisOverlap
+  ): void {
+    if (newAxisOverlap === undefined) {
+      return this.parentNode().neighbors().setAxisOverlap(
+        reverseDirection(this.parentDirection()),
+        inDirection as AxisOverlap
+      );
+    }
+    this.ensure(inDirection as Direction).allowAxisOverlap =
+      newAxisOverlap;
+    this.node().invalidate();
+  }
+
 }

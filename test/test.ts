@@ -11,7 +11,7 @@ import { DirectionNode } from "../src/DirectionNode";
 
 import { DirectionCaret } from "../src/DirectionCaret";
 
-import { CommitLayout } from "../src";
+import { CommitLayout } from "../src/DirectionNode/Layout/CommitLayout";
 import { Extent, checkExtentsEqual } from "../src/DirectionNode/Layout/Extent";
 import { Size } from "../src/Size";
 

@@ -80,7 +80,7 @@ export class Layout {
     let scale = 1.0;
     let neededVersion;
     if (!node.neighbors().isRoot()) {
-      neededVersion = findPaintGroup(node.parentNode()).layout()
+      neededVersion = findPaintGroup(node.neighbors().parentNode()).layout()
         ._absoluteVersion;
     }
     while (true) {
@@ -90,7 +90,7 @@ export class Layout {
         break;
       }
 
-      const par: Layout = node.parentNode().layout();
+      const par: Layout = node.neighbors().parentNode().layout();
       if (!par._absoluteDirty && par._absoluteVersion === neededVersion) {
         // Just use the parent's absolute position to start.
         this._absoluteXPos = par._absoluteXPos;
@@ -100,8 +100,8 @@ export class Layout {
         break;
       }
 
-      nodeList.push(reverseDirection(node.parentDirection()));
-      node = node.parentNode();
+      nodeList.push(reverseDirection(node.neighbors().parentDirection()));
+      node = node.neighbors().parentNode();
     }
 
     // nodeList contains [
@@ -125,7 +125,7 @@ export class Layout {
         layout._absoluteDirty = false;
         if (!node.neighbors().isRoot()) {
           layout._absoluteVersion = findPaintGroup(
-            node.parentNode()
+            node.neighbors().parentNode()
           ).layout()._absoluteVersion;
         }
       }
@@ -139,7 +139,7 @@ export class Layout {
     this._absoluteDirty = false;
     if (!this.node().neighbors().isRoot()) {
       this._absoluteVersion = findPaintGroup(
-        this.node().parentNode()
+        this.node().neighbors().parentNode()
       ).layout()._absoluteVersion;
     }
   }
@@ -153,7 +153,7 @@ export class Layout {
     }
     return (
       this._absoluteVersion !==
-      findPaintGroup(this.node().parentNode()).layout()._absoluteVersion
+      findPaintGroup(this.node().neighbors().parentNode()).layout()._absoluteVersion
     );
   }
 
@@ -201,7 +201,7 @@ export class Layout {
         break;
       }
 
-      const par = node.parentNode().layout();
+      const par = node.neighbors().parentNode().layout();
       if (!isNaN(par._groupXPos)) {
         // Just use the parent's position to start.
         this._groupXPos = par._groupXPos;
@@ -211,8 +211,8 @@ export class Layout {
         break;
       }
 
-      nodeList.push(reverseDirection(node.parentDirection()));
-      node = node.parentNode();
+      nodeList.push(reverseDirection(node.neighbors().parentDirection()));
+      node = node.neighbors().parentNode();
     }
 
     // nodeList contains [
