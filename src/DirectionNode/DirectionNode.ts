@@ -24,8 +24,8 @@ import AxisOverlap from "./AxisOverlap";
 import { Neighbor } from "./Neighbor";
 import { DirectionNodeSiblings } from "./Siblings";
 import {
-  DirectionNodePaintGroup,
-} from "./DirectionNodePaintGroup";
+  PaintGroup,
+} from "./PaintGroup";
 
 import { Neighbors } from "./Neighbors";
 import { findPaintGroup } from "./findPaintGroup";
@@ -38,7 +38,7 @@ export class DirectionNode<Value = any> {
 
   private _siblings: DirectionNodeSiblings;
   private _paintGroup:
-    | DirectionNodePaintGroup
+    | PaintGroup
     | undefined;
   private _paintGroupRoot: DirectionNode;
   private _id: string | number | undefined;
@@ -60,7 +60,7 @@ export class DirectionNode<Value = any> {
     // Layout
     this._siblings = new DirectionNodeSiblings(this);
     this._paintGroupRoot = this;
-    this._paintGroup = new DirectionNodePaintGroup(
+    this._paintGroup = new PaintGroup(
       this,
       false
     );
@@ -169,9 +169,9 @@ export class DirectionNode<Value = any> {
   /**
    * Gets this node's paint group, if it is a paint group.
    *
-   * @return {DirectionNodePaintGroup | undefined} this node's paint group, or undefined if it is not a paint group.
+   * @return {PaintGroup | undefined} this node's paint group, or undefined if it is not a paint group.
    */
-  localPaintGroup(): DirectionNodePaintGroup | undefined {
+  localPaintGroup(): PaintGroup | undefined {
     return this._paintGroup;
   }
 
@@ -208,9 +208,9 @@ export class DirectionNode<Value = any> {
   /**
    * Gets the paint group used for this DirectionNode.
    *
-   * @return {DirectionNodePaintGroup} the paint group used for this DirectionNode.
+   * @return {PaintGroup} the paint group used for this DirectionNode.
    */
-  paintGroup(): DirectionNodePaintGroup {
+  paintGroup(): PaintGroup {
     if (!this._paintGroup) {
       const node = this.paintGroupRoot();
       if (!node) {
@@ -247,7 +247,7 @@ export class DirectionNode<Value = any> {
     if (this.localPaintGroup()) {
       this.paintGroup().crease();
     } else {
-      this._paintGroup = new DirectionNodePaintGroup(
+      this._paintGroup = new PaintGroup(
         this,
         true
       );

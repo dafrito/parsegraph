@@ -4,7 +4,7 @@ import { getLastPaintGroup } from "./getLastPaintGroup";
 import makeLimit from "./makeLimit";
 import { DirectionNode } from "..";
 
-export class DirectionNodePaintGroup {
+export class PaintGroup {
   _next: DirectionNode;
   _prev: DirectionNode;
   _node: DirectionNode;
