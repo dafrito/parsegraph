@@ -176,8 +176,12 @@ export class DirectionNode<Value = any> {
 
   /**
    * Clears this node's local paint group, if any.
+   * 
+   * Called by the paint group when it is being removed.
+   * 
+   * This does not trigger invalidation.
    */
-  private clearPaintGroup(): void {
+  clearPaintGroup(): void {
     this._paintGroup = undefined;
   }
 
@@ -186,18 +190,18 @@ export class DirectionNode<Value = any> {
    *
    * @return {DirectionNode} the paint group root for this DirectionNode.
    */
-  private paintGroupNode(): DirectionNode {
+  paintGroupNode(): DirectionNode {
     return this._paintGroupNode;
   }
 
   /**
    * Changes the paint group root.
    *
-   * This does not trigger a layout change.
+   * This does not trigger invalidation.
    *
    * @param {DirectionNode} pg - the new paint group root
    */
-  private setPaintGroupNode(pg: DirectionNode) {
+  setPaintGroupNode(pg: DirectionNode) {
     if (!pg) {
       throw new Error("Refusing to set paint group root to null");
     }
@@ -225,6 +229,10 @@ export class DirectionNode<Value = any> {
     return this._paintGroup;
   }
 
+  /**
+   * Creates a paint group for this node, and makes it explicit
+   * so it will persist once connecting to a parent node.
+   */
   crease() {
     if (this.isPaintGroup()) {
       this.paintGroup().crease();
@@ -233,6 +241,10 @@ export class DirectionNode<Value = any> {
     }
   }
 
+  /**
+   * Removes the paint group from this node, unless it is a root
+   * node. 
+   */
   uncrease() {
     if (this.paintGroup()) {
       this.paintGroup().uncrease();
