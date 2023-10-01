@@ -263,7 +263,7 @@ export class CommitLayout extends BaseCommitLayout {
 
     if (
       node.nodeFit() === Fit.NAIVE &&
-      (node.neighbors().isRoot() || !isNaN(node.parentX()))
+      (node.neighbors().isRoot() || !isNaN(node.neighbors().parentX()))
     ) {
       node.layout().setPhase(LayoutPhase.COMMITTED);
       return false;

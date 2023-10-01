@@ -161,20 +161,6 @@ export class DirectionNode<Value = any> {
   //
   // ///////////////////////////////////////////////////////////////////////////
 
-  parentX(): number {
-    if (this.neighbors().isRoot()) {
-      return 0;
-    }
-    return this.neighbors().parent()?.xPos ?? NaN;
-  }
-
-  parentY(): number {
-    if (this.neighbors().isRoot()) {
-      return 0;
-    }
-    return this.neighbors().parent()?.yPos ?? NaN;
-  }
-
   siblings(): Siblings {
     return this._siblings;
   }
@@ -191,7 +177,7 @@ export class DirectionNode<Value = any> {
   /**
    * Clears this node's local paint group, if any.
    */
-  clearPaintGroup(): void {
+  private clearPaintGroup(): void {
     this._paintGroup = undefined;
   }
 
@@ -200,7 +186,7 @@ export class DirectionNode<Value = any> {
    *
    * @return {DirectionNode} the paint group root for this DirectionNode.
    */
-  paintGroupNode(): DirectionNode {
+  private paintGroupNode(): DirectionNode {
     return this._paintGroupNode;
   }
 
@@ -211,7 +197,7 @@ export class DirectionNode<Value = any> {
    *
    * @param {DirectionNode} pg - the new paint group root
    */
-  setPaintGroupNode(pg: DirectionNode) {
+  private setPaintGroupNode(pg: DirectionNode) {
     if (!pg) {
       throw new Error("Refusing to set paint group root to null");
     }

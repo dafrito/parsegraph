@@ -275,4 +275,18 @@ export class Neighbors {
     this.node().invalidate();
   }
 
+  parentX(): number {
+    if (this.isRoot()) {
+      return 0;
+    }
+    return this.parent()?.xPos ?? NaN;
+  }
+
+  parentY(): number {
+    if (this.isRoot()) {
+      return 0;
+    }
+    return this.parent()?.yPos ?? NaN;
+  }
+
 }
