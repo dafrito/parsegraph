@@ -29,10 +29,9 @@ import createException, {
 
 import { LayoutPhase } from "..";
 
-import { Size } from "../../../Size";
-
 import { BaseCommitLayout } from "./BaseCommitLayout";
 import { LayoutPainter } from "./LayoutPainter";
+import { combineExtents } from "./CombineExtents";
 import { positionChild } from "./positionChild";
 
 /**
@@ -1114,13 +1113,13 @@ export class CommitLayout extends BaseCommitLayout {
     );
 
     // Combine their extents.
-    this.combineExtents(
+    combineExtents(
       node,
       firstDirection,
       firstNodeAlignment,
       separationFromFirst
     );
-    this.combineExtents(
+    combineExtents(
       node,
       secondDirection,
       secondNodeAlignment,
