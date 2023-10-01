@@ -33,6 +33,7 @@ import { BaseCommitLayout } from "./BaseCommitLayout";
 import { LayoutPainter } from "./LayoutPainter";
 import { combineExtents } from "./CombineExtents";
 import { positionChild } from "./positionChild";
+import { getAlignment } from "./getAlignment";
 
 /**
  * The thickness (diameter) of the line.
@@ -873,8 +874,8 @@ export class CommitLayout extends BaseCommitLayout {
     const secondNode: DirectionNode = node.neighbors().nodeAt(secondDirection);
 
     // Get the alignments for the children.
-    const firstNodeAlignment: number = this.getAlignment(node, firstDirection);
-    const secondNodeAlignment: number = this.getAlignment(
+    const firstNodeAlignment: number = getAlignment(node, firstDirection);
+    const secondNodeAlignment: number = getAlignment(
       node,
       secondDirection
     );
