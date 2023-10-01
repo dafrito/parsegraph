@@ -34,6 +34,7 @@ import { AddLineBounds } from "./AddLineBounds";
 import { positionChild } from "./positionChild";
 import { getAlignment } from "./getAlignment";
 import { layoutSingle } from "./LayoutSingle";
+import { commitInwardLayout } from "./commitInwardLayout";
 
 /**
  * The thickness (diameter) of the line.
@@ -105,7 +106,7 @@ export class CommitLayout extends BaseCommitLayout {
       this._lineBounds.addLineBounds(node, dir, this.bodySize);
     });
 
-    if (this.commitInwardLayout(node) === true) {
+    if (commitInwardLayout(this.painter(), node, this.bodySize, this.firstSize) === true) {
       return true;
     }
 
@@ -246,61 +247,6 @@ export class CommitLayout extends BaseCommitLayout {
       dir,
       preferVertical
     );
-  }
-
-  private commitInwardLayout(node: DirectionNode): boolean {
-    if (!node.neighbors().hasNode(Direction.INWARD)) {
-      return false;
-    }
-    const nestedNode: DirectionNode = node.neighbors().nodeAt(Direction.INWARD);
-    if (nestedNode.layout().phase() !== LayoutPhase.COMMITTED) {
-      node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
-      return true;
-    }
-    nestedNode.layout().extentSize(this.firstSize);
-    const nestedSize = this.firstSize;
-    if (
-      node.neighbors().getAlignment(Direction.INWARD) ===
-      Alignment.INWARD_VERTICAL
-    ) {
-      node
-        .neighbors()
-        .setPosAt(
-          Direction.INWARD,
-          nestedNode.scale() *
-            (nestedNode.layout().extentOffsetAt(Direction.DOWNWARD) -
-              nestedSize[0] / 2),
-          this.bodySize[1] / 2 -
-            this.getSeparation(node, Axis.Z, Direction.INWARD, true) /
-              2 +
-            nestedNode.scale() *
-              (-nestedSize[1] +
-                nestedNode.layout().extentOffsetAt(Direction.FORWARD))
-        );
-    } else {
-      // console.log(this.horizontalPadding(), this.borderThickness());
-      node
-        .neighbors()
-        .setPosAt(
-          Direction.INWARD,
-          this.bodySize[0] / 2 -
-            this.getSeparation(
-              node,
-              Axis.Z,
-              Direction.INWARD,
-              false
-            ) /
-              2 +
-            nestedNode.scale() *
-              (-nestedSize[0] +
-                nestedNode.layout().extentOffsetAt(Direction.DOWNWARD)),
-          nestedNode.scale() *
-            (nestedNode.layout().extentOffsetAt(Direction.FORWARD) -
-              nestedSize[1] / 2)
-        );
-    }
-
-    return false;
   }
 
   // Layout a pair of nodes in the given directions.
