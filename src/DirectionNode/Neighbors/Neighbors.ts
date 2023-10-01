@@ -7,15 +7,16 @@ import {
   getPositiveDirection,
   isCardinalDirection,
   reverseDirection,
-} from "../Direction";
+} from "../../Direction";
 import createException, {
   BAD_NODE_DIRECTION,
   BAD_AXIS,
   NO_NODE_FOUND,
   NODE_IS_ROOT,
-} from "../Exception";
-import { DirectionNode } from "./DirectionNode";
-import { Alignment, AxisOverlap } from "..";
+} from "../../Exception";
+import { DirectionNode } from "../DirectionNode";
+import { Alignment } from "./Alignment";
+import { AxisOverlap } from "./AxisOverlap";
 
 export class Neighbors {
   private _node: DirectionNode;

@@ -1,8 +1,8 @@
 import { assert } from "chai";
 
 import { Neighbors } from "./Neighbors";
-import { DirectionNode } from "./DirectionNode";
-import { Direction } from "../Direction/constants";
+import { DirectionNode } from "../DirectionNode";
+import { Direction } from "../../Direction/constants";
 
 describe("Neighbors", () => {
   it("can be created", () => {

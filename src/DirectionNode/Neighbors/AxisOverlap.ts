@@ -1,4 +1,4 @@
-import createException, { BAD_AXIS_OVERLAP } from "../Exception";
+import createException, { BAD_AXIS_OVERLAP } from "../../Exception";
 
 /**
  * The NeighborData-specific configuration setting to set whether this

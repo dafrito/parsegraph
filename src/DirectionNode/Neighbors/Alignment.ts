@@ -1,4 +1,4 @@
-import createException, { BAD_NODE_ALIGNMENT } from "../Exception";
+import createException, { BAD_NODE_ALIGNMENT } from "../../Exception";
 
 /**
  * Alignment is a NeighborData-specific property, so it can be set before the neighbor is connected.

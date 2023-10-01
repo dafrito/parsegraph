@@ -11,12 +11,11 @@ import { Direction, reverseDirection, forEachDirection } from "../Direction";
 import { Layout } from "./Layout";
 
 import { LayoutPhase } from "./Layout";
-import Alignment from "./Alignment";
-import AxisOverlap from "./AxisOverlap";
+import Alignment from "./Neighbors/Alignment";
 import { Siblings } from "./Siblings";
 import { PaintGroup } from "./PaintGroup";
 
-import { Neighbors } from "./Neighbors";
+import { Neighbors } from "./Neighbors/Neighbors";
 import { findPaintGroup } from "./findPaintGroup";
 
 let nodeCount = 0;
