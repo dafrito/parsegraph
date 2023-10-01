@@ -42,5 +42,5 @@ export interface LayoutPainter {
    *
    * @return {boolean} true if painting needs another call, false if done
    */
-  paint(pg: DirectionNode): boolean;
+  paint?: (pg: DirectionNode) => boolean;
 }

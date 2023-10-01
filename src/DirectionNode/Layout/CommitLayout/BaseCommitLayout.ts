@@ -184,7 +184,8 @@ export class BaseCommitLayout {
       }
     }
 
-    if (this.needsPosition && this.painter().paint(this.paintGroup)) {
+    const paint = this.painter().paint;
+    if (this.needsPosition && paint && paint.call(this.painter(), this.paintGroup)) {
       return true;
     }
 
