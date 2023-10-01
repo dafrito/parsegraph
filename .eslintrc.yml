@@ -12,7 +12,7 @@ plugins:
   - "@typescript-eslint"
 rules: {
   "complexity": ["error", 20],
-  "require-jsdoc": ["off"],
+  "require-jsdoc": ["warn"],
   "no-unused-vars": "off",
   "@typescript-eslint/no-unused-vars": ["error", { "vars": "all", "argsIgnorePattern": "^_$" }]
 }
