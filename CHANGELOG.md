@@ -1,3 +1,10 @@
+## version 3.0.2
+
+October 1, 2023 release
+
+Build changes
+
+
 ## version 3.0.0
 
 October 1, 2023 release
