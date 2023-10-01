@@ -246,14 +246,14 @@ export class DirectionNode<Value = any> {
   //
   // ///////////////////////////////////////////////////////////////////////////
 
-  x(): number {
+  parentX(): number {
     if (this.neighbors().isRoot()) {
       return 0;
     }
     return this.neighbors().parent()?.xPos ?? NaN;
   }
 
-  y(): number {
+  parentY(): number {
     if (this.neighbors().isRoot()) {
       return 0;
     }

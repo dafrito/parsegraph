@@ -113,8 +113,8 @@ export class Layout {
     for (let i = nodeList.length - 1; i >= 0; --i) {
       const directionToChild = nodeList[i];
 
-      this._absoluteXPos += node.x() * parentScale;
-      this._absoluteYPos += node.y() * parentScale;
+      this._absoluteXPos += node.parentX() * parentScale;
+      this._absoluteYPos += node.parentY() * parentScale;
 
       parentScale = scale;
       const layout = node.layout();
@@ -131,8 +131,8 @@ export class Layout {
       node = node.neighbors().nodeAt(directionToChild);
     }
 
-    this._absoluteXPos += node.x() * parentScale;
-    this._absoluteYPos += node.y() * parentScale;
+    this._absoluteXPos += node.parentX() * parentScale;
+    this._absoluteYPos += node.parentY() * parentScale;
     this._absoluteScale = scale;
     this._absoluteDirty = false;
     if (!this.node().neighbors().isRoot()) {
@@ -219,8 +219,8 @@ export class Layout {
       const directionToChild = nodeList[i];
 
       if (i !== nodeList.length - 1) {
-        this._groupXPos += node.x() * parentScale;
-        this._groupYPos += node.y() * parentScale;
+        this._groupXPos += node.parentX() * parentScale;
+        this._groupYPos += node.parentY() * parentScale;
       }
 
       parentScale = scale;
@@ -230,8 +230,8 @@ export class Layout {
     this._groupScale = scale;
 
     if (!this.node().localPaintGroup()) {
-      this._groupXPos += node.x() * parentScale;
-      this._groupYPos += node.y() * parentScale;
+      this._groupXPos += node.parentX() * parentScale;
+      this._groupYPos += node.parentY() * parentScale;
     }
 
     if (isNaN(this._groupXPos)) {
