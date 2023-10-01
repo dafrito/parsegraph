@@ -224,9 +224,13 @@ export class CommitLayout extends BaseCommitLayout {
     const dirSign = directionSign(childDirection);
     if (isVerticalDirection(childDirection)) {
       // The child is positioned vertically.
-      node.neighbors().setPosAt(childDirection, alignment, dirSign * separation);
+      node
+        .neighbors()
+        .setPosAt(childDirection, alignment, dirSign * separation);
     } else {
-      node.neighbors().setPosAt(childDirection, dirSign * separation, alignment);
+      node
+        .neighbors()
+        .setPosAt(childDirection, dirSign * separation, alignment);
     }
     /* console.log(
               nameDirection(childDirection) + " " +
@@ -417,32 +421,41 @@ export class CommitLayout extends BaseCommitLayout {
     }
     const nestedSize: Size = nestedNode.layout().extentSize(this.firstSize);
     if (node.getAlignment(Direction.INWARD) === Alignment.INWARD_VERTICAL) {
-      node.neighbors().setPosAt(
-        Direction.INWARD,
-        nestedNode.scale() *
-          (nestedNode.layout().extentOffsetAt(Direction.DOWNWARD) -
-            nestedSize.width() / 2),
-        this.bodySize.height() / 2 -
-          this.painter().getSeparation(node, Axis.Z, Direction.INWARD, true) /
-            2 +
+      node
+        .neighbors()
+        .setPosAt(
+          Direction.INWARD,
           nestedNode.scale() *
-            (-nestedSize.height() +
-              nestedNode.layout().extentOffsetAt(Direction.FORWARD))
-      );
+            (nestedNode.layout().extentOffsetAt(Direction.DOWNWARD) -
+              nestedSize.width() / 2),
+          this.bodySize.height() / 2 -
+            this.painter().getSeparation(node, Axis.Z, Direction.INWARD, true) /
+              2 +
+            nestedNode.scale() *
+              (-nestedSize.height() +
+                nestedNode.layout().extentOffsetAt(Direction.FORWARD))
+        );
     } else {
       // console.log(this.horizontalPadding(), this.borderThickness());
-      node.neighbors().setPosAt(
-        Direction.INWARD,
-        this.bodySize.width() / 2 -
-          this.painter().getSeparation(node, Axis.Z, Direction.INWARD, false) /
-            2 +
+      node
+        .neighbors()
+        .setPosAt(
+          Direction.INWARD,
+          this.bodySize.width() / 2 -
+            this.painter().getSeparation(
+              node,
+              Axis.Z,
+              Direction.INWARD,
+              false
+            ) /
+              2 +
+            nestedNode.scale() *
+              (-nestedSize.width() +
+                nestedNode.layout().extentOffsetAt(Direction.DOWNWARD)),
           nestedNode.scale() *
-            (-nestedSize.width() +
-              nestedNode.layout().extentOffsetAt(Direction.DOWNWARD)),
-        nestedNode.scale() *
-          (nestedNode.layout().extentOffsetAt(Direction.FORWARD) -
-            nestedSize.height() / 2)
-      );
+            (nestedNode.layout().extentOffsetAt(Direction.FORWARD) -
+              nestedSize.height() / 2)
+        );
     }
 
     return false;
@@ -1141,11 +1154,19 @@ export class CommitLayout extends BaseCommitLayout {
       node
         .layout()
         .extentsAt(getPositiveDirection(perpAxis))
-        .combineBound(positiveOffset, node.neighbors().lineLengthAt(given), lineSize);
+        .combineBound(
+          positiveOffset,
+          node.neighbors().lineLengthAt(given),
+          lineSize
+        );
       node
         .layout()
         .extentsAt(getNegativeDirection(perpAxis))
-        .combineBound(negativeOffset, node.neighbors().lineLengthAt(given), lineSize);
+        .combineBound(
+          negativeOffset,
+          node.neighbors().lineLengthAt(given),
+          lineSize
+        );
     }
   }
 }

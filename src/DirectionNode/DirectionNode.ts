@@ -94,11 +94,11 @@ export class DirectionNode<Value = any> {
 
   /**
    * Sets a new value for this DirectionNode.
-   * 
+   *
    * The layout is invaidated if the value is changed.
-   * 
+   *
    * @param { Value | undefined } newValue - the new value to use
-   * @returns the new value
+   * @return the new value
    */
   setValue(newValue: Value | undefined): Value | undefined {
     // console.log("Setting value to ", newValue);
