@@ -27,8 +27,19 @@ export const LINE_THICKNESS = 12;
  *
  * @see {@link LayoutPainter}
  */
-export class CommitLayout extends BaseCommitLayout {
+export class CommitLayout {
   private _lineBounds: AddLineBounds;
+  protected bodySize: Size;
+  protected firstSize: Size;
+  protected secondSize: Size;
+  protected needsPosition: boolean;
+
+  protected rootPaintGroup: DirectionNode;
+  protected paintGroup?: DirectionNode;
+  protected root?: DirectionNode;
+  protected node?: DirectionNode;
+  protected layoutPhase: number;
+  private _painter: LayoutPainter;
 
   /**
    * Creates a new run of the layout algorithm.
@@ -37,11 +48,16 @@ export class CommitLayout extends BaseCommitLayout {
    * @param {LayoutPainter} painter - the painter used for sizing and painting information.
    */
   constructor(node: DirectionNode, painter: LayoutPainter) {
-    super(node, painter);
     this._lineBounds = new AddLineBounds();
+    this._painter = painter;
+    this.bodySize = [NaN, NaN];
+    this.firstSize = [NaN, NaN];
+    this.secondSize = [NaN, NaN];
+    this.reset(node);
   }
 
-  protected override initExtent(
+
+  protected initExtent(
     node: DirectionNode,
     inDirection: Direction,
     length: number,
@@ -55,11 +71,100 @@ export class CommitLayout extends BaseCommitLayout {
     // console.log(new Error("OFFSET = " + offset));
   }
 
-  protected override commitLayout(node: DirectionNode): boolean {
-    const laidOut = super.commitLayout(node);
+  reset(node: DirectionNode): void {
+    this.rootPaintGroup = node.neighbors().root();
+    this.layoutPhase = 1;
+    this.needsPosition = false;
+    this.root = undefined;
+    this.node = undefined;
+    this.paintGroup = undefined;
+    this.bodySize[0] = NaN;
+    this.bodySize[1] = NaN;
+    this.firstSize[0] = NaN;
+    this.firstSize[1] = NaN;
+    this.secondSize[0] = NaN;
+    this.secondSize[1] = NaN;
+  }
+
+  startingNode(): DirectionNode {
+    return this.rootPaintGroup;
+  }
+
+  protected painter(): LayoutPainter {
+    return this._painter;
+  }
+
+  protected commitLayout(node: DirectionNode): boolean {
+    // Do nothing if this node already has a layout committed.
+    switch (node.layout().phase()) {
+      case LayoutPhase.COMMITTED:
+        return false;
+      case LayoutPhase.NULL:
+        // Check for invalid layout states.
+        throw createException(BAD_LAYOUT_STATE);
+      case LayoutPhase.IN_COMMIT:
+        // Do not allow overlapping layout commits.
+        throw createException(BAD_LAYOUT_STATE);
+    }
+
+    // Begin the layout.
+    node.layout().setPhase(LayoutPhase.IN_COMMIT);
+
+    // Set the node's size.
+    const bodySize = this.bodySize;
+    this.painter().size(node, bodySize);
+    node.layout().setSize(bodySize);
+
+    // This node's horizontal bottom, used with downward nodes.
+    this.initExtent(
+      node,
+      Direction.DOWNWARD,
+      // Length:
+      bodySize[0],
+      // Size:
+      bodySize[1] / 2,
+      // Offset to body center:
+      bodySize[0] / 2
+    );
+
+    // This node's horizontal top, used with upward nodes.
+    this.initExtent(
+      node,
+      Direction.UPWARD,
+      // Length:
+      bodySize[0],
+      // Size:
+      bodySize[1] / 2,
+      // Offset to body center:
+      bodySize[0] / 2
+    );
+
+    // This node's vertical back, used with backward nodes.
+    this.initExtent(
+      node,
+      Direction.BACKWARD,
+      // Length:
+      bodySize[1],
+      // Size:
+      bodySize[0] / 2,
+      // Offset to body center:
+      bodySize[1] / 2
+    );
+
+    // This node's vertical front, used with forward nodes.
+    this.initExtent(
+      node,
+      Direction.FORWARD,
+      // Length:
+      bodySize[1],
+      // Size:
+      bodySize[0] / 2,
+      // Offset to body center:
+      bodySize[1] / 2
+    );
 
     if (node.layout().phase() === LayoutPhase.COMMITTED) {
-      return laidOut;
+      return true;
     }
 
     if (
@@ -97,450 +202,157 @@ export class CommitLayout extends BaseCommitLayout {
     return true;
   }
 
-  private commitAxisBasedLayout(node: DirectionNode): boolean {
-    // Layout based upon the axis preference.
-    if (
-      node.siblings().canonicalLayoutPreference() == PreferredAxis.PERPENDICULAR
-    ) {
-      const firstAxis: Axis = getPerpendicularAxis(
-        node.neighbors().parentDirection()
-      );
 
-      // Check for nodes perpendicular to parent's direction
-      const hasFirstAxisNodes: [Direction, Direction] = node
-        .neighbors()
-        .hasNodes(firstAxis);
-      const oppositeFromParent: Direction = reverseDirection(
-        node.neighbors().parentDirection()
-      );
-      if (
-        this.layoutAxis(node, hasFirstAxisNodes[0], hasFirstAxisNodes[1], false)
-      ) {
-        return true;
-      }
-
-      // Layout this node's second-axis child, if that child exists.
-      if (node.neighbors().hasNode(oppositeFromParent)) {
-        // Layout the second-axis child.
-        if (layoutSingle(node, oppositeFromParent, true, LINE_THICKNESS, this.bodySize, this.firstSize, this.painter())) {
-          return true;
-        }
-      }
-    } else {
-      // Layout this node's second-axis child, if that child exists.
-      const oppositeFromParent: Direction = reverseDirection(
-        node.neighbors().parentDirection()
-      );
-
-      // Check for nodes perpendicular to parent's direction
-      const perpendicularNodes: [Direction, Direction] = node
-        .neighbors()
-        .hasNodes(getPerpendicularAxis(node.neighbors().parentDirection()));
-
-      if (node.neighbors().hasNode(oppositeFromParent)) {
-        // Layout the second-axis child.
-        if (
-          layoutSingle(
-            node,
-            oppositeFromParent,
-            perpendicularNodes[0] === Direction.NULL &&
-              perpendicularNodes[1] === Direction.NULL,
-            LINE_THICKNESS,
-            this.bodySize,
-            this.firstSize,
-            this.painter()
-          )
-        ) {
-          return true;
-        }
-      }
-
-      if (
-        this.layoutAxis(
-          node,
-          perpendicularNodes[0],
-          perpendicularNodes[1],
-          true
-        )
-      ) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  private commitRootlikeLayout(node: DirectionNode): boolean {
-    if (
-      node.siblings().getLayoutPreference() === PreferredAxis.HORIZONTAL ||
-      node.siblings().getLayoutPreference() === PreferredAxis.PERPENDICULAR
-    ) {
-      // Root-like, so just lay out both axes.
-      if (
-        this.layoutAxis(
-          node,
-          Direction.BACKWARD,
-          Direction.FORWARD,
-          !node.neighbors().hasNode(Direction.UPWARD) &&
-            !node.neighbors().hasNode(Direction.DOWNWARD)
-        )
-      ) {
-        return true;
-      }
-
-      // This node is root-like, so it lays out the second-axis children in
-      // the same method as the first axis.
-      if (this.layoutAxis(node, Direction.UPWARD, Direction.DOWNWARD, true)) {
-        return true;
-      }
-    } else {
-      // Root-like, so just lay out both axes.
-      if (
-        this.layoutAxis(
-          node,
-          Direction.UPWARD,
-          Direction.DOWNWARD,
-          !node.neighbors().hasNode(Direction.BACKWARD) &&
-            !node.neighbors().hasNode(Direction.FORWARD)
-        )
-      ) {
-        return true;
-      }
-
-      // This node is root-like, so it lays out the second-axis children in
-      // the same method as the first axis.
-      if (this.layoutAxis(node, Direction.BACKWARD, Direction.FORWARD, true)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  private getSeparation(node: DirectionNode, axis: Axis, dir: Direction, preferVertical: boolean): number {
-    const getSeparation = this.painter().getSeparation;
-    if (!getSeparation) {
-      return 0;
-    }
-    return getSeparation(
-      node,
-      axis,
-      dir,
-      preferVertical
-    );
-  }
-
-  // Layout a pair of nodes in the given directions.
-  private layoutAxis(
-    node: DirectionNode,
-    firstDirection: Direction,
-    secondDirection: Direction,
-    allowAxisOverlap: boolean
-  ): boolean {
-    if (
-      firstDirection === secondDirection &&
-      firstDirection != Direction.NULL
-    ) {
-      throw createException(BAD_NODE_DIRECTION);
-    }
-    // Change the node direction to null if there is no node in that
-    // direction.
-    if (!node.neighbors().hasNode(firstDirection)) {
-      firstDirection = Direction.NULL;
-    }
-    if (!node.neighbors().hasNode(secondDirection)) {
-      secondDirection = Direction.NULL;
-    }
-
-    // Return if there are no directions.
-    if (firstDirection == Direction.NULL && secondDirection == Direction.NULL) {
+  protected commitLayoutPhaseOne(): boolean {
+    // Commit layout for all nodes.
+    if (this.layoutPhase > 1) {
       return false;
     }
 
-    // Test if this node has a first-axis child in only one direction.
-    if (firstDirection == Direction.NULL || secondDirection == Direction.NULL) {
-      // Find the direction of the only first-axis child.
-      let firstAxisDirection: Direction;
-      if (firstDirection != Direction.NULL) {
-        firstAxisDirection = firstDirection;
-      } else {
-        // It must be the second direction.
-        firstAxisDirection = secondDirection;
-      }
+    // Start new layout.
+    if (!this.paintGroup) {
+      this.paintGroup = this.rootPaintGroup
+        .paintGroup()
+        .prev() as DirectionNode;
+      this.root = this.paintGroup;
+      this.node = this.root as DirectionNode;
+      this.needsPosition = false;
+    }
 
-      // Layout that node.
-      if (layoutSingle(node, firstAxisDirection, allowAxisOverlap, LINE_THICKNESS, this.bodySize, this.firstSize, this.painter())) {
-        node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
-        return true;
+    if (this.root?.layout().needsCommit()) {
+      this.needsPosition = true;
+      do {
+        // Loop back to the first node, from the root.
+        this.node = this.node?.siblings().next() as DirectionNode;
+        if (this.node.layout().needsCommit()) {
+          this.commitLayout(this.node);
+          this.node.layout().invalidateGroupPos();
+          this.node.layout().invalidateAbsolutePos();
+          this.node.setPaintGroupNode(this.paintGroup);
+          return true;
+        }
+      } while (this.node !== this.root);
+    } else {
+      this.needsPosition = Boolean(
+        this.needsPosition || this.root?.layout().needsPosition()
+      );
+
+      if (this.needsPosition) {
+        do {
+          if (!this.node) {
+            throw new Error("Node must not be undefined");
+          }
+          const layout = this.node.layout();
+          layout.invalidateAbsolutePos();
+          layout.invalidateGroupPos();
+          layout.commitGroupPos();
+          this.node = this.node.siblings().prev() as DirectionNode;
+        } while (this.node !== this.root);
       }
+    }
+
+    const paint = this.painter().paint;
+    if (
+      this.needsPosition &&
+      paint &&
+      paint.call(this.painter(), this.paintGroup)
+    ) {
+      return true;
+    }
+
+    if (this.paintGroup === this.rootPaintGroup) {
+      ++this.layoutPhase;
+      this.paintGroup = undefined;
       return false;
     }
 
-    /* console.log(
-              "Laying out " +
-              nameDirection(firstDirection) + " and " +
-              nameDirection(secondDirection) + " children."
-          );*/
-
-    // This node has first-axis children in both directions.
-    const firstNode: DirectionNode = node.neighbors().nodeAt(firstDirection);
-    const secondNode: DirectionNode = node.neighbors().nodeAt(secondDirection);
-
-    // Get the alignments for the children.
-    const firstNodeAlignment: number = getAlignment(node, firstDirection);
-    const secondNodeAlignment: number = getAlignment(
-      node,
-      secondDirection
-    );
-    // console.log("First alignment: " + firstNodeAlignment);
-    // console.log("Second alignment: " + secondNodeAlignment);
-
-    let separationBetweenChildren: number = firstNode
-      .layout()
-      .extentsAt(secondDirection)
-      .separation(
-        secondNode.layout().extentsAt(firstDirection),
-        (node.neighbors().nodeAt(secondDirection).scale() /
-          node.neighbors().nodeAt(firstDirection).scale()) *
-          (secondNodeAlignment -
-            secondNode.layout().extentOffsetAt(firstDirection)) -
-          (firstNodeAlignment -
-            firstNode.layout().extentOffsetAt(secondDirection)),
-        true,
-        node.neighbors().nodeAt(secondDirection).scale() /
-          node.neighbors().nodeAt(firstDirection).scale(),
-        0
-      );
-    separationBetweenChildren *= node
-      .neighbors()
-      .nodeAt(firstDirection)
-      .scale();
-
-    // console.log("Separation between children="
-    //   + separationBetweenChildren);
-
-    /*
-          var firstExtent = this.extentsAt(firstDirection);
-          console.log(
-              "This " +
-              nameDirection(firstDirection) +
-              " extent (offset to center=" +
-              this.extentOffsetAt(firstDirection) +
-              ")"
-          );
-          firstExtent.forEach(
-              function(length, size, i) {
-                  console.log(i + ". l=" + length + ", s=" + size);
-              }
-          );
-
-          console.log(
-              nameDirection(firstDirection) +
-              " " + nameType(this.neighbors().nodeAt(firstDirection).type()) +
-              "'s " + nameDirection(secondDirection) +
-              " extent (offset to center=" +
-              this.neighbors().nodeAt(firstDirection).extentOffsetAt(secondDirection) +
-              ")"
-          );
-          this.neighbors().nodeAt(firstDirection).extentsAt(secondDirection).forEach(
-              function(length, size, i) {
-                  console.log(i + ". l=" + length + ", s=" + size);
-              }
-          );
-
-          console.log(
-              "FirstNodeAlignment=" + firstNodeAlignment
-          );
-          console.log(
-              "firstDirection extentOffset=" +
-                  this.extentOffsetAt(firstDirection)
-          );
-          console.log(
-              "firstNode.extentOffsetAt(secondDirection)=" +
-              firstNode.extentOffsetAt(secondDirection)
-          );*/
-
-    let firstAxisOverlap: boolean = allowAxisOverlap;
-    switch (node.neighbors().nodeAt(firstDirection).neighbors().axisOverlap()) {
-      case AxisOverlap.PREVENTED:
-        firstAxisOverlap = false;
-        break;
-      case AxisOverlap.ALLOWED:
-        firstAxisOverlap = true;
-        break;
-    }
-    let secondAxisOverlap: boolean = allowAxisOverlap;
-    switch (
-      node.neighbors().nodeAt(secondDirection).neighbors().axisOverlap()
-    ) {
-      case AxisOverlap.PREVENTED:
-        secondAxisOverlap = false;
-        break;
-      case AxisOverlap.ALLOWED:
-        secondAxisOverlap = true;
-        break;
-    }
-
-    // Allow some overlap if we have both first-axis sides, but
-    // nothing ahead on the second axis.
-    let separationFromFirst: number = node
-      .layout()
-      .extentsAt(firstDirection)
-      .separation(
-        firstNode.layout().extentsAt(secondDirection),
-        node.layout().extentOffsetAt(firstDirection) +
-          firstNodeAlignment -
-          node.neighbors().nodeAt(firstDirection).scale() *
-            firstNode.layout().extentOffsetAt(secondDirection),
-        firstAxisOverlap,
-        node.neighbors().nodeAt(firstDirection).scale(),
-        LINE_THICKNESS / 2
-      );
-
-    let separationFromSecond: number = node
-      .layout()
-      .extentsAt(secondDirection)
-      .separation(
-        secondNode.layout().extentsAt(firstDirection),
-        node.layout().extentOffsetAt(secondDirection) +
-          secondNodeAlignment -
-          node.neighbors().nodeAt(secondDirection).scale() *
-            secondNode.layout().extentOffsetAt(firstDirection),
-        secondAxisOverlap,
-        node.neighbors().nodeAt(secondDirection).scale(),
-        LINE_THICKNESS / 2
-      );
-
-    /* console.log(
-              "Separation from this " + nameType(this.type()) + " to " +
-              nameDirection(firstDirection) + " " +
-              nameType(this.neighbors().nodeAt(firstDirection).type()) + "=" +
-              separationFromFirst
-          );
-          console.log(
-              "Separation from this " + nameType(this.type()) + " to " +
-              nameDirection(secondDirection) + " " +
-              nameType(this.neighbors().nodeAt(secondDirection).type()) + "=" +
-              separationFromSecond
-          );*/
-
-    // TODO Handle occlusion of the second axis if we have a parent or
-    // if we have a second-axis child. Doesn't this code need to ensure
-    // the second-axis child is not trapped inside too small a space?
-
-    if (
-      separationBetweenChildren >=
-      separationFromFirst + separationFromSecond
-    ) {
-      // The separation between the children is greater than the
-      // separation between each child and this node.
-
-      // Center them as much as possible.
-      separationFromFirst = Math.max(
-        separationFromFirst,
-        separationBetweenChildren / 2
-      );
-      separationFromSecond = Math.max(
-        separationFromSecond,
-        separationBetweenChildren / 2
-      );
-    } else {
-      // separationBetweenChildren
-      //    < separationFromFirst + separationFromSecond
-      // The separation between children is less than what this node
-      // needs to separate each child from itself, so do nothing to
-      // the separation values.
-    }
-
-    firstNode.layout().size(this.firstSize);
-    secondNode.layout().size(this.secondSize);
-    if (getDirectionAxis(firstDirection) === Axis.VERTICAL) {
-      separationFromFirst = Math.max(
-        separationFromFirst,
-        node.neighbors().nodeAt(firstDirection).scale() *
-          (this.firstSize[1] / 2) +
-          this.bodySize[1] / 2
-      );
-      separationFromFirst +=
-        this.getSeparation(
-          node,
-          Axis.VERTICAL,
-          firstDirection,
-          true
-        ) * node.neighbors().nodeAt(firstDirection).scale();
-
-      separationFromSecond = Math.max(
-        separationFromSecond,
-        node.neighbors().nodeAt(secondDirection).scale() *
-          (this.secondSize[1] / 2) +
-          this.bodySize[1] / 2
-      );
-      separationFromSecond +=
-        this.getSeparation(
-          node,
-          Axis.VERTICAL,
-          secondDirection,
-          true
-        ) * node.neighbors().nodeAt(secondDirection).scale();
-    } else {
-      separationFromFirst = Math.max(
-        separationFromFirst,
-        node.neighbors().nodeAt(firstDirection).scale() *
-          (this.firstSize[0] / 2) +
-          this.bodySize[0] / 2
-      );
-      separationFromFirst +=
-        this.getSeparation(
-          node,
-          Axis.HORIZONTAL,
-          firstDirection,
-          false
-        ) * node.neighbors().nodeAt(firstDirection).scale();
-
-      separationFromSecond = Math.max(
-        separationFromSecond,
-        node.neighbors().nodeAt(secondDirection).scale() *
-          (this.secondSize[0] / 2) +
-          this.bodySize[0] / 2
-      );
-      separationFromSecond +=
-        this.getSeparation(
-          node,
-          Axis.HORIZONTAL,
-          secondDirection,
-          false
-        ) * node.neighbors().nodeAt(secondDirection).scale();
-    }
-
-    // Set the positions of the nodes.
-    positionChild(
-      node,
-      firstDirection,
-      firstNodeAlignment,
-      separationFromFirst
-    );
-    positionChild(
-      node,
-      secondDirection,
-      secondNodeAlignment,
-      separationFromSecond
-    );
-
-    // Combine their extents.
-    combineExtents(
-      node,
-      firstDirection,
-      firstNodeAlignment,
-      separationFromFirst
-    );
-    combineExtents(
-      node,
-      secondDirection,
-      secondNodeAlignment,
-      separationFromSecond
-    );
-
-    return false;
+    this.paintGroup = this.paintGroup.paintGroup().prev() as DirectionNode;
+    this.root = this.paintGroup;
+    this.node = this.root;
+    return true;
   }
 
+  protected commitLayoutPhaseTwo(): boolean {
+    if (!this.needsPosition || this.layoutPhase !== 2) {
+      return false;
+    }
+
+    // Start second phase of layout
+    if (!this.paintGroup) {
+      this.paintGroup = this.rootPaintGroup;
+      this.root = this.paintGroup;
+      this.node = undefined;
+    }
+
+    if (
+      this.paintGroup?.layout().needsCommit() ||
+      this.paintGroup?.layout().needsPosition()
+    ) {
+      if (!this.node) {
+        this.node = this.paintGroup.siblings().prev() as DirectionNode;
+      }
+      // Loop from the root to the last node.
+      const layout = this.node.layout();
+      layout.invalidateAbsolutePos();
+      layout.invalidateGroupPos();
+      layout.commitGroupPos();
+      this.node = this.node.siblings().prev() as DirectionNode;
+      return true;
+    }
+
+    this.paintGroup = this.paintGroup?.paintGroup().next() as DirectionNode;
+    if (this.paintGroup === this.rootPaintGroup) {
+      ++this.layoutPhase;
+      this.needsPosition = false;
+      this.paintGroup = undefined;
+      return false;
+    }
+
+    this.root = this.paintGroup;
+    this.node = undefined;
+    return true;
+  }
+
+  protected commitLayoutPhaseThree(): boolean {
+    if (this.layoutPhase !== 3) {
+      return false;
+    }
+
+    if (!this.paintGroup) {
+      this.paintGroup = this.rootPaintGroup;
+    }
+
+    const layout = this.paintGroup?.layout();
+    if (layout) {
+      layout.invalidateAbsolutePos();
+      layout.commitAbsolutePos();
+    }
+
+    this.paintGroup = this.paintGroup?.paintGroup().next() as DirectionNode;
+    if (this.paintGroup === this.rootPaintGroup) {
+      ++this.layoutPhase;
+      this.needsPosition = false;
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Traverse the graph depth-first, committing each node's layout in turn.
+   *
+   * @return {boolean} true if the algorithm needs more cranks.
+   */
+  crank(): boolean {
+    if (
+      this.commitLayoutPhaseOne() ||
+      this.commitLayoutPhaseTwo() ||
+      this.commitLayoutPhaseThree()
+    ) {
+      return true;
+    }
+
+    this.reset(this.rootPaintGroup);
+    return false;
+  }
 }
