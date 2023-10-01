@@ -71,12 +71,12 @@ export class CommitLayout extends BaseCommitLayout {
     }
 
     if (node.neighbors().isRootlike()) {
-      if (this.commitRootlikeLayout(node)) {
+      if (commitRootlikeLayout(this.painter(), node, LINE_THICKNESS, this.bodySize)) {
         node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
         return true;
       }
     } else {
-      if (this.commitAxisBasedLayout(node)) {
+      if (commitAxisBasedLayout(this.painter(), node, LINE_THICKNESS, this.bodySize)) {
         node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
         return true;
       }
