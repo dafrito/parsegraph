@@ -3,7 +3,7 @@ import fuzzyEquals, {
   cloneFuzziness,
   getFuzziness,
   setFuzziness,
-} from "../src/DirectionNode/Layout/Extent/fuzzyequals";
+} from "./fuzzyequals";
 
 describe("fuzzyEquals", function () {
   it("treats equal numbers as equal", () => {
