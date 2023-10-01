@@ -480,7 +480,7 @@ export class Siblings {
       }
     }
 
-    this.node().layoutChanged();
+    this.node().invalidate();
   }
 
   pull(given: Direction): void {

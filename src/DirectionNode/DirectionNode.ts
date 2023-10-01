@@ -60,7 +60,7 @@ export class DirectionNode<Value = any> {
   //
   // ///////////////////////////////////////////////////////////////////////////
 
-  layoutChanged(): void {
+  invalidate(): void {
     let node: DirectionNode = this;
     while (node !== null) {
       const oldLayoutPhase = node.layout().phase();
@@ -108,7 +108,7 @@ export class DirectionNode<Value = any> {
     }
     const oldVal = this._value;
     this._value = newValue;
-    this.layoutChanged();
+    this.invalidate();
     return this._value;
   }
 
@@ -118,7 +118,7 @@ export class DirectionNode<Value = any> {
 
   setRightToLeft(val: boolean): void {
     this._rightToLeft = !!val;
-    this.layoutChanged();
+    this.invalidate();
   }
 
   nodeFit(): Fit {
@@ -127,7 +127,7 @@ export class DirectionNode<Value = any> {
 
   setNodeFit(nodeFit: Fit): void {
     this._nodeFit = nodeFit;
-    this.layoutChanged();
+    this.invalidate();
   }
 
   scale(): number {
@@ -136,7 +136,7 @@ export class DirectionNode<Value = any> {
 
   setScale(scale: number): void {
     this._scale = scale;
-    this.layoutChanged();
+    this.invalidate();
   }
 
   getAlignment(inDirection: Direction): Alignment {
@@ -158,7 +158,7 @@ export class DirectionNode<Value = any> {
     }
     this.neighbors().ensure(inDirection as Direction).alignmentMode =
       newAlignmentMode;
-    this.layoutChanged();
+    this.invalidate();
   }
 
   axisOverlap(inDirection?: Direction): AxisOverlap {
@@ -185,7 +185,7 @@ export class DirectionNode<Value = any> {
     }
     this.neighbors().ensure(inDirection as Direction).allowAxisOverlap =
       newAxisOverlap;
-    this.layoutChanged();
+    this.invalidate();
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -394,7 +394,7 @@ export class DirectionNode<Value = any> {
       node.clearPaintGroup();
     }
 
-    this.layoutChanged();
+    this.invalidate();
 
     return node;
   }
@@ -435,7 +435,7 @@ export class DirectionNode<Value = any> {
     }
 
     disconnected.siblings().convertLayoutPreference(inDirection);
-    this.layoutChanged();
+    this.invalidate();
 
     return disconnected;
   }
