@@ -110,7 +110,8 @@ export class DirectionCaret<Value> {
     }
 
     return this.node()
-      .neighbors().parentNode()
+      .neighbors()
+      .parentNode()
       .disconnect(reverseDirection(this.node().neighbors().parentDirection()));
   }
 
@@ -277,10 +278,9 @@ export class DirectionCaret<Value> {
     inDirection: Direction | string,
     newAlignmentMode: Alignment | string
   ): void {
-    this.node().neighbors().align(
-      readDirection(inDirection),
-      readAlignment(newAlignmentMode)
-    );
+    this.node()
+      .neighbors()
+      .align(readDirection(inDirection), readAlignment(newAlignmentMode));
     if (newAlignmentMode != Alignment.NONE) {
       this.node().setNodeFit(Fit.EXACT);
     }

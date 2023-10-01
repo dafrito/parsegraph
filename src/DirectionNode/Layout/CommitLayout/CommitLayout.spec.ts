@@ -9,7 +9,6 @@ import {
   getPositiveDirection,
   paintNodeBounds,
   turnRight,
-  readDirection,
 } from "../../..";
 
 import { CommitLayout } from "./CommitLayout";
@@ -50,7 +49,7 @@ const demo = (rootNode: DirectionNode): Metrics => {
       ++m.seps;
       return 0;
     },
-    paint: (pg: DirectionNode): boolean => {
+    paint: (): boolean => {
       // TODO pre-render content as necessary
       // This is optional.
       ++m.paints;
@@ -67,7 +66,7 @@ const demo = (rootNode: DirectionNode): Metrics => {
   rootNode.paintGroup().forEach((pg: DirectionNode) => {
     ++m.paintGroupRenders;
     pg.siblings().forEachNode((node) => {
-      paintNodeBounds(node, (x, y, w, h) => {
+      paintNodeBounds(node, () => {
         // Draw the node.
         ++m.renders;
       });
@@ -105,7 +104,7 @@ const demo2 = (rootNode: DirectionNode): Metrics2 => {
       // TODO pre-render content as necessary
       // This is optional.
       ++m.paints;
-      pg.siblings().forEachNode((node) => {
+      pg.siblings().forEachNode(() => {
         ++m.paintedNodes;
       });
       return false;
@@ -121,7 +120,7 @@ const demo2 = (rootNode: DirectionNode): Metrics2 => {
   rootNode.paintGroup().forEach((pg: DirectionNode) => {
     ++m.paintGroupRenders;
     pg.siblings().forEachNode((node) => {
-      paintNodeBounds(node, (x, y, w, h) => {
+      paintNodeBounds(node, () => {
         // Draw the node.
         ++m.renders;
       });
@@ -154,7 +153,7 @@ const demoMultiple = (rootNode: DirectionNode): (() => Metrics) => {
       ++m.seps;
       return 0;
     },
-    paint: (pg: DirectionNode): boolean => {
+    paint: (): boolean => {
       // TODO pre-render content as necessary
       // This is optional.
       ++m.paints;
@@ -179,7 +178,7 @@ const demoMultiple = (rootNode: DirectionNode): (() => Metrics) => {
     rootNode.paintGroup().forEach((pg: DirectionNode) => {
       ++m.paintGroupRenders;
       pg.siblings().forEachNode((node) => {
-        paintNodeBounds(node, (x, y, w, h) => {
+        paintNodeBounds(node, () => {
           // Draw the node.
           ++m.renders;
         });
@@ -216,7 +215,7 @@ describe("CommitLayout", () => {
         ++sepCount;
         return 0;
       },
-      paint: (pg: DirectionNode): boolean => {
+      paint: (): boolean => {
         // TODO pre-render content as necessary
         // This is optional.
         ++paintCount;
@@ -234,7 +233,7 @@ describe("CommitLayout", () => {
     let renderCounts = 0;
     rootNode.paintGroup().forEach((pg: DirectionNode) => {
       pg.siblings().forEachNode((node) => {
-        paintNodeBounds(node, (x, y, w, h) => {
+        paintNodeBounds(node, () => {
           // Draw the node.
           ++renderCounts;
         });
@@ -274,7 +273,7 @@ describe("CommitLayout", () => {
         ++sepCount;
         return 0;
       },
-      paint: (pg: DirectionNode): boolean => {
+      paint: (): boolean => {
         // TODO pre-render content as necessary
         // This is optional.
         ++paintCount;
@@ -292,7 +291,7 @@ describe("CommitLayout", () => {
     let renderCounts = 0;
     rootNode.paintGroup().forEach((pg: DirectionNode) => {
       pg.siblings().forEachNode((node) => {
-        paintNodeBounds(node, (x, y, w, h) => {
+        paintNodeBounds(node, () => {
           // Draw the node.
           ++renderCounts;
         });
@@ -334,7 +333,7 @@ describe("CommitLayout", () => {
         ++sepCount;
         return 0;
       },
-      paint: (pg: DirectionNode): boolean => {
+      paint: (): boolean => {
         // TODO pre-render content as necessary
         // This is optional.
         ++paintCount;
@@ -352,7 +351,7 @@ describe("CommitLayout", () => {
     let renderCounts = 0;
     rootNode.paintGroup().forEach((pg: DirectionNode) => {
       pg.siblings().forEachNode((node) => {
-        paintNodeBounds(node, (x, y, w, h) => {
+        paintNodeBounds(node, () => {
           // Draw the node.
           ++renderCounts;
         });
@@ -810,6 +809,7 @@ describe("CommitLayout", () => {
         str += "\n";
       }
     }
+    expect(str).not.toHaveLength(0);
     // console.log(str);
   });
 
@@ -824,8 +824,7 @@ describe("CommitLayout", () => {
       }
       car.pop();
 
-      const m = demo2(car.root());
-      // console.log(m);
+      demo2(car.root());
       car.spawn("u", "b");
 
       return demo2(car.root());
@@ -872,7 +871,7 @@ describe("CommitLayout", () => {
         // The same value can be called for every neighbor.
         return 0;
       },
-      paint: (pg: DirectionNode): boolean => {
+      paint: (): boolean => {
         // TODO pre-render content as necessary
         // This is optional.
         return false;
@@ -889,7 +888,7 @@ describe("CommitLayout", () => {
     let renderCounts = 0;
     rootNode.paintGroup().forEach((pg: DirectionNode) => {
       pg.siblings().forEachNode((node) => {
-        paintNodeBounds(node, (x, y, w, h) => {
+        paintNodeBounds(node, () => {
           // Draw the node.
           ++renderCounts;
         });

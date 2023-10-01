@@ -153,7 +153,8 @@ export class Layout {
     }
     return (
       this._absoluteVersion !==
-      findPaintGroup(this.node().neighbors().parentNode()).layout()._absoluteVersion
+      findPaintGroup(this.node().neighbors().parentNode()).layout()
+        ._absoluteVersion
     );
   }
 

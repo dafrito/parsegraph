@@ -186,7 +186,10 @@ export class Siblings {
       if (!pastDir) {
         continue;
       }
-      if (!this.node().neighbors().isRoot() && dir === this.node().neighbors().parent()?.reverseDirection()) {
+      if (
+        !this.node().neighbors().isRoot() &&
+        dir === this.node().neighbors().parent()?.reverseDirection()
+      ) {
         continue;
       }
       if (this.node().neighbors().hasNode(dir)) {
@@ -214,7 +217,10 @@ export class Siblings {
       if (!pastDir) {
         continue;
       }
-      if (!this.node().neighbors().isRoot() && dir === this.node().neighbors().parent()?.reverseDirection()) {
+      if (
+        !this.node().neighbors().isRoot() &&
+        dir === this.node().neighbors().parent()?.reverseDirection()
+      ) {
         continue;
       }
       if (this.node().neighbors().hasNode(dir)) {
@@ -229,8 +235,9 @@ export class Siblings {
   }
 
   horzToVert() {
-    const parentDir = this.node().neighbors().isRoot() ? null :
-      this.node().neighbors().parentDirection();
+    const parentDir = this.node().neighbors().isRoot()
+      ? null
+      : this.node().neighbors().parentDirection();
     const b =
       parentDir === Direction.BACKWARD
         ? null
@@ -280,8 +287,9 @@ export class Siblings {
   }
 
   vertToHorz() {
-    const parentDir = this.node().neighbors().isRoot() ?
-      null : this.node().neighbors().parentDirection();
+    const parentDir = this.node().neighbors().isRoot()
+      ? null
+      : this.node().neighbors().parentDirection();
     const b =
       parentDir === Direction.BACKWARD
         ? null

@@ -4,7 +4,8 @@ import { DirectionNode } from "..";
 /**
  * Returns true if the given other node comes after this node in layout order.
  *
- * @param {DirectionNode} given - other DirectionNode.
+ * @param {DirectionNode} node - the subject DirectionNode.
+ * @param {DirectionNode} other - the object DirectionNode.
  * @return {boolean} true if this node comes after the given node.
  *
  * @see {@link comesBefore}

@@ -6,6 +6,7 @@ import { DirectionNode } from "./DirectionNode";
  * This iterates up the parent neighbors until a paint group root is
  * found. If none is found, then the root is used.
  *
+ * @param {DirectionNode} origin - the node that starts the search
  * @return {DirectionNode} the paint group root
  */
 export const findPaintGroup = (origin: DirectionNode): DirectionNode => {

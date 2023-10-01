@@ -109,9 +109,7 @@ export class Neighbors {
     if (this.isRoot()) {
       return this.hasNode(direction);
     }
-    return (
-      this.hasNode(direction) && this.parentDirection() !== direction
-    );
+    return this.hasNode(direction) && this.parentDirection() !== direction;
   }
 
   hasChild(direction: Direction): boolean {
@@ -238,21 +236,22 @@ export class Neighbors {
     newAlignmentMode?: Alignment
   ): void {
     if (newAlignmentMode === undefined) {
-      return this.parentNode().neighbors().align(
-        reverseDirection(this.parentDirection()),
-        inDirection as Alignment
-      );
+      return this.parentNode()
+        .neighbors()
+        .align(
+          reverseDirection(this.parentDirection()),
+          inDirection as Alignment
+        );
     }
-    this.ensure(inDirection as Direction).alignmentMode =
-      newAlignmentMode;
+    this.ensure(inDirection as Direction).alignmentMode = newAlignmentMode;
     this.node().invalidate();
   }
 
   axisOverlap(inDirection?: Direction): AxisOverlap {
     if (inDirection === undefined) {
-      return this.parentNode().neighbors().axisOverlap(
-        reverseDirection(this.parentDirection())
-      );
+      return this.parentNode()
+        .neighbors()
+        .axisOverlap(reverseDirection(this.parentDirection()));
     }
     if (this.hasNode(inDirection)) {
       return this.at(inDirection).allowAxisOverlap;
@@ -265,13 +264,14 @@ export class Neighbors {
     newAxisOverlap?: AxisOverlap
   ): void {
     if (newAxisOverlap === undefined) {
-      return this.parentNode().neighbors().setAxisOverlap(
-        reverseDirection(this.parentDirection()),
-        inDirection as AxisOverlap
-      );
+      return this.parentNode()
+        .neighbors()
+        .setAxisOverlap(
+          reverseDirection(this.parentDirection()),
+          inDirection as AxisOverlap
+        );
     }
-    this.ensure(inDirection as Direction).allowAxisOverlap =
-      newAxisOverlap;
+    this.ensure(inDirection as Direction).allowAxisOverlap = newAxisOverlap;
     this.node().invalidate();
   }
 
@@ -288,5 +288,4 @@ export class Neighbors {
     }
     return this.parent()?.yPos ?? NaN;
   }
-
 }

@@ -5,7 +5,8 @@ import { pathToRoot } from "./pathToRoot";
 /**
  * Returns true if the given other node comes before this node in layout order.
  *
- * @param {DirectionNode} given - other DirectionNode.
+ * @param {DirectionNode} node - subject DirectionNode.
+ * @param {DirectionNode} other - object DirectionNode.
  * @return {boolean} true if this node comes before the given node.
  *
  * @see {@link comesAfter}

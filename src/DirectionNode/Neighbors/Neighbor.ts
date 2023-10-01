@@ -1,9 +1,5 @@
 import { DirectionNode } from "..";
-import { Direction, isCardinalDirection, reverseDirection } from "../../Direction";
-import createException, {
-  BAD_NODE_DIRECTION,
-  NO_NODE_FOUND,
-} from "../../Exception";
+import { Direction, reverseDirection } from "../../Direction";
 
 import Alignment from "./Alignment";
 import AxisOverlap from "./AxisOverlap";

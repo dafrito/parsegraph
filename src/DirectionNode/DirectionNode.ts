@@ -1,12 +1,11 @@
 import createException, {
   BAD_NODE_DIRECTION,
-  NODE_IS_ROOT,
   NO_OUTWARD_CONNECT,
   NO_PARENT_CONNECT,
 } from "../Exception";
 import { Fit } from "./Fit";
 
-import { Direction, reverseDirection, forEachDirection } from "../Direction";
+import { Direction, reverseDirection } from "../Direction";
 
 import { Layout } from "./Layout";
 
@@ -114,7 +113,7 @@ export class DirectionNode<Value = any> {
    * The layout is invaidated if the value is changed.
    *
    * @param { Value | undefined } newValue - the new value to use
-   * @return the new value
+   * @return { Value | undefined } the new value
    */
   setValue(newValue: Value | undefined): Value | undefined {
     // console.log("Setting value to ", newValue);
@@ -122,7 +121,6 @@ export class DirectionNode<Value = any> {
     if (orig === newValue) {
       return orig;
     }
-    const oldVal = this._value;
     this._value = newValue;
     this.invalidate();
     return this._value;
@@ -176,9 +174,9 @@ export class DirectionNode<Value = any> {
 
   /**
    * Clears this node's local paint group, if any.
-   * 
+   *
    * Called by the paint group when it is being removed.
-   * 
+   *
    * This does not trigger invalidation.
    */
   clearPaintGroup(): void {
@@ -243,7 +241,7 @@ export class DirectionNode<Value = any> {
 
   /**
    * Removes the paint group from this node, unless it is a root
-   * node. 
+   * node.
    */
   uncrease() {
     if (this.paintGroup()) {
@@ -310,19 +308,22 @@ export class DirectionNode<Value = any> {
       if (this.neighbors().isRoot()) {
         return this;
       }
-      return this.neighbors().parentNode().disconnect(
-        reverseDirection(this.neighbors().parentDirection())
-      );
+      return this.neighbors()
+        .parentNode()
+        .disconnect(reverseDirection(this.neighbors().parentDirection()));
     }
 
     if (!this.neighbors().hasNode(inDirection)) {
       return undefined;
     }
 
-    if (!this.neighbors().isRoot() && this.neighbors().parentDirection() === inDirection) {
-      return this.neighbors().parentNode().disconnect(
-        reverseDirection(this.neighbors().parentDirection())
-      );
+    if (
+      !this.neighbors().isRoot() &&
+      this.neighbors().parentDirection() === inDirection
+    ) {
+      return this.neighbors()
+        .parentNode()
+        .disconnect(reverseDirection(this.neighbors().parentDirection()));
     }
     // Disconnect the node.
     const neighbor = this.neighbors().at(inDirection);
@@ -345,5 +346,4 @@ export class DirectionNode<Value = any> {
 
     return disconnected;
   }
-
 }

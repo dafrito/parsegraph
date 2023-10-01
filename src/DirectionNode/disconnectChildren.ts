@@ -19,4 +19,4 @@ export const disconnectChildren = (parent: DirectionNode): DirectionNode[] => {
     }
   });
   return nodes;
-}
+};
