@@ -27,7 +27,7 @@ export class DirectionNode<Value = any> {
 
   private _siblings: Siblings;
   private _paintGroup: PaintGroup | undefined;
-  private _paintGroupRoot: DirectionNode;
+  private _paintGroupNode: DirectionNode;
   private _id: string | number | undefined;
   private _nodeFit: Fit;
   private _rightToLeft: boolean;
@@ -46,7 +46,7 @@ export class DirectionNode<Value = any> {
 
     // Layout
     this._siblings = new Siblings(this);
-    this._paintGroupRoot = this;
+    this._paintGroupNode = this;
     this._paintGroup = new PaintGroup(this, false);
 
     if (value !== undefined) {
@@ -286,8 +286,8 @@ export class DirectionNode<Value = any> {
    *
    * @return {DirectionNode} the paint group root for this DirectionNode.
    */
-  paintGroupRoot(): DirectionNode {
-    return this._paintGroupRoot;
+  paintGroupNode(): DirectionNode {
+    return this._paintGroupNode;
   }
 
   /**
@@ -297,11 +297,11 @@ export class DirectionNode<Value = any> {
    *
    * @param {DirectionNode} pg - the new paint group root
    */
-  setPaintGroupRoot(pg: DirectionNode) {
+  setpaintGroupNode(pg: DirectionNode) {
     if (!pg) {
       throw new Error("Refusing to set paint group root to null");
     }
-    this._paintGroupRoot = pg;
+    this._paintGroupNode = pg;
   }
 
   /**
@@ -311,7 +311,7 @@ export class DirectionNode<Value = any> {
    */
   paintGroup(): PaintGroup {
     if (!this._paintGroup) {
-      const node = this.paintGroupRoot();
+      const node = this.paintGroupNode();
       if (!node) {
         throw new Error("Paint group root is null");
       }
@@ -383,10 +383,10 @@ export class DirectionNode<Value = any> {
       pg.paintGroup().append(node);
     } else {
       this.siblings().insertIntoLayout(inDirection);
-      node.setPaintGroupRoot(this.paintGroupRoot());
+      node.setpaintGroupNode(this.paintGroupNode());
       node
         .siblings()
-        .forEachNode((n) => n.setPaintGroupRoot(this.paintGroupRoot()));
+        .forEachNode((n) => n.setpaintGroupNode(this.paintGroupNode()));
       if (node.paintGroup().next() !== node) {
         const pg = findPaintGroup(this);
         pg.paintGroup().merge(node);
