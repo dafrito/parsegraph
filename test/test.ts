@@ -1385,17 +1385,17 @@ describe("Package", function () {
 
   it("Node lisp test simplified", function () {
     const root = makeNode(BUD);
-    root.state().setId("root");
+    root.setId("root");
 
     const a = makeNode(BLOCK);
-    a.state().setId("a");
+    a.setId("a");
     const b = makeNode(BLOCK);
-    b.state().setId("b");
+    b.setId("b");
     const c = makeNode(BLOCK);
-    c.state().setId("c");
+    c.setId("c");
 
     const chi = makeNode(BUD);
-    chi.state().setId("chi");
+    chi.setId("chi");
 
     chi.connectNode(FORWARD, c);
 
@@ -1410,7 +1410,7 @@ describe("Package", function () {
 
   it("Right-to-left test", function () {
     const node = makeNode(BUD);
-    node.state().setRightToLeft(true);
+    node.setRightToLeft(true);
   });
 
   it("Crease test", function () {
@@ -1455,7 +1455,7 @@ describe("Package", function () {
       n = child;
       if (i == 5) {
         n.crease();
-        n.state().setScale(0.5);
+        n.setScale(0.5);
         creased = n;
       }
     }
@@ -1479,7 +1479,7 @@ describe("Package", function () {
     const car = makeCaret(BUD);
     commitLayout(car.node());
     const originalRoot = car.node();
-    originalRoot.state().setId("ROOT");
+    originalRoot.setId("ROOT");
     // car.spawn('b', 'u');
     // car.spawn('f', 'u');
 
@@ -1502,10 +1502,10 @@ describe("Package", function () {
       */
 
     car.spawnMove("d", "b");
-    car.node().state().setId("CENTER BLOCK");
+    car.node().setId("CENTER BLOCK");
     car.push();
     car.spawnMove("b", "u");
-    car.node().state().setId("DOWN BUD");
+    car.node().setId("DOWN BUD");
     // car.spawnMove('d', 's');
     // car.label('1');
     car.pop();
@@ -1533,7 +1533,7 @@ describe("Package", function () {
     let car = makeCaret(BUD);
     commitLayout(car.node());
     const originalRoot = car.node();
-    originalRoot.state().setId("ROOT");
+    originalRoot.setId("ROOT");
     for (let i = 0; i < 5; ++i) {
       const subCar = makeCaret(BUD);
       car.node().connectNode(Direction.DOWNWARD, subCar.root());

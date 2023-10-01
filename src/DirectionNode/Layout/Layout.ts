@@ -95,7 +95,7 @@ export class Layout {
         // Just use the parent's absolute position to start.
         this._absoluteXPos = par._absoluteXPos;
         this._absoluteYPos = par._absoluteYPos;
-        scale = par._absoluteScale * node.state().scale();
+        scale = par._absoluteScale * node.scale();
         parentScale = par._absoluteScale;
         break;
       }
@@ -127,7 +127,7 @@ export class Layout {
           layout._absoluteVersion = findPaintGroup(node.parentNode()).layout()._absoluteVersion;
         }
       }
-      scale *= node.neighbors().nodeAt(directionToChild).state().scale();
+      scale *= node.neighbors().nodeAt(directionToChild).scale();
       node = node.neighbors().nodeAt(directionToChild);
     }
 
@@ -200,7 +200,7 @@ export class Layout {
         // Just use the parent's position to start.
         this._groupXPos = par._groupXPos;
         this._groupYPos = par._groupYPos;
-        scale = par._groupScale * node.state().scale();
+        scale = par._groupScale * node.scale();
         parentScale = par._groupScale;
         break;
       }
@@ -224,7 +224,7 @@ export class Layout {
       }
 
       parentScale = scale;
-      scale *= node.neighbors().nodeAt(directionToChild).state().scale();
+      scale *= node.neighbors().nodeAt(directionToChild).scale();
       node = node.neighbors().nodeAt(directionToChild);
     }
     this._groupScale = scale;

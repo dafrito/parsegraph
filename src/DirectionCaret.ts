@@ -286,7 +286,7 @@ export class DirectionCaret<Value> {
       readAlignment(newAlignmentMode)
     );
     if (newAlignmentMode != Alignment.NONE) {
-      this.node().state().setNodeFit(Fit.EXACT);
+      this.node().setNodeFit(Fit.EXACT);
     }
   }
 
@@ -314,7 +314,7 @@ export class DirectionCaret<Value> {
       node = node.neighbors().nodeAt(readDirection(inDirection));
     }
     if (node) {
-      node.state().setScale(SHRINK_SCALE);
+      node.setScale(SHRINK_SCALE);
     }
   }
 
@@ -324,7 +324,7 @@ export class DirectionCaret<Value> {
       node = node.neighbors().nodeAt(readDirection(inDirection));
     }
     if (node) {
-      node.state().setScale(1.0);
+      node.setScale(1.0);
     }
   }
 
@@ -333,7 +333,7 @@ export class DirectionCaret<Value> {
     if (inDirection) {
       node = node.neighbors().nodeAt(readDirection(inDirection));
     }
-    node.state().setNodeFit(Fit.EXACT);
+    node.setNodeFit(Fit.EXACT);
   }
 
   fitLoose(inDirection?: Direction | string): void {
@@ -341,7 +341,7 @@ export class DirectionCaret<Value> {
     if (inDirection) {
       node = node.neighbors().nodeAt(readDirection(inDirection));
     }
-    node.state().setNodeFit(Fit.LOOSE);
+    node.setNodeFit(Fit.LOOSE);
   }
 
   fitNaive(inDirection?: Direction | string): void {
@@ -349,7 +349,7 @@ export class DirectionCaret<Value> {
     if (inDirection) {
       node = node.neighbors().nodeAt(readDirection(inDirection));
     }
-    node.state().setNodeFit(Fit.NAIVE);
+    node.setNodeFit(Fit.NAIVE);
   }
 
   // ////////////////////////////////////////////////////////////////////////////
@@ -367,14 +367,14 @@ export class DirectionCaret<Value> {
     const created = this.doSpawn(newType);
     this.node().connectNode(readDirection(inDirection), created);
     created.siblings().setLayoutPreference(PreferredAxis.PERPENDICULAR);
-    created.state().setNodeFit(this.node().state().nodeFit());
+    created.setNodeFit(this.node().nodeFit());
 
     // Use the given alignment mode.
     if (newAlignmentMode !== undefined) {
       newAlignmentMode = readAlignment(newAlignmentMode);
       this.align(readDirection(inDirection), newAlignmentMode);
       if (newAlignmentMode !== Alignment.NONE) {
-        this.node().state().setNodeFit(Fit.EXACT);
+        this.node().setNodeFit(Fit.EXACT);
       }
     }
 
@@ -416,8 +416,8 @@ export class DirectionCaret<Value> {
 
   id(val?: string | number) {
     if (arguments.length === 0) {
-      return this.node().state().id();
+      return this.node().id();
     }
-    this.node().state().setId(val);
+    this.node().setId(val);
   }
 }

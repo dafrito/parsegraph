@@ -2,7 +2,7 @@ export * from "./DirectionNode";
 export * from "./Neighbor";
 export * from "./DirectionNodeSiblings";
 export * from "./DirectionNodePaintGroup";
-export * from "./DirectionNodeState";
+export * from "./Fit";
 export * from "./AxisOverlap";
 export * from "./Alignment";
 export * from "./Layout";

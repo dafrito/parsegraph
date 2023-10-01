@@ -365,7 +365,7 @@ describe("DirectionCaret", function () {
     //   namePreferredAxis(a._layoutPreference));
     const r = getLayoutNodes(root)[0];
     if (r !== c) {
-      throw new Error("Expected c, got " + r.state().id());
+      throw new Error("Expected c, got " + r.id());
     }
 
     root.disconnectNode(Direction.FORWARD);

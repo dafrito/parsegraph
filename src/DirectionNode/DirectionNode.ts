@@ -7,6 +7,7 @@ import createException, {
   NO_PARENT_CONNECT,
   NOT_PAINT_GROUP,
 } from "../Exception";
+import { Fit } from "./Fit";
 
 import {
   Direction,
@@ -25,15 +26,13 @@ import { DirectionNodeSiblings } from "./DirectionNodeSiblings";
 import {
   DirectionNodePaintGroup,
 } from "./DirectionNodePaintGroup";
-import { DirectionNodeState } from "./DirectionNodeState";
 
 import { Neighbors } from "./Neighbors";
 import { findPaintGroup } from "./findPaintGroup";
 
+let nodeCount = 0;
 export class DirectionNode<Value = any> {
   private _layout?: Layout;
-
-  private _state: DirectionNodeState<Value, DirectionNode<Value>>;
 
   private _neighbors: Neighbors;
 
@@ -42,8 +41,19 @@ export class DirectionNode<Value = any> {
     | DirectionNodePaintGroup
     | undefined;
   private _paintGroupRoot: DirectionNode;
+  private _id: string | number | undefined;
+  private _nodeFit: Fit;
+  private _rightToLeft: boolean;
+  private _scale: number;
+  private _value?: Value;
 
   constructor(value?: Value) {
+    this._id = nodeCount++;
+    this._value = undefined;
+    this._nodeFit = Fit.LOOSE;
+    this._rightToLeft = false;
+    this._scale = 1.0;
+
     // Neighbors
     this._neighbors = new Neighbors(this);
 
@@ -411,33 +421,60 @@ export class DirectionNode<Value = any> {
   //
   // ///////////////////////////////////////////////////////////////////////////
 
-  hasState() {
-    return !!this._state;
+  id(): string | number | undefined {
+    return this._id;
   }
 
-  state() {
-    if (!this._state) {
-      this._state = new DirectionNodeState(this);
-    }
-    return this._state;
-  }
-
-  id() {
-    return this.state().id();
-  }
-
-  setId(id: string | number) {
-    this.state().setId(id);
+  setId(id: string | number | undefined) {
+    this._id = id;
     return this;
   }
 
   value(): Value | undefined {
-    return this.hasState() ? this.state().value() : undefined;
+    return this._value;
   }
 
-  setValue(value: Value | undefined) {
-    return this.state().setValue(value);
+  setValue(newValue: Value | undefined, report?: boolean): Value | undefined {
+    // console.log("Setting value to ", newValue);
+    const orig = this.value();
+    if (orig === newValue) {
+      return orig;
+    }
+    const oldVal = this._value;
+    this._value = newValue;
+    if (arguments.length === 1 || report) {
+      this.layoutChanged();
+    }
+    return this._value;
   }
+
+  rightToLeft(): boolean {
+    return this._rightToLeft;
+  }
+
+  setRightToLeft(val: boolean): void {
+    this._rightToLeft = !!val;
+    this.layoutChanged();
+  }
+
+  nodeFit(): Fit {
+    return this._nodeFit;
+  }
+
+  setNodeFit(nodeFit: Fit): void {
+    this._nodeFit = nodeFit;
+    this.layoutChanged();
+  }
+
+  scale(): number {
+    return this._scale;
+  }
+
+  setScale(scale: number): void {
+    this._scale = scale;
+    this.layoutChanged();
+  }
+
 
   getAlignment(inDirection: Direction): Alignment {
     if (this.neighbors().hasNode(inDirection)) {

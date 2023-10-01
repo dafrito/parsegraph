@@ -1,4 +1,4 @@
-import createException, { BAD_NODE_FIT } from "../../Exception";
+import createException, { BAD_NODE_FIT } from "../Exception";
 
 export enum Fit {
   NULL = 14,
