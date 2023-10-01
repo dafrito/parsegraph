@@ -9,15 +9,7 @@ import createException, {
   NODE_IS_ROOT,
   BAD_LAYOUT_PREFERENCE,
 } from "../../Exception";
-import { NeighborNode } from "../Neighbors";
-import { StateNode } from "../..";
-
-export interface SiblingNode<T extends SiblingNode<T>>
-  extends NeighborNode<T>,
-    StateNode {
-  siblings(): DirectionNodeSiblings<T>;
-  localPaintGroup(): any;
-}
+import { DirectionNode } from "../DirectionNode";
 
 const MAX_SIBLINGS = 100000;
 
@@ -39,21 +31,21 @@ const VERTICAL_ORDER: Direction[] = [
   Direction.OUTWARD,
 ];
 
-export class DirectionNodeSiblings<T extends SiblingNode<T>> {
-  _prev: T;
-  _next: T;
-  _node: T;
+export class DirectionNodeSiblings {
+  _prev: DirectionNode;
+  _next: DirectionNode;
+  _node: DirectionNode;
   _layoutPreference: PreferredAxis;
 
-  constructor(node: T) {
+  constructor(node: DirectionNode) {
     this._node = node;
     this._prev = this._node;
     this._next = this._node;
     this._layoutPreference = PreferredAxis.HORIZONTAL;
   }
 
-  forEachNode(func: (node: T) => void): void {
-    let node: T = this.node();
+  forEachNode(func: (node: DirectionNode) => void): void {
+    let node: DirectionNode = this.node();
     do {
       func(node);
       node = node.siblings().prev();
@@ -75,12 +67,12 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
   }
 
   removeFromLayout(inDirection: Direction): void {
-    const disconnected: T = this.node().neighbors().nodeAt(inDirection);
+    const disconnected: DirectionNode = this.node().neighbors().nodeAt(inDirection);
     if (!disconnected) {
       return;
     }
-    const layoutBefore: T = this.node().siblings().earlier(inDirection);
-    const earliestDisc: T = disconnected.siblings().head(disconnected);
+    const layoutBefore: DirectionNode = this.node().siblings().earlier(inDirection);
+    const earliestDisc: DirectionNode = disconnected.siblings().head(disconnected);
 
     if (layoutBefore) {
       this.connect(layoutBefore, disconnected.siblings().next());
@@ -95,24 +87,24 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
     disconnected.siblings().verify();
   }
 
-  private connect(a: T, b: T): void {
+  private connect(a: DirectionNode, b: DirectionNode): void {
     // console.log("connecting " +  a.id() + " to " + b.id());
     a.siblings()._next = b;
     b.siblings()._prev = a;
   }
 
   insertIntoLayout(inDirection: Direction): void {
-    const node: T = this.node().neighbors().nodeAt(inDirection);
+    const node: DirectionNode = this.node().neighbors().nodeAt(inDirection);
     if (!node) {
       return;
     }
 
-    const nodeHead: T = node.siblings().head();
+    const nodeHead: DirectionNode = node.siblings().head();
 
-    const layoutAfter: T = this.node().siblings().later(inDirection);
-    const layoutBefore: T = this.node().siblings().earlier(inDirection);
+    const layoutAfter: DirectionNode = this.node().siblings().later(inDirection);
+    const layoutBefore: DirectionNode = this.node().siblings().earlier(inDirection);
 
-    const nodeTail: T = node;
+    const nodeTail: DirectionNode = node;
     // console.log(this + ".connectNode(" + nameDirection(inDirection) +
     //   ", " + node + ") layoutBefore=" +
     //   layoutBefore + " layoutAfter=" +
@@ -134,16 +126,16 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
     this.verify();
   }
 
-  next(): T {
+  next(): DirectionNode {
     return this._next;
   }
 
-  prev(): T {
+  prev(): DirectionNode {
     return this._prev;
   }
 
-  head(excludeThisNode?: T): T {
-    let deeplyLinked: T = this.node();
+  head(excludeThisNode?: DirectionNode): DirectionNode {
+    let deeplyLinked: DirectionNode = this.node();
     let foundOne;
     while (true) {
       foundOne = false;
@@ -171,7 +163,7 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
     return deeplyLinked;
   }
 
-  earlier(inDirection: Direction): T {
+  earlier(inDirection: Direction): DirectionNode {
     let layoutBefore;
     const dirs = this.node().siblings().layoutOrder();
     let pastDir = false;
@@ -198,7 +190,7 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
     return layoutBefore;
   }
 
-  later(inDirection: Direction): T {
+  later(inDirection: Direction): DirectionNode {
     let layoutAfter;
     const dirs = this.node().siblings().layoutOrder();
     let pastDir = false;
@@ -330,9 +322,9 @@ export class DirectionNodeSiblings<T extends SiblingNode<T>> {
     this.verify();
   }
 
-  dump(): T[] {
-    const nodes: T[] = [];
-    let node: T = this.node();
+  dump(): DirectionNode[] {
+    const nodes: DirectionNode[] = [];
+    let node: DirectionNode = this.node();
     do {
       node = node.siblings().next();
       nodes.push(node);

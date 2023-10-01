@@ -20,40 +20,37 @@ import { Layout } from "./Layout";
 import { LayoutPhase } from "./Layout";
 import Alignment from "./Alignment";
 import AxisOverlap from "./AxisOverlap";
-import { NeighborData } from "./NeighborData";
+import { Neighbor } from "./Neighbor";
 import { DirectionNodeSiblings } from "./DirectionNodeSiblings";
 import {
   DirectionNodePaintGroup,
-  PaintGroupNode,
 } from "./DirectionNodePaintGroup";
 import { DirectionNodeState } from "./DirectionNodeState";
 
 import { Neighbors } from "./Neighbors";
 import { findPaintGroup } from "./findPaintGroup";
 
-export class DirectionNode<Value = any>
-  implements PaintGroupNode<DirectionNode<Value>>
-{
+export class DirectionNode<Value = any> {
   private _layout?: Layout;
 
   private _state: DirectionNodeState<Value, DirectionNode<Value>>;
 
-  private _neighbors: Neighbors<DirectionNode<Value>>;
+  private _neighbors: Neighbors;
 
-  private _siblings: DirectionNodeSiblings<DirectionNode<Value>>;
+  private _siblings: DirectionNodeSiblings;
   private _paintGroup:
-    | DirectionNodePaintGroup<DirectionNode<Value>>
+    | DirectionNodePaintGroup
     | undefined;
   private _paintGroupRoot: DirectionNode;
 
   constructor(value?: Value) {
     // Neighbors
-    this._neighbors = new Neighbors<DirectionNode<Value>>(this);
+    this._neighbors = new Neighbors(this);
 
     // Layout
-    this._siblings = new DirectionNodeSiblings<DirectionNode<Value>>(this);
+    this._siblings = new DirectionNodeSiblings(this);
     this._paintGroupRoot = this;
-    this._paintGroup = new DirectionNodePaintGroup<DirectionNode<Value>>(
+    this._paintGroup = new DirectionNodePaintGroup(
       this,
       false
     );
@@ -88,11 +85,11 @@ export class DirectionNode<Value = any>
   //
   // ///////////////////////////////////////////////////////////////////////////
 
-  neighbors(): Neighbors<DirectionNode<Value>> {
+  neighbors(): Neighbors {
     return this._neighbors;
   }
 
-  neighborAt(dir: Direction): NeighborData<DirectionNode<Value>> {
+  neighborAt(dir: Direction): Neighbor {
     return this.neighbors().at(dir);
   }
 
@@ -132,7 +129,7 @@ export class DirectionNode<Value = any>
   //
   // ///////////////////////////////////////////////////////////////////////////
 
-  siblings(): DirectionNodeSiblings<DirectionNode<Value>> {
+  siblings(): DirectionNodeSiblings {
     return this._siblings;
   }
 
@@ -164,7 +161,7 @@ export class DirectionNode<Value = any>
    *
    * @return {DirectionNodePaintGroup | undefined} this node's paint group, or undefined if it is not a paint group.
    */
-  localPaintGroup(): DirectionNodePaintGroup<DirectionNode<Value>> | undefined {
+  localPaintGroup(): DirectionNodePaintGroup | undefined {
     return this._paintGroup;
   }
 
@@ -203,7 +200,7 @@ export class DirectionNode<Value = any>
    *
    * @return {DirectionNodePaintGroup} the paint group used for this DirectionNode.
    */
-  paintGroup(): DirectionNodePaintGroup<DirectionNode<Value>> {
+  paintGroup(): DirectionNodePaintGroup {
     if (!this._paintGroup) {
       const node = this.paintGroupRoot();
       if (!node) {
@@ -240,7 +237,7 @@ export class DirectionNode<Value = any>
     if (this.localPaintGroup()) {
       this.paintGroup().crease();
     } else {
-      this._paintGroup = new DirectionNodePaintGroup<DirectionNode<Value>>(
+      this._paintGroup = new DirectionNodePaintGroup(
         this,
         true
       );
@@ -442,19 +439,19 @@ export class DirectionNode<Value = any>
     return this.state().setValue(value);
   }
 
-  nodeAlignmentMode(inDirection: Direction): Alignment {
+  getAlignment(inDirection: Direction): Alignment {
     if (this.neighbors().hasNode(inDirection)) {
       return this.neighborAt(inDirection).alignmentMode;
     }
     return Alignment.NULL;
   }
 
-  setNodeAlignmentMode(
+  align(
     inDirection: Direction | Alignment,
     newAlignmentMode?: Alignment
   ): void {
     if (newAlignmentMode === undefined) {
-      return this.parentNode().setNodeAlignmentMode(
+      return this.parentNode().align(
         reverseDirection(this.parentDirection()),
         inDirection as Alignment
       );

@@ -115,7 +115,7 @@ export class CommitLayout extends BaseCommitLayout {
 
     let rv;
 
-    const alignmentMode = node.nodeAlignmentMode(childDirection);
+    const alignmentMode = node.getAlignment(childDirection);
     switch (alignmentMode) {
       case Alignment.NULL:
         throw createException(BAD_NODE_ALIGNMENT);
@@ -196,7 +196,7 @@ export class CommitLayout extends BaseCommitLayout {
 
     // Determine the line length.
     let extentSize: number;
-    if (node.nodeAlignmentMode(childDirection) === Alignment.NONE) {
+    if (node.getAlignment(childDirection) === Alignment.NONE) {
       child.layout().size(this.firstSize);
       if (isVerticalDirection(childDirection)) {
         extentSize = this.firstSize.height() / 2;
@@ -418,7 +418,7 @@ export class CommitLayout extends BaseCommitLayout {
     }
     const nestedSize: Size = nestedNode.layout().extentSize(this.firstSize);
     if (
-      node.nodeAlignmentMode(Direction.INWARD) === Alignment.INWARD_VERTICAL
+      node.getAlignment(Direction.INWARD) === Alignment.INWARD_VERTICAL
     ) {
       node.setPosAt(
         Direction.INWARD,

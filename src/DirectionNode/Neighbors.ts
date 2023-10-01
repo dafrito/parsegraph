@@ -1,4 +1,4 @@
-import { NeighborData } from "./NeighborData";
+import { Neighbor } from "./Neighbor";
 import {
   Axis,
   Direction,
@@ -7,22 +7,19 @@ import {
   getPositiveDirection,
 } from "../Direction";
 import createException, { BAD_NODE_DIRECTION, BAD_AXIS } from "../Exception";
+import { DirectionNode } from "./DirectionNode";
 
-export interface NeighborNode<T extends NeighborNode<T>> {
-  neighbors(): Neighbors<T>;
-}
+export class Neighbors {
+  private _node: DirectionNode;
+  private _neighbors: Neighbor[];
+  private _parentNeighbor: Neighbor | undefined;
 
-export class Neighbors<T extends NeighborNode<T>> {
-  private _node: T;
-  private _neighbors: NeighborData<T>[];
-  private _parentNeighbor: NeighborData<T> | undefined;
-
-  constructor(node: T) {
+  constructor(node: DirectionNode) {
     this._node = node;
     this._neighbors = new Array(NUM_DIRECTIONS);
   }
 
-  assignParent(fromNode?: T, parentDirection?: Direction): void {
+  assignParent(fromNode?: DirectionNode, parentDirection?: Direction): void {
     if (arguments.length === 0 || !fromNode) {
       // Clearing the parent.
       this._parentNeighbor = undefined;
@@ -36,7 +33,7 @@ export class Neighbors<T extends NeighborNode<T>> {
     }
   }
 
-  parent(): NeighborData<T> | undefined {
+  parent(): Neighbor | undefined {
     return this._parentNeighbor;
   }
 
@@ -44,13 +41,13 @@ export class Neighbors<T extends NeighborNode<T>> {
     return this._node;
   }
 
-  at(dir: Direction): NeighborData<T> {
+  at(dir: Direction): Neighbor {
     return this._neighbors[dir];
   }
 
-  ensure(inDirection: Direction): NeighborData<T> {
+  ensure(inDirection: Direction): Neighbor {
     if (!this.at(inDirection)) {
-      this._neighbors[inDirection] = new NeighborData(this.node(), inDirection);
+      this._neighbors[inDirection] = new Neighbor(this.node(), inDirection);
     }
     return this.at(inDirection);
   }
@@ -92,8 +89,8 @@ export class Neighbors<T extends NeighborNode<T>> {
     return this.hasChildAt(direction);
   }
 
-  hasAncestor(parent: T): boolean {
-    let candidate: T | undefined = this.node();
+  hasAncestor(parent: DirectionNode): boolean {
+    let candidate: DirectionNode | undefined = this.node();
     while (!candidate.neighbors().isRoot()) {
       if (candidate == parent) {
         return true;
@@ -123,7 +120,7 @@ export class Neighbors<T extends NeighborNode<T>> {
     );
   }
 
-  nodeAt(atDirection: Direction): T {
+  nodeAt(atDirection: Direction): DirectionNode {
     const n = this.at(atDirection);
     if (!n) {
       if (this.parent()?.reverseDirection() === atDirection) {
@@ -150,8 +147,8 @@ export class Neighbors<T extends NeighborNode<T>> {
     });
   }
 
-  root(): T {
-    let p: T = this.node();
+  root(): DirectionNode {
+    let p: DirectionNode = this.node();
     while (!p.neighbors().isRoot()) {
       const par = p.neighbors().parent()?.node();
       if (!par) {

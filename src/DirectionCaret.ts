@@ -281,7 +281,7 @@ export class DirectionCaret<Value> {
     inDirection: Direction | string,
     newAlignmentMode: Alignment | string
   ): void {
-    this.node().setNodeAlignmentMode(
+    this.node().align(
       readDirection(inDirection),
       readAlignment(newAlignmentMode)
     );

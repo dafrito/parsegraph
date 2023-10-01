@@ -4,7 +4,7 @@ import { Size } from "../../../Size";
 
 /**
  * Provides sizing information for {@link DirectionNode} graphs and can paint
- * during {@link CommitLayoutData} commits.
+ * during {@link CommitLayout} commits.
  */
 export interface LayoutPainter {
   /**

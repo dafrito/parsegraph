@@ -1,5 +1,5 @@
 export * from "./DirectionNode";
-export * from "./NeighborData";
+export * from "./Neighbor";
 export * from "./DirectionNodeSiblings";
 export * from "./DirectionNodePaintGroup";
 export * from "./DirectionNodeState";
