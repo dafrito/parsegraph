@@ -42,7 +42,7 @@ export class Layout {
     this._groupYPos = NaN;
     this._groupScale = NaN;
 
-    this._size = new Size();
+    this._size = [NaN, NaN];
   }
 
   setPhase(state: LayoutPhase) {
@@ -281,97 +281,78 @@ export class Layout {
     this.extentsAt(atDirection).setOffset(offset);
   }
 
-  extentSize(outPos?: Size): Size {
-    if (!outPos) {
-      outPos = new Size();
-    }
-
+  extentSize(outPos: number[]): void {
     // We can just use the length to determine the full size.
 
     // The horizontal extents have length in the vertical direction.
-    outPos.setHeight(this.extentsAt(Direction.FORWARD).boundingValues()[0]);
+    outPos[1] = this.extentsAt(Direction.FORWARD).boundingValues()[0];
 
     // The vertical extents have length in the vertical direction.
-    outPos.setWidth(this.extentsAt(Direction.DOWNWARD).boundingValues()[0]);
-
-    return outPos;
+    outPos[0] = this.extentsAt(Direction.DOWNWARD).boundingValues()[0];
   }
 
-  groupSizeRect(rect?: Rect): Rect {
-    const groupSize = this.groupSize();
-    if (!rect) {
-      return new Rect(
-        this.groupX(),
-        this.groupY(),
-        groupSize.width(),
-        groupSize.height()
-      );
-    }
-    rect.setX(this.groupX());
-    rect.setY(this.groupY());
-    rect.setWidth(groupSize.width());
-    rect.setHeight(groupSize.height());
-    return rect;
+  groupSizeRect(rect: number[]): void {
+    this.groupSize(rect);
+    rect[2] = rect[0];
+    rect[3] = rect[1];
+    rect[0] = this.groupX();
+    rect[1] = this.groupY();
   }
 
-  absoluteSizeRect(rect?: Rect): Rect {
-    const absoluteSize = this.absoluteSize();
-    if (!rect) {
-      return new Rect(
-        this.absoluteX(),
-        this.absoluteY(),
-        absoluteSize.width(),
-        absoluteSize.height()
-      );
-    }
-    rect.setX(this.absoluteX());
-    rect.setY(this.absoluteY());
-    rect.setWidth(absoluteSize.width());
-    rect.setHeight(absoluteSize.height());
-    return rect;
+  absoluteSizeRect(rect: number[]): void {
+    this.absoluteSize(rect);
+    rect[2] = rect[0];
+    rect[3] = rect[1];
+    rect[0] = this.absoluteX();
+    rect[1] = this.absoluteY();
   }
 
-  size(bodySize?: Size): Size {
+  size(bodySize: number[]): void {
     if (bodySize) {
-      bodySize.setSize(this._size.width(), this._size.height());
+      bodySize[0] = this._size[0];
+      bodySize[1] = this._size[1];
     }
-    return this._size;
   }
 
-  setSize(bodySize: Size) {
-    this._size.setSize(bodySize.width(), bodySize.height());
+  setSize(bodySize: number[]) {
+    this._size[0] = bodySize[0];
+    this._size[1] = bodySize[1];
   }
 
-  absoluteSize(bodySize?: Size): Size {
-    return this.size(bodySize).scaled(this.absoluteScale());
+  absoluteSize(bodySize: number[]): void {
+    this.size(bodySize);
+    const absScale = this.absoluteScale();
+    bodySize[0] *= absScale;
+    bodySize[1] *= absScale;
   }
 
-  groupSize(bodySize?: Size): Size {
-    bodySize = this.size(bodySize);
-    bodySize.scale(this.groupScale());
-    return bodySize;
+  groupSize(bodySize: number[]): void {
+    const groupScale = this.groupScale();
+    bodySize[0] = this._size[0] * groupScale;
+    bodySize[1] = this._size[1] * groupScale;
   }
 
   inNodeBody(
     x: number,
     y: number,
     userScale: number,
-    bodySize?: Size
+    bodySize: Size
   ): boolean {
-    const s = this.size(bodySize);
+    this.size(bodySize);
+    const s = bodySize;
     const ax = this.absoluteX();
     const ay = this.absoluteY();
     const aScale = this.absoluteScale();
-    if (x < userScale * ax - (userScale * aScale * s.width()) / 2) {
+    if (x < userScale * ax - (userScale * aScale * s[0]) / 2) {
       return false;
     }
-    if (x > userScale * ax + (userScale * aScale * s.width()) / 2) {
+    if (x > userScale * ax + (userScale * aScale * s[0]) / 2) {
       return false;
     }
-    if (y < userScale * ay - (userScale * aScale * s.height()) / 2) {
+    if (y < userScale * ay - (userScale * aScale * s[1]) / 2) {
       return false;
     }
-    if (y > userScale * ay + (userScale * aScale * s.height()) / 2) {
+    if (y > userScale * ay + (userScale * aScale * s[1]) / 2) {
       return false;
     }
     return true;
@@ -397,7 +378,7 @@ export class Layout {
     const forwardMax =
       userScale * ax -
       userScale * aScale * this.extentOffsetAt(Direction.DOWNWARD) +
-      userScale * aScale * extentSize.width();
+      userScale * aScale * extentSize[0];
     if (x > forwardMax) {
       return false;
     }
@@ -410,7 +391,7 @@ export class Layout {
     const vertMax =
       userScale * ay -
       userScale * aScale * this.extentOffsetAt(Direction.FORWARD) +
-      userScale * aScale * extentSize.height();
+      userScale * aScale * extentSize[1];
     if (y > vertMax) {
       return false;
     }
@@ -426,7 +407,7 @@ export class Layout {
       userScale = 1;
     }
 
-    const extentSize: Size = new Size();
+    const extentSize: Size = [NaN, NaN];
     const candidates: DirectionNode[] = [this.node()];
 
     const addCandidate = (node: DirectionNode, direction: Direction) => {

@@ -39,8 +39,8 @@ const demo = (rootNode: DirectionNode): Metrics => {
     size: (node: DirectionNode, size: Size) => {
       // TODO Provide the size of the node to the size object.
       // This will be called for every DirectionNode.
-      size.setWidth(24);
-      size.setHeight(80);
+      size[0] = 24;
+      size[1] = 80;
       ++m.sizes;
     },
     getSeparation: () => {
@@ -90,8 +90,8 @@ const demo2 = (rootNode: DirectionNode): Metrics2 => {
     size: (node: DirectionNode, size: Size) => {
       // TODO Provide the size of the node to the size object.
       // This will be called for every DirectionNode.
-      size.setWidth(24);
-      size.setHeight(80);
+      size[0] = 24;
+      size[1] = 80;
       ++m.sizes;
     },
     getSeparation: () => {
@@ -143,8 +143,8 @@ const demoMultiple = (rootNode: DirectionNode): (() => Metrics) => {
     size: (node: DirectionNode, size: Size) => {
       // TODO Provide the size of the node to the size object.
       // This will be called for every DirectionNode.
-      size.setWidth(24);
-      size.setHeight(80);
+      size[0] = 24;
+      size[1] = 80;
       ++m.sizes;
     },
     getSeparation: () => {
@@ -205,8 +205,8 @@ describe("CommitLayout", () => {
       size: (node: DirectionNode, size: Size) => {
         // TODO Provide the size of the node to the size object.
         // This will be called for every DirectionNode.
-        size.setWidth(24);
-        size.setHeight(80);
+        size[0] = 24;
+        size[1] = 80;
         ++sizeCount;
       },
       getSeparation: () => {
@@ -263,8 +263,8 @@ describe("CommitLayout", () => {
       size: (node: DirectionNode, size: Size) => {
         // TODO Provide the size of the node to the size object.
         // This will be called for every DirectionNode.
-        size.setWidth(24);
-        size.setHeight(80);
+        size[0] = 24;
+        size[1] = 80;
         ++sizeCount;
       },
       getSeparation: () => {
@@ -323,8 +323,8 @@ describe("CommitLayout", () => {
       size: (node: DirectionNode, size: Size) => {
         // TODO Provide the size of the node to the size object.
         // This will be called for every DirectionNode.
-        size.setWidth(24);
-        size.setHeight(80);
+        size[0] = 24;
+        size[1] = 80;
         ++sizeCount;
       },
       getSeparation: () => {
@@ -863,8 +863,8 @@ describe("CommitLayout", () => {
       size: (node: DirectionNode, size: Size) => {
         // TODO Provide the size of the node to the size object.
         // This will be called for every DirectionNode.
-        size.setWidth(24);
-        size.setHeight(80);
+        size[0] = 24;
+        size[1] = 80;
       },
       getSeparation: () => {
         // TODO return the minimum separation between two DirectionNodes.
@@ -909,7 +909,8 @@ describe("CommitLayout", () => {
     }
     const painter = {
       size: (_: DirectionNode, size: Size) => {
-        size.setSize(100, 100);
+        size[0] = 100;
+        size[1] = 100;
       },
       getSeparation: () => {
         return 0;

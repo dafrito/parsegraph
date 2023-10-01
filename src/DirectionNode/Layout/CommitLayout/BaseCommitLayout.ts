@@ -20,9 +20,9 @@ export class BaseCommitLayout {
 
   constructor(node: DirectionNode, painter: LayoutPainter) {
     this._painter = painter;
-    this.bodySize = new Size();
-    this.firstSize = new Size();
-    this.secondSize = new Size();
+    this.bodySize = [NaN, NaN];
+    this.firstSize = [NaN, NaN];
+    this.secondSize = [NaN, NaN];
     this.reset(node);
   }
 
@@ -47,9 +47,12 @@ export class BaseCommitLayout {
     this.root = undefined;
     this.node = undefined;
     this.paintGroup = undefined;
-    this.bodySize.setSize(NaN, NaN);
-    this.firstSize.setSize(NaN, NaN);
-    this.secondSize.setSize(NaN, NaN);
+    this.bodySize[0] = NaN;
+    this.bodySize[1] = NaN;
+    this.firstSize[0] = NaN;
+    this.firstSize[1] = NaN;
+    this.secondSize[0] = NaN;
+    this.secondSize[1] = NaN;
   }
 
   startingNode(): DirectionNode {
@@ -86,11 +89,11 @@ export class BaseCommitLayout {
       node,
       Direction.DOWNWARD,
       // Length:
-      bodySize.width(),
+      bodySize[0],
       // Size:
-      bodySize.height() / 2,
+      bodySize[1] / 2,
       // Offset to body center:
-      bodySize.width() / 2
+      bodySize[0] / 2
     );
 
     // This node's horizontal top, used with upward nodes.
@@ -98,11 +101,11 @@ export class BaseCommitLayout {
       node,
       Direction.UPWARD,
       // Length:
-      bodySize.width(),
+      bodySize[0],
       // Size:
-      bodySize.height() / 2,
+      bodySize[1] / 2,
       // Offset to body center:
-      bodySize.width() / 2
+      bodySize[0] / 2
     );
 
     // This node's vertical back, used with backward nodes.
@@ -110,11 +113,11 @@ export class BaseCommitLayout {
       node,
       Direction.BACKWARD,
       // Length:
-      bodySize.height(),
+      bodySize[1],
       // Size:
-      bodySize.width() / 2,
+      bodySize[0] / 2,
       // Offset to body center:
-      bodySize.height() / 2
+      bodySize[1] / 2
     );
 
     // This node's vertical front, used with forward nodes.
@@ -122,11 +125,11 @@ export class BaseCommitLayout {
       node,
       Direction.FORWARD,
       // Length:
-      bodySize.height(),
+      bodySize[1],
       // Size:
-      bodySize.width() / 2,
+      bodySize[0] / 2,
       // Offset to body center:
-      bodySize.height() / 2
+      bodySize[1] / 2
     );
 
     // Implementations should actually commit the layout here.

@@ -56,7 +56,7 @@ export class CommitLayout extends BaseCommitLayout {
    */
   constructor(node: DirectionNode, painter: LayoutPainter) {
     super(node, painter);
-    this.lineBounds = new Size();
+    this.lineBounds = [NaN, NaN];
     this.bv = [NaN, NaN, NaN];
   }
 
@@ -199,9 +199,9 @@ export class CommitLayout extends BaseCommitLayout {
     if (node.neighbors().getAlignment(childDirection) === Alignment.NONE) {
       child.layout().size(this.firstSize);
       if (isVerticalDirection(childDirection)) {
-        extentSize = this.firstSize.height() / 2;
+        extentSize = this.firstSize[1] / 2;
       } else {
-        extentSize = this.firstSize.width() / 2;
+        extentSize = this.firstSize[0] / 2;
       }
     } else {
       extentSize = child
@@ -434,7 +434,8 @@ export class CommitLayout extends BaseCommitLayout {
       node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
       return true;
     }
-    const nestedSize: Size = nestedNode.layout().extentSize(this.firstSize);
+    nestedNode.layout().extentSize(this.firstSize);
+    const nestedSize = this.firstSize;
     if (
       node.neighbors().getAlignment(Direction.INWARD) ===
       Alignment.INWARD_VERTICAL
@@ -445,12 +446,12 @@ export class CommitLayout extends BaseCommitLayout {
           Direction.INWARD,
           nestedNode.scale() *
             (nestedNode.layout().extentOffsetAt(Direction.DOWNWARD) -
-              nestedSize.width() / 2),
-          this.bodySize.height() / 2 -
+              nestedSize[0] / 2),
+          this.bodySize[1] / 2 -
             this.getSeparation(node, Axis.Z, Direction.INWARD, true) /
               2 +
             nestedNode.scale() *
-              (-nestedSize.height() +
+              (-nestedSize[1] +
                 nestedNode.layout().extentOffsetAt(Direction.FORWARD))
         );
     } else {
@@ -459,7 +460,7 @@ export class CommitLayout extends BaseCommitLayout {
         .neighbors()
         .setPosAt(
           Direction.INWARD,
-          this.bodySize.width() / 2 -
+          this.bodySize[0] / 2 -
             this.getSeparation(
               node,
               Axis.Z,
@@ -468,11 +469,11 @@ export class CommitLayout extends BaseCommitLayout {
             ) /
               2 +
             nestedNode.scale() *
-              (-nestedSize.width() +
+              (-nestedSize[0] +
                 nestedNode.layout().extentOffsetAt(Direction.DOWNWARD)),
           nestedNode.scale() *
             (nestedNode.layout().extentOffsetAt(Direction.FORWARD) -
-              nestedSize.height() / 2)
+              nestedSize[1] / 2)
         );
     }
 
@@ -780,14 +781,14 @@ export class CommitLayout extends BaseCommitLayout {
 
     // Add padding and ensure the child is not separated less than
     // it would be if the node was not offset by alignment.
-    child.layout().size().copyTo(this.firstSize);
+    child.layout().size(this.firstSize);
 
     if (getDirectionAxis(direction) == Axis.VERTICAL) {
       separationFromChild = Math.max(
         separationFromChild,
         node.neighbors().nodeAt(direction).scale() *
-          (this.firstSize.height() / 2) +
-          this.bodySize.height() / 2
+          (this.firstSize[1] / 2) +
+          this.bodySize[1] / 2
       );
       separationFromChild +=
         this.getSeparation(node, Axis.VERTICAL, direction, true) *
@@ -796,8 +797,8 @@ export class CommitLayout extends BaseCommitLayout {
       separationFromChild = Math.max(
         separationFromChild,
         node.neighbors().nodeAt(direction).scale() *
-          (this.firstSize.width() / 2) +
-          this.bodySize.width() / 2
+          (this.firstSize[0] / 2) +
+          this.bodySize[0] / 2
       );
       separationFromChild +=
         this.getSeparation(node, Axis.HORIZONTAL, direction, false) *
@@ -1043,8 +1044,8 @@ export class CommitLayout extends BaseCommitLayout {
       separationFromFirst = Math.max(
         separationFromFirst,
         node.neighbors().nodeAt(firstDirection).scale() *
-          (this.firstSize.height() / 2) +
-          this.bodySize.height() / 2
+          (this.firstSize[1] / 2) +
+          this.bodySize[1] / 2
       );
       separationFromFirst +=
         this.getSeparation(
@@ -1057,8 +1058,8 @@ export class CommitLayout extends BaseCommitLayout {
       separationFromSecond = Math.max(
         separationFromSecond,
         node.neighbors().nodeAt(secondDirection).scale() *
-          (this.secondSize.height() / 2) +
-          this.bodySize.height() / 2
+          (this.secondSize[1] / 2) +
+          this.bodySize[1] / 2
       );
       separationFromSecond +=
         this.getSeparation(
@@ -1071,8 +1072,8 @@ export class CommitLayout extends BaseCommitLayout {
       separationFromFirst = Math.max(
         separationFromFirst,
         node.neighbors().nodeAt(firstDirection).scale() *
-          (this.firstSize.width() / 2) +
-          this.bodySize.width() / 2
+          (this.firstSize[0] / 2) +
+          this.bodySize[0] / 2
       );
       separationFromFirst +=
         this.getSeparation(
@@ -1085,8 +1086,8 @@ export class CommitLayout extends BaseCommitLayout {
       separationFromSecond = Math.max(
         separationFromSecond,
         node.neighbors().nodeAt(secondDirection).scale() *
-          (this.secondSize.width() / 2) +
-          this.bodySize.width() / 2
+          (this.secondSize[0] / 2) +
+          this.bodySize[0] / 2
       );
       separationFromSecond +=
         this.getSeparation(
@@ -1133,11 +1134,11 @@ export class CommitLayout extends BaseCommitLayout {
     direction: Direction,
     bodySize: Size
   ): number {
-    node.layout().size().copyTo(bodySize);
+    node.layout().size(bodySize);
     if (isVerticalDirection(direction)) {
-      return bodySize.height() / 2;
+      return bodySize[1] / 2;
     } else {
-      return bodySize.width() / 2;
+      return bodySize[0] / 2;
     }
   }
 
@@ -1166,9 +1167,9 @@ export class CommitLayout extends BaseCommitLayout {
       // Append the line-shaped bound.
       let lineSize: number;
       if (perpAxis === Axis.VERTICAL) {
-        lineSize = this.bodySize.height() / 2;
+        lineSize = this.bodySize[1] / 2;
       } else {
-        lineSize = this.bodySize.width() / 2;
+        lineSize = this.bodySize[0] / 2;
       }
       // lineSize = this.neighbors().nodeAt(given).scale() * LINE_THICKNESS / 2;
       node
