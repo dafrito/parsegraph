@@ -898,4 +898,30 @@ describe("CommitLayout", () => {
     assert.equal(renderCounts, 1);
     assert.equal(layoutCounts, 1);
   });
+
+  it("is recoverable if replaced", () => {
+    const root = new DirectionNode("root");
+    let n = root;
+    for(let i = 0; i < 100; ++i) {
+      const child = new DirectionNode("child");
+      n.connect(Direction.FORWARD, child);
+      n = child;
+    }
+    const painter = {
+      size: (_: DirectionNode, size: Size) => {
+        size.setSize(100, 100);
+      },
+      getSeparation: () => {
+        return 0;
+      }
+    };
+    const firstCld = new CommitLayout(root, painter);
+    for (let i = 0; i < 50; ++i) {
+      firstCld.crank();
+    }
+    expect(root.layout().needsCommit()).toEqual(true);
+    const secondCld = new CommitLayout(root, painter);
+    while(secondCld.crank());
+    expect(root.layout().needsCommit()).toEqual(false);
+  });
 });
