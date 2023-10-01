@@ -561,7 +561,7 @@ export class CommitLayout extends BaseCommitLayout {
           );*/
 
     // Get the alignment for the children.
-    const alignment: number = this.getAlignment(node, direction);
+    const alignment: number = getAlignment(node, direction);
     // console.log("Calculated alignment of " + alignment + ".");
 
     const child: DirectionNode = node.neighbors().nodeAt(direction);
@@ -629,7 +629,7 @@ export class CommitLayout extends BaseCommitLayout {
     //   separationFromChild + ".");
 
     // Set the node's position.
-    this.positionChild(node, direction, alignment, separationFromChild);
+    positionChild(node, direction, alignment, separationFromChild);
 
     // Combine the extents of the child and this node.
     this.combineExtents(node, direction, alignment, separationFromChild);
