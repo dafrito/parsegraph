@@ -7,7 +7,12 @@ import {
 
 import { DirectionNode } from "./DirectionNode";
 
-export type BoundsPainter = (x: number, y: number, w: number, h: number) => void;
+export type BoundsPainter = (
+  x: number,
+  y: number,
+  w: number,
+  h: number
+) => void;
 
 const size = [NaN, NaN];
 

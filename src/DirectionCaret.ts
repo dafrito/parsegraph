@@ -66,8 +66,8 @@ export class DirectionCaret<Value> {
 
   /**
    * Returns the caret's current node.
-   * 
-   * @returns {DirectionNode<Value>} the current node
+   *
+   * @return {DirectionNode<Value>} the current node
    * @throws if the caret has no node.
    */
   node(): DirectionNode<Value> {

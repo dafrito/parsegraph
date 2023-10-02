@@ -237,6 +237,6 @@ export const combineExtents = (
       );
       break;
     default:
-      throw new Error("Unknown direction given: " + childDirection)
+      throw new Error("Unknown direction given: " + childDirection);
   }
 };

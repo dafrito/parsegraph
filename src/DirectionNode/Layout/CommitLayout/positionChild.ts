@@ -76,9 +76,15 @@ export const positionChild = (
   const dirSign = directionSign(childDirection);
   if (isVerticalDirection(childDirection)) {
     // The child is positioned vertically.
-    node.neighbors().at(childDirection).setPos(alignment, dirSign * separation);
+    node
+      .neighbors()
+      .at(childDirection)
+      .setPos(alignment, dirSign * separation);
   } else {
-    node.neighbors().at(childDirection).setPos(dirSign * separation, alignment);
+    node
+      .neighbors()
+      .at(childDirection)
+      .setPos(dirSign * separation, alignment);
   }
   /* console.log(
             nameDirection(childDirection) + " " +

@@ -91,7 +91,9 @@ export class CommitLayout {
         throw new Error("Layout phase must not be null");
       case LayoutPhase.IN_COMMIT:
         // Do not allow overlapping layout commits.
-        throw new Error("Refusing to commit layout while it is already being committed");
+        throw new Error(
+          "Refusing to commit layout while it is already being committed"
+        );
     }
 
     // Begin the layout.

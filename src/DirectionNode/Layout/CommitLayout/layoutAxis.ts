@@ -38,7 +38,9 @@ export const layoutAxis = (
   bodySize: number[]
 ): boolean => {
   if (firstDirection === secondDirection && firstDirection != Direction.NULL) {
-    throw new Error("First and second directions cannot be the same unless they are both null");
+    throw new Error(
+      "First and second directions cannot be the same unless they are both null"
+    );
   }
   // Change the node direction to null if there is no node in that
   // direction.

@@ -13,7 +13,9 @@ export const findConsecutiveLength = (
 ): number => {
   // Exclude some directions that cannot be calculated.
   if (!isCardinalDirection(inDirection)) {
-    throw new Error("Given direction is not cardinal: " + nameDirection(inDirection));
+    throw new Error(
+      "Given direction is not cardinal: " + nameDirection(inDirection)
+    );
   }
 
   const directionAxis: Axis = getDirectionAxis(inDirection);

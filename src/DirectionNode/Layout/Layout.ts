@@ -328,7 +328,12 @@ export class Layout {
     bodySize[1] = this._size[1] * groupScale;
   }
 
-  inNodeBody(x: number, y: number, userScale: number, bodySize: number[]): boolean {
+  inNodeBody(
+    x: number,
+    y: number,
+    userScale: number,
+    bodySize: number[]
+  ): boolean {
     this.size(bodySize);
     const s = bodySize;
     const ax = this.absoluteX();

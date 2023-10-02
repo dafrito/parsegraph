@@ -46,7 +46,7 @@ export class Extent {
     return this._offset;
   }
 
-  forEach(func: (length: number, size: number, index: number)=>void): void {
+  forEach(func: (length: number, size: number, index: number) => void): void {
     for (let i = 0; i < this._numBounds; ++i) {
       func(this.boundLengthAt(i), this.boundSizeAt(i), i);
     }

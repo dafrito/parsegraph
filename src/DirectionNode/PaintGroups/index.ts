@@ -1,2 +1,2 @@
-export * from './PaintGroups';
-export * from './PaintGroup';
+export * from "./PaintGroups";
+export * from "./PaintGroup";

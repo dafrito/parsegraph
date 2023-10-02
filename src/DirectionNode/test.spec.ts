@@ -8,13 +8,9 @@ import {
   namePreferredAxis,
 } from "../../src/DirectionNode";
 
-import {
-  findPaintGroup,
-} from "./PaintGroups/findPaintGroup";
+import { findPaintGroup } from "./PaintGroups/findPaintGroup";
 
-import {
-  comesBefore,
-} from "./PaintGroups/comesBefore";
+import { comesBefore } from "./PaintGroups/comesBefore";
 
 import { DirectionCaret } from "../../src/DirectionCaret";
 

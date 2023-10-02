@@ -107,7 +107,9 @@ export function alternateDirection(given: Direction): Direction {
     case Direction.FORWARD:
       return Direction.DOWNWARD;
     default:
-      throw new Error("No alternate direction for direction: " + nameDirection(given));
+      throw new Error(
+        "No alternate direction for direction: " + nameDirection(given)
+      );
   }
 }
 
@@ -205,7 +207,9 @@ export function turnLeft(given: Direction): Direction {
     case Direction.UPWARD:
       return Direction.BACKWARD;
     default:
-      throw new Error("No direction to turn when given " + nameDirection(given));
+      throw new Error(
+        "No direction to turn when given " + nameDirection(given)
+      );
   }
 }
 

@@ -440,7 +440,9 @@ export class Siblings {
         given !== PreferredAxis.VERTICAL &&
         given !== PreferredAxis.HORIZONTAL
       ) {
-        throw new Error("Root layout preference can only be VERTICAL or HORIZONTAL");
+        throw new Error(
+          "Root layout preference can only be VERTICAL or HORIZONTAL"
+        );
       }
       if (this.getLayoutPreference() === given) {
         return;

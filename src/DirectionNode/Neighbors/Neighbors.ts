@@ -207,7 +207,7 @@ export class Neighbors {
     }
 
     if (!this.node().neighbors().hasNode(inDirection)) {
-      throw new Error("Node must have a child in the given direction")
+      throw new Error("Node must have a child in the given direction");
     }
 
     return this.at(inDirection).separation();

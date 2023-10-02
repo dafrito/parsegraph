@@ -27,7 +27,9 @@ export const connectNode = (
 ): DirectionNode => {
   // Ensure the node can be connected in the given direction.
   if (inDirection == Direction.OUTWARD) {
-    throw new Error("By rule, nodes cannot be spawned in the outward direction.");
+    throw new Error(
+      "By rule, nodes cannot be spawned in the outward direction."
+    );
   }
   if (inDirection == Direction.NULL) {
     throw new Error("Direction must not be null");
