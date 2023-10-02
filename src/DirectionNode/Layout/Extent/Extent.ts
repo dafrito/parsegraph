@@ -7,14 +7,14 @@ const NUM_EXTENT_BOUND_COMPONENTS = 2;
 const SEPARATION_TIMEOUT = 100000;
 
 export class Extent {
-  _offset: number;
-  _numBounds: number;
-  _bounds: Float32Array;
-  _start: number;
+  private _offset: number;
+  private _numBounds: number;
+  private _bounds: Float32Array;
+  private _start: number;
 
-  _minSize: number;
-  _maxSize: number;
-  _totalLength: number;
+  private _minSize: number;
+  private _maxSize: number;
+  private _totalLength: number;
 
   constructor(copy?: Extent) {
     if (copy !== undefined && copy._bounds) {

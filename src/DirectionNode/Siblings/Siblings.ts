@@ -28,10 +28,10 @@ const VERTICAL_ORDER: Direction[] = [
 ];
 
 export class Siblings {
-  _prev: DirectionNode;
-  _next: DirectionNode;
-  _node: DirectionNode;
-  _layoutPreference: PreferredAxis;
+  private _prev: DirectionNode;
+  private _next: DirectionNode;
+  private _node: DirectionNode;
+  private _layoutPreference: PreferredAxis;
 
   constructor(node: DirectionNode) {
     this._node = node;

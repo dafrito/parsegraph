@@ -5,10 +5,10 @@ import makeLimit from "./makeLimit";
 import { DirectionNode } from "..";
 
 export class PaintGroup {
-  _next: DirectionNode;
-  _prev: DirectionNode;
-  _node: DirectionNode;
-  _explicit: boolean;
+  private _next: DirectionNode;
+  private _prev: DirectionNode;
+  private _node: DirectionNode;
+  private _explicit: boolean;
 
   constructor(node: DirectionNode, explicit: boolean) {
     this._node = node;
