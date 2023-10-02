@@ -1,9 +1,9 @@
 import { DirectionNode } from "./DirectionNode";
-import { LinePainter } from "./paintNodeLines";
+import { BoundsPainter } from "./paintNodeLines";
 
 const size = [NaN, NaN];
 
-export function paintNodeBounds(node: DirectionNode, painter: LinePainter) {
+export function paintNodeBounds(node: DirectionNode, painter: BoundsPainter) {
   const layout = node.layout();
   layout.groupSize(size);
   const x = layout.groupX();

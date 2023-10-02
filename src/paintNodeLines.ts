@@ -7,13 +7,13 @@ import {
 
 import { DirectionNode } from "./DirectionNode";
 
-export type LinePainter = (x: number, y: number, w: number, h: number) => void;
+export type BoundsPainter = (x: number, y: number, w: number, h: number) => void;
 
 const size = [NaN, NaN];
 
 const drawLine = (
   lineThickness: number,
-  painter: LinePainter,
+  painter: BoundsPainter,
   direction: Direction,
   node: DirectionNode
 ) => {
@@ -66,7 +66,7 @@ const drawLine = (
 export function paintNodeLines(
   node: DirectionNode,
   lineThickness: number,
-  painter: LinePainter
+  painter: BoundsPainter
 ) {
   forEachCardinalDirection((dir: Direction) => {
     drawLine(lineThickness, painter, dir, node);
