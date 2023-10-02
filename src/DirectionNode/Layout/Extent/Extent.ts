@@ -341,11 +341,8 @@ export class Extent {
     lengthAdjustment: number,
     sizeAdjustment: number,
     scale: number,
-    bv?: number[]
+    bv: number[]
   ): void {
-    if (!bv) {
-      bv = [NaN, NaN, NaN];
-    }
     given.boundingValues(bv);
     const givenLength = bv[0];
     const givenMaxSize = bv[2];
