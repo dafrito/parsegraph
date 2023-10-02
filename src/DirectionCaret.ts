@@ -149,10 +149,6 @@ export class DirectionCaret<Value> {
     return !!node.paintGroups().isPaintGroup();
   }
 
-  creased(inDirection?: Direction | string): boolean {
-    return this.isCreased(inDirection);
-  }
-
   move(toDirection: Direction | string): void {
     const dest: DirectionNode<Value> = this.node()
       .neighbors()
