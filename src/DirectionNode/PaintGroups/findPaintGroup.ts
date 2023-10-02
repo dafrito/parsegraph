@@ -1,4 +1,4 @@
-import { DirectionNode } from "./DirectionNode";
+import { DirectionNode } from "../DirectionNode";
 
 /**
  * Finds the paint group root.

@@ -1,7 +1,7 @@
 import { Extent } from "./Extent";
 
 import { Direction, reverseDirection } from "../../Direction";
-import { findPaintGroup } from "../../DirectionNode/findPaintGroup";
+import { findPaintGroup } from "../../DirectionNode/PaintGroups/findPaintGroup";
 import { DirectionNode } from "../../DirectionNode/DirectionNode";
 import { LayoutPhase } from "./LayoutPhase";
 

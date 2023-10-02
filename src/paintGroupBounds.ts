@@ -1,6 +1,6 @@
 import { Direction, nameDirection } from "./Direction";
 import { DirectionNode } from "./DirectionNode";
-import { findPaintGroup } from "./DirectionNode/findPaintGroup";
+import { findPaintGroup } from "./DirectionNode/PaintGroups/findPaintGroup";
 
 export function paintGroupBounds(nodeRoot: DirectionNode) {
   if (

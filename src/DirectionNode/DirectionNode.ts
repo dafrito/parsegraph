@@ -6,8 +6,7 @@ import { Layout } from "./Layout";
 
 import { LayoutPhase } from "./Layout";
 import { Siblings } from "./Siblings";
-import { PaintGroup } from "./PaintGroup";
-import { PaintGroups } from "./PaintGroups";
+import { PaintGroups, PaintGroup } from "./PaintGroups";
 
 import { Neighbors } from "./Neighbors/Neighbors";
 import { connectNode } from "./connectNode";

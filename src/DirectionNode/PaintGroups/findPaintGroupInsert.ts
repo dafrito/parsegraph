@@ -1,4 +1,4 @@
-import { DirectionNode } from "./DirectionNode";
+import { DirectionNode } from "../DirectionNode";
 import { findClosestPaintGroup } from "./findClosestPaintGroup";
 import makeLimit from "./makeLimit";
 import { comesBefore } from "./comesBefore";

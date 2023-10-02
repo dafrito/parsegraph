@@ -1,5 +1,5 @@
 import { PaintGroup } from "./PaintGroup";
-import { DirectionNode } from "./DirectionNode";
+import { DirectionNode } from "../DirectionNode";
 
 export class PaintGroups {
   private _paintGroup: PaintGroup | undefined;

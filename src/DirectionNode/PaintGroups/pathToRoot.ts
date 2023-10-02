@@ -1,5 +1,5 @@
 import makeLimit from "./makeLimit";
-import { DirectionNode } from "./DirectionNode";
+import { DirectionNode } from "../DirectionNode";
 
 export const pathToRoot = (n: DirectionNode) => {
   const nodes: DirectionNode[] = [];

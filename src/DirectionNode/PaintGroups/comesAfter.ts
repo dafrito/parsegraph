@@ -1,5 +1,5 @@
 import { comesBefore } from "./comesBefore";
-import { DirectionNode } from "..";
+import { DirectionNode } from "../DirectionNode";
 
 /**
  * Returns true if the given other node comes after this node in layout order.

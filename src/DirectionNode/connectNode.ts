@@ -1,7 +1,7 @@
 import { Direction, reverseDirection } from "../Direction";
 
 import Alignment from "./Neighbors/Alignment";
-import { findPaintGroup } from "./findPaintGroup";
+import { findPaintGroup } from "./PaintGroups/findPaintGroup";
 
 import { DirectionNode } from "./DirectionNode";
 

@@ -1,7 +1,7 @@
 import { expect, assert } from "chai";
 import { Direction, readDirection } from "../../src/Direction";
 
-import { findPaintGroupInsert } from "../../src/DirectionNode/findPaintGroupInsert";
+import { findPaintGroupInsert } from "./PaintGroups/findPaintGroupInsert";
 import {
   DirectionNode,
   PreferredAxis,
@@ -10,11 +10,11 @@ import {
 
 import {
   findPaintGroup,
-} from "../../src/DirectionNode/findPaintGroup";
+} from "./PaintGroups/findPaintGroup";
 
 import {
   comesBefore,
-} from "../../src/DirectionNode/comesBefore";
+} from "./PaintGroups/comesBefore";
 
 import { DirectionCaret } from "../../src/DirectionCaret";
 

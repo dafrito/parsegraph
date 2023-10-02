@@ -1,5 +1,5 @@
-import { reverseDirection } from "../Direction/functions";
-import { DirectionNode } from "./DirectionNode";
+import { reverseDirection } from "../../Direction";
+import { DirectionNode } from "../DirectionNode";
 import { pathToRoot } from "./pathToRoot";
 
 /**

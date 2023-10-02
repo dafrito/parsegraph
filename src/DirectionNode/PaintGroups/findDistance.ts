@@ -1,5 +1,5 @@
 import { pathToRoot } from "./pathToRoot";
-import { DirectionNode } from "./DirectionNode";
+import { DirectionNode } from "../DirectionNode";
 
 export const findDistance = (
   node: DirectionNode,

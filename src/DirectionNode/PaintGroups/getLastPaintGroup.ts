@@ -1,4 +1,4 @@
-import { DirectionNode } from "./DirectionNode";
+import { DirectionNode } from "../DirectionNode";
 import makeLimit from "./makeLimit";
 
 /**

@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { Direction } from "../../src/Direction";
 import { PreferredAxis, DirectionNode } from "../../src/DirectionNode";
-import { findDistance } from "../../src/DirectionNode/findDistance";
+import { findDistance } from "./PaintGroups/findDistance";
 
 describe("DirectionNode", function () {
   it("can be constructed without a Type param", () => {

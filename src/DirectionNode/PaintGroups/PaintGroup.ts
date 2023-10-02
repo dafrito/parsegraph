@@ -2,7 +2,7 @@ import { findPaintGroup } from "./findPaintGroup";
 import { findPaintGroupInsert } from "./findPaintGroupInsert";
 import { getLastPaintGroup } from "./getLastPaintGroup";
 import makeLimit from "./makeLimit";
-import { DirectionNode } from "..";
+import { DirectionNode } from "../DirectionNode";
 
 export class PaintGroup {
   private _next: DirectionNode;
