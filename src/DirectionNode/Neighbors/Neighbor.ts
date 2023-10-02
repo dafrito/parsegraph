@@ -13,8 +13,8 @@ export class Neighbor {
   alignmentOffset: number;
   separation: number;
   lineLength: number;
-  xPos: number;
-  yPos: number;
+  private _xPos: number;
+  private _yPos: number;
 
   constructor(node: DirectionNode, dir: Direction) {
     this._node = node;
@@ -25,8 +25,21 @@ export class Neighbor {
     this.allowAxisOverlap = AxisOverlap.DEFAULT;
     this.separation = 0;
     this.lineLength = 0;
-    this.xPos = NaN;
-    this.yPos = NaN;
+    this._xPos = NaN;
+    this._yPos = NaN;
+  }
+
+  xPos() {
+    return this._xPos;
+  }
+
+  yPos() {
+    return this._yPos;
+  }
+
+  setPos(x: number, y: number): void {
+    this._xPos = x;
+    this._yPos = y;
   }
 
   direction(): Direction {

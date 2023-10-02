@@ -185,11 +185,6 @@ export class Neighbors {
     );
   }
 
-  setPosAt(inDirection: Direction, x: number, y: number): void {
-    this.at(inDirection).xPos = x;
-    this.at(inDirection).yPos = y;
-  }
-
   lineLengthAt(direction: Direction): number {
     if (!this.hasNode(direction)) {
       return 0;
@@ -273,13 +268,13 @@ export class Neighbors {
     if (this.isRoot()) {
       return 0;
     }
-    return this.parent()?.xPos ?? NaN;
+    return this.parent()?.xPos() ?? NaN;
   }
 
   parentY(): number {
     if (this.isRoot()) {
       return 0;
     }
-    return this.parent()?.yPos ?? NaN;
+    return this.parent()?.yPos() ?? NaN;
   }
 }

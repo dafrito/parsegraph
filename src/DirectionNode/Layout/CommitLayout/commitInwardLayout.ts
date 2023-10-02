@@ -29,8 +29,7 @@ export const commitInwardLayout = (
   ) {
     node
       .neighbors()
-      .setPosAt(
-        Direction.INWARD,
+      .at(Direction.INWARD).setPos(
         nestedNode.scale() *
           (nestedNode.layout().extentOffsetAt(Direction.DOWNWARD) -
             nestedSize[0] / 2),
@@ -44,8 +43,7 @@ export const commitInwardLayout = (
     // console.log(this.horizontalPadding(), this.borderThickness());
     node
       .neighbors()
-      .setPosAt(
-        Direction.INWARD,
+      .at(Direction.INWARD).setPos(
         bodySize[0] / 2 -
           getSeparation(painter, node, Axis.Z, Direction.INWARD, false) / 2 +
           nestedNode.scale() *
