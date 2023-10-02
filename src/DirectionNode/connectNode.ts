@@ -48,8 +48,8 @@ export const connectNode = (
   // Connect the node.
   const neighbor = parent.neighbors().ensure(inDirection);
   // Allow alignments to be set before children are spawned.
-  if (neighbor.alignmentMode == Alignment.NULL) {
-    neighbor.alignmentMode = Alignment.NONE;
+  if (neighbor.getAlignment() === Alignment.NULL) {
+    neighbor.align(Alignment.NONE);
   }
   neighbor.meet(node);
   node.neighbors().assignParent(parent, inDirection);

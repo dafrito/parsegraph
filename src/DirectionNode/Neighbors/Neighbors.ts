@@ -215,7 +215,7 @@ export class Neighbors {
 
   getAlignment(inDirection: Direction): Alignment {
     if (this.hasNode(inDirection)) {
-      return this.at(inDirection).alignmentMode;
+      return this.at(inDirection).getAlignment();
     }
     return Alignment.NULL;
   }
@@ -232,7 +232,7 @@ export class Neighbors {
           inDirection as Alignment
         );
     }
-    this.ensure(inDirection as Direction).alignmentMode = newAlignmentMode;
+    this.ensure(inDirection as Direction).align(newAlignmentMode);
     this.node().invalidate();
   }
 
