@@ -15,10 +15,9 @@ import { LayoutPainter } from "./LayoutPainter";
 import { combineExtents } from "./combineExtents";
 import { positionChild } from "./positionChild";
 import { getAlignment } from "./getAlignment";
-import { Size } from "../../../Size";
 import { getSeparation } from "./getSeparation";
 
-const firstSize: Size = [NaN, NaN];
+const firstSize: number[] = [NaN, NaN];
 
 // Layout a single node in the given direction.
 export const layoutSingle = (
@@ -26,7 +25,7 @@ export const layoutSingle = (
   direction: Direction,
   allowAxisOverlap: boolean,
   lineThickness: number,
-  bodySize: Size,
+  bodySize: number[],
   painter: LayoutPainter
 ): boolean => {
   if (!node.neighbors().hasNode(direction)) {

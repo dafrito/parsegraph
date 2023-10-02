@@ -1,5 +1,3 @@
-import createException, { BAD_AXIS, BAD_NODE_DIRECTION } from "../Exception";
-
 import { Direction, Axis } from "./constants";
 
 export function readDirection(given: string | Direction): Direction {
@@ -109,7 +107,7 @@ export function alternateDirection(given: Direction): Direction {
     case Direction.FORWARD:
       return Direction.DOWNWARD;
     default:
-      throw createException(BAD_NODE_DIRECTION);
+      throw new Error("No alternate direction for direction: " + nameDirection(given));
   }
 }
 
@@ -175,7 +173,7 @@ export function getPositiveDirection(given: Axis) {
     case Axis.Z:
       return Direction.OUTWARD;
     case Axis.NULL:
-      throw createException(BAD_AXIS);
+      throw new Error("Null axis has no positive or negative direction");
   }
 }
 
@@ -207,7 +205,7 @@ export function turnLeft(given: Direction): Direction {
     case Direction.UPWARD:
       return Direction.BACKWARD;
     default:
-      throw createException(BAD_NODE_DIRECTION);
+      throw new Error("No direction to turn when given " + nameDirection(given));
   }
 }
 

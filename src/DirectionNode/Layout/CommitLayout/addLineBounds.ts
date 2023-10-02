@@ -10,14 +10,12 @@ import {
 
 import { DirectionNode, Fit } from "../..";
 
-import { Size } from "../../../Size";
-
-const lineBounds: Size = [NaN, NaN];
+const lineBounds: number[] = [NaN, NaN];
 
 const sizeIn = (
   node: DirectionNode,
   direction: Direction,
-  bodySize: Size
+  bodySize: number[]
 ): number => {
   node.layout().size(bodySize);
   if (isVerticalDirection(direction)) {
@@ -30,7 +28,7 @@ const sizeIn = (
 export const addLineBounds = (
   node: DirectionNode,
   given: Direction,
-  bodySize: Size
+  bodySize: number[]
 ) => {
   if (!node.neighbors().hasChild(given)) {
     return;

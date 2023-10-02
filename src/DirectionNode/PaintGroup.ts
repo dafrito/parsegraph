@@ -3,7 +3,6 @@ import { findPaintGroupInsert } from "./findPaintGroupInsert";
 import { getLastPaintGroup } from "./getLastPaintGroup";
 import makeLimit from "./makeLimit";
 import { DirectionNode } from "..";
-import createException, { NOT_PAINT_GROUP } from "../Exception";
 
 export class PaintGroup {
   _next: DirectionNode;
@@ -211,8 +210,8 @@ export class PaintGroup {
     let node: DirectionNode = this.node();
     let prev = node;
     do {
-      if (!node.paintGroup()) {
-        throw createException(NOT_PAINT_GROUP);
+      if (!node.paintGroups().isPaintGroup()) {
+        throw new Error("Paint group returned is not a paint group");
       }
       func(node);
       node = node.paintGroup().prev();

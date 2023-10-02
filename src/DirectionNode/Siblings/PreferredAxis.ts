@@ -1,5 +1,3 @@
-import createException, { BAD_LAYOUT_PREFERENCE } from "../../Exception";
-
 export enum PreferredAxis {
   NULL = 0,
   PARENT,
@@ -23,7 +21,7 @@ export function namePreferredAxis(given: PreferredAxis): string {
     case PreferredAxis.VERTICAL:
       return "VERTICAL";
   }
-  throw createException(BAD_LAYOUT_PREFERENCE, given);
+  throw new Error("Unknown PreferredAxis given: " + given);
 }
 
 export function readPreferredAxis(given: string | number): PreferredAxis {

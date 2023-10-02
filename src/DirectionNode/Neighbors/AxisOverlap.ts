@@ -1,5 +1,3 @@
-import createException, { BAD_AXIS_OVERLAP } from "../../Exception";
-
 /**
  * The NeighborData-specific configuration setting to set whether this
  * neighbor's axis can overlap its parent.
@@ -34,7 +32,7 @@ export function nameAxisOverlap(given: AxisOverlap): string {
     case AxisOverlap.DEFAULT:
       return "DEFAULT";
   }
-  throw createException(BAD_AXIS_OVERLAP);
+  throw new Error("Unknown AxisOverlap given: " + given);
 }
 
 /**

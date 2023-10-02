@@ -7,17 +7,16 @@ import {
 
 import { DirectionNode, PreferredAxis } from "../..";
 
-import { layoutAxis } from "..";
+import { layoutAxis } from "./layoutAxis";
 
 import { LayoutPainter } from "./LayoutPainter";
 import { layoutSingle } from "./layoutSingle";
-import { Size } from "../../../Size";
 
 export const commitAxisBasedLayout = (
   painter: LayoutPainter,
   node: DirectionNode,
   lineThickness: number,
-  bodySize: Size
+  bodySize: number[]
 ): boolean => {
   // Layout based upon the axis preference.
   if (

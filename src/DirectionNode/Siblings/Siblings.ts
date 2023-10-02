@@ -5,10 +5,6 @@ import {
   Axis,
 } from "../../Direction";
 import { PreferredAxis } from "./PreferredAxis";
-import createException, {
-  NODE_IS_ROOT,
-  BAD_LAYOUT_PREFERENCE,
-} from "../../Exception";
 import { DirectionNode } from "../DirectionNode";
 
 const MAX_SIBLINGS = 100000;
@@ -399,14 +395,13 @@ export class Siblings {
   }
 
   canonicalLayoutPreference(): PreferredAxis {
-    // Root nodes do not have a canonical layout preference.
     if (this.node().neighbors().isRoot()) {
-      throw createException(NODE_IS_ROOT);
+      throw new Error("Root nodes do not have a canonical layout preference");
     }
 
     const parentDir = this.node().neighbors().parent()?.direction();
     if (parentDir === undefined) {
-      throw new Error("Cannot canonicalize root layout preference");
+      throw new Error("Node is not root but has no parent");
     }
 
     // Convert the layout preference to either preferring the parent or
@@ -434,7 +429,7 @@ export class Siblings {
         canonicalPref = this.getLayoutPreference();
         break;
       case PreferredAxis.NULL:
-        throw createException(BAD_LAYOUT_PREFERENCE);
+        throw new Error("Node's PreferredAxis must not be null");
     }
     return canonicalPref;
   }
@@ -445,7 +440,7 @@ export class Siblings {
         given !== PreferredAxis.VERTICAL &&
         given !== PreferredAxis.HORIZONTAL
       ) {
-        throw createException(BAD_LAYOUT_PREFERENCE);
+        throw new Error("Root layout preference can only be VERTICAL or HORIZONTAL");
       }
       if (this.getLayoutPreference() === given) {
         return;

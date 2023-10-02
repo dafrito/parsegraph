@@ -2,8 +2,6 @@ import { Direction, Axis, getDirectionAxis } from "../../../Direction";
 
 import { DirectionNode, AxisOverlap } from "../..";
 
-import createException, { BAD_NODE_DIRECTION } from "../../../Exception";
-
 import { LayoutPhase } from "..";
 
 import { LayoutPainter } from "./LayoutPainter";
@@ -11,11 +9,10 @@ import { combineExtents } from "./combineExtents";
 import { positionChild } from "./positionChild";
 import { getAlignment } from "./getAlignment";
 import { layoutSingle } from "./layoutSingle";
-import { Size } from "../../../Size";
 import { getSeparation } from "./getSeparation";
 
-const firstSize: Size = [NaN, NaN];
-const secondSize: Size = [NaN, NaN];
+const firstSize: number[] = [NaN, NaN];
+const secondSize: number[] = [NaN, NaN];
 
 /**
  * Layout a pair of nodes in the given directions.
@@ -38,10 +35,10 @@ export const layoutAxis = (
   secondDirection: Direction,
   allowAxisOverlap: boolean,
   lineThickness: number,
-  bodySize: Size
+  bodySize: number[]
 ): boolean => {
   if (firstDirection === secondDirection && firstDirection != Direction.NULL) {
-    throw createException(BAD_NODE_DIRECTION);
+    throw new Error("First and second directions cannot be the same unless they are both null");
   }
   // Change the node direction to null if there is no node in that
   // direction.

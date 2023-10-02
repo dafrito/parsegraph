@@ -1,5 +1,3 @@
-import createException, { BAD_LAYOUT_STATE } from "../../Exception";
-
 export enum LayoutPhase {
   NULL = 0,
   NEEDS_COMMIT,
@@ -18,5 +16,5 @@ export function nameLayoutPhase(given: LayoutPhase): string {
     case LayoutPhase.IN_COMMIT:
       return "IN_COMMIT";
   }
-  throw createException(BAD_LAYOUT_STATE, given);
+  throw new Error("Unknown LayoutPhase given: " + given);
 }

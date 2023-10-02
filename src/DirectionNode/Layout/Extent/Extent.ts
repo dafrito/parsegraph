@@ -22,7 +22,7 @@ export class Extent {
       this._numBounds = copy._numBounds;
       this._bounds = new Float32Array(copy._bounds);
       this._start = copy._start;
-      if (copy._minSize !== null) {
+      if (!isNaN(copy._minSize)) {
         this._minSize = copy._minSize;
         this._maxSize = copy._maxSize;
         this._totalLength = copy._totalLength;
@@ -31,10 +31,10 @@ export class Extent {
       this._start = 0;
       this._offset = 0;
       this._numBounds = 0;
-      this._bounds = null;
-      this._minSize = null;
-      this._maxSize = null;
-      this._totalLength = null;
+      this._bounds = new Float32Array();
+      this._minSize = NaN;
+      this._maxSize = NaN;
+      this._totalLength = NaN;
     }
   }
 
@@ -88,9 +88,9 @@ export class Extent {
   }
 
   invalidateBoundingValues(): void {
-    this._minSize = null;
-    this._maxSize = null;
-    this._totalLength = null;
+    this._minSize = NaN;
+    this._maxSize = NaN;
+    this._totalLength = NaN;
   }
 
   setBoundLengthAt(index: number, length: number): void {
@@ -296,7 +296,7 @@ export class Extent {
   sizeAt(offset: number): number {
     // Do not allow negative offsets.
     if (offset < 0) {
-      throw new Error("OFFSET_IS_NEGATIVE");
+      throw new Error("Negative offsets are not supported");
     }
 
     // Determine the bound at the given offset.
@@ -347,7 +347,7 @@ export class Extent {
     bv?: number[]
   ): void {
     if (!bv) {
-      bv = [null, null, null];
+      bv = [NaN, NaN, NaN];
     }
     given.boundingValues(bv);
     const givenLength = bv[0];
@@ -541,9 +541,9 @@ export class Extent {
 
   boundingValues(outVal?: number[]): number[] {
     if (!outVal) {
-      outVal = [null, null, null];
+      outVal = [NaN, NaN, NaN];
     }
-    if (this._minSize !== null) {
+    if (!isNaN(this._minSize)) {
       outVal[0] = this._totalLength;
       outVal[1] = this._minSize;
       outVal[2] = this._maxSize;
@@ -632,46 +632,5 @@ export class Extent {
       );
       offset += this.boundLengthAt(i);
     }
-  }
-
-  toDom(message: any): HTMLElement {
-    const rv = document.createElement("table");
-    rv.className = "Extent";
-
-    if (message !== undefined) {
-      const titleRow = document.createElement("tr");
-      rv.appendChild(titleRow);
-      titleRow.appendChild(document.createElement("th"));
-      titleRow.lastElementChild.innerHTML = message;
-      (titleRow.lastElementChild as HTMLTableHeaderCellElement).colSpan = 3;
-    }
-
-    const headerRow = document.createElement("tr");
-    rv.appendChild(headerRow);
-    headerRow.appendChild(document.createElement("th"));
-    headerRow.lastElementChild.innerHTML = "Offset";
-    headerRow.appendChild(document.createElement("th"));
-    headerRow.lastElementChild.innerHTML = "Length";
-    headerRow.appendChild(document.createElement("th"));
-    headerRow.lastElementChild.innerHTML = "Size";
-
-    let offset = 0;
-    for (let i = 0; i < this.numBounds(); ++i) {
-      const boundRow = document.createElement("tr");
-      rv.appendChild(boundRow);
-
-      boundRow.appendChild(document.createElement("td"));
-      boundRow.lastElementChild.innerHTML = "" + offset;
-
-      boundRow.appendChild(document.createElement("td"));
-      boundRow.lastElementChild.innerHTML = "" + this.boundLengthAt(i);
-
-      boundRow.appendChild(document.createElement("td"));
-      boundRow.lastElementChild.innerHTML = "" + this.boundSizeAt(i);
-
-      offset += this.boundLengthAt(i);
-    }
-
-    return rv;
   }
 }

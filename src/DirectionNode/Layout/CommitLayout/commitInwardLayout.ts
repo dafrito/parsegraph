@@ -5,14 +5,13 @@ import { Alignment, DirectionNode } from "../..";
 import { LayoutPhase } from "..";
 
 import { LayoutPainter } from "./LayoutPainter";
-import { Size } from "../../../Size";
 import { getSeparation } from "./getSeparation";
 
 export const commitInwardLayout = (
   painter: LayoutPainter,
   node: DirectionNode,
-  bodySize: Size,
-  firstSize: Size
+  bodySize: number[],
+  firstSize: number[]
 ): boolean => {
   if (!node.neighbors().hasNode(Direction.INWARD)) {
     return false;

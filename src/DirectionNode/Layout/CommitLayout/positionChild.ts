@@ -8,8 +8,6 @@ import {
 
 import { Alignment, DirectionNode } from "../..";
 
-import createException, { BAD_NODE_DIRECTION } from "../../../Exception";
-
 /**
  * Positions a child.
  *
@@ -38,7 +36,7 @@ export const positionChild = (
     throw new Error("separation must always be positive.");
   }
   if (!isCardinalDirection(childDirection)) {
-    throw createException(BAD_NODE_DIRECTION);
+    throw new Error("Direction used for positioning must be cardinal");
   }
   const child: DirectionNode = node.neighbors().nodeAt(childDirection);
   const reversedDirection: Direction = reverseDirection(childDirection);

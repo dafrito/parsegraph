@@ -2,14 +2,13 @@ import { Direction, forEachCardinalDirection } from "../../../Direction";
 
 import { DirectionNode, Fit } from "../..";
 
-import { LayoutPhase, commitAxisBasedLayout } from "..";
+import { LayoutPhase } from "..";
+import { commitAxisBasedLayout } from "./commitAxisBasedLayout";
 
 import { LayoutPainter } from "./LayoutPainter";
 import { addLineBounds } from "./addLineBounds";
 import { commitInwardLayout } from "./commitInwardLayout";
 import { commitRootlikeLayout } from "./commitRootlikeLayout";
-import createException, { BAD_LAYOUT_STATE } from "../../../Exception";
-import { Size } from "../../../Size";
 
 const LINE_THICKNESS = 12;
 
@@ -19,9 +18,9 @@ const LINE_THICKNESS = 12;
  * @see {@link LayoutPainter}
  */
 export class CommitLayout {
-  protected bodySize: Size;
-  protected firstSize: Size;
-  protected secondSize: Size;
+  protected bodySize: number[];
+  protected firstSize: number[];
+  protected secondSize: number[];
   protected needsPosition: boolean;
 
   protected rootPaintGroup: DirectionNode;
@@ -89,10 +88,10 @@ export class CommitLayout {
         return false;
       case LayoutPhase.NULL:
         // Check for invalid layout states.
-        throw createException(BAD_LAYOUT_STATE);
+        throw new Error("Layout phase must not be null");
       case LayoutPhase.IN_COMMIT:
         // Do not allow overlapping layout commits.
-        throw createException(BAD_LAYOUT_STATE);
+        throw new Error("Refusing to commit layout while it is already being committed");
     }
 
     // Begin the layout.

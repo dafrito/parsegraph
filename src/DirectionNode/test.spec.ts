@@ -4,11 +4,17 @@ import { Direction, readDirection } from "../../src/Direction";
 import { findPaintGroupInsert } from "../../src/DirectionNode/findPaintGroupInsert";
 import {
   DirectionNode,
-  comesBefore,
   PreferredAxis,
   namePreferredAxis,
-  findPaintGroup,
 } from "../../src/DirectionNode";
+
+import {
+  findPaintGroup,
+} from "../../src/DirectionNode/findPaintGroup";
+
+import {
+  comesBefore,
+} from "../../src/DirectionNode/comesBefore";
 
 import { DirectionCaret } from "../../src/DirectionCaret";
 

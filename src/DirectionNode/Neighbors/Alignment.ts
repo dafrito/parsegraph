@@ -1,5 +1,3 @@
-import createException, { BAD_NODE_ALIGNMENT } from "../../Exception";
-
 /**
  * Alignment is a NeighborData-specific property, so it can be set before the neighbor is connected.
  *
@@ -37,7 +35,7 @@ export function nameAlignment(given: Alignment): string {
     case Alignment.INWARD_VERTICAL:
       return "VERTICAL";
   }
-  throw createException(BAD_NODE_ALIGNMENT, given);
+  throw new Error("Unknown Alignment given: " + given);
 }
 
 export function readAlignment(given: string | Alignment): Alignment {

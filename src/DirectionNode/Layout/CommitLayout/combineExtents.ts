@@ -4,8 +4,6 @@ import { Direction } from "../../../Direction";
 
 import { Alignment, DirectionNode, Fit } from "../..";
 
-import createException, { BAD_NODE_DIRECTION } from "../../../Exception";
-
 const bv = [NaN, NaN, NaN];
 
 export const combineExtent = (
@@ -239,6 +237,6 @@ export const combineExtents = (
       );
       break;
     default:
-      throw createException(BAD_NODE_DIRECTION);
+      throw new Error("Unknown direction given: " + childDirection)
   }
 };

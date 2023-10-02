@@ -13,7 +13,6 @@ import { DirectionCaret } from "../src/DirectionCaret";
 
 import { CommitLayout } from "../src/DirectionNode/Layout/CommitLayout";
 import { Extent, checkExtentsEqual } from "../src/DirectionNode/Layout/Extent";
-import { Size } from "../src/Size";
 
 import { assert } from "chai";
 
@@ -121,7 +120,7 @@ const readStyle = (given?: any): BlockStyle => {
 };
 
 const layoutPainter = {
-  size: (node: DirectionNode, size: Size) => {
+  size: (node: DirectionNode, size: number[]) => {
     const style = readStyle(node.value());
     size[0] =
       style.minWidth + style.borderThickness * 2 + style.horizontalPadding * 2;

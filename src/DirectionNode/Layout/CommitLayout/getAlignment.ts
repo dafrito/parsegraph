@@ -8,8 +8,6 @@ import {
 
 import { Alignment, DirectionNode } from "../..";
 
-import createException, { BAD_NODE_ALIGNMENT } from "../../../Exception";
-
 import { findConsecutiveLength } from "./findConsecutiveLength";
 
 /**
@@ -38,7 +36,7 @@ export const getAlignment = (
   const alignmentMode = node.neighbors().getAlignment(childDirection);
   switch (alignmentMode) {
     case Alignment.NULL:
-      throw createException(BAD_NODE_ALIGNMENT);
+      throw new Error("Node has null alignment");
     case Alignment.NONE:
       // Unaligned nodes have no alignment offset.
       rv = 0;

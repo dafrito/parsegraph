@@ -181,8 +181,6 @@ export class DirectionNode<Value = any> {
    * @param {Direction} inDirection - the direction to attach the given node
    * @param {DirectionNode<Value>} node - the node to attach
    * @return {DirectionNode} the given node
-   *
-   * @see {@link connectNode}
    */
   connect(
     inDirection: Direction,
@@ -198,8 +196,6 @@ export class DirectionNode<Value = any> {
    * is this node from its parent.
    * @return {DirectionNode | undefined} the disconnected node, or undefined if no node was disconnected.
    * If this node was to be removed and this node is a root node, this node is returned.
-   *
-   * @see {@link disconnectNode}
    */
   disconnect(inDirection?: Direction): DirectionNode | undefined {
     return disconnectNode(this, inDirection);

@@ -4,13 +4,12 @@ import { DirectionNode, PreferredAxis } from "../..";
 
 import { LayoutPainter } from "./LayoutPainter";
 import { layoutAxis } from "./layoutAxis";
-import { Size } from "../../../Size";
 
 export const commitRootlikeLayout = (
   painter: LayoutPainter,
   node: DirectionNode,
   lineThickness: number,
-  bodySize: Size
+  bodySize: number[]
 ): boolean => {
   if (
     node.siblings().getLayoutPreference() === PreferredAxis.HORIZONTAL ||

@@ -8,12 +8,6 @@ import {
   isCardinalDirection,
   reverseDirection,
 } from "../../Direction";
-import createException, {
-  BAD_NODE_DIRECTION,
-  BAD_AXIS,
-  NO_NODE_FOUND,
-  NODE_IS_ROOT,
-} from "../../Exception";
 import { DirectionNode } from "../DirectionNode";
 import { Alignment } from "./Alignment";
 import { AxisOverlap } from "./AxisOverlap";
@@ -38,13 +32,13 @@ export class Neighbors {
       this._parentNeighbor = fromNode.neighbors().at(parentDirection);
     }
     if (!this._parentNeighbor) {
-      throw createException(BAD_NODE_DIRECTION);
+      throw new Error("Parent neighbor not found");
     }
   }
 
   parent(): Neighbor {
     if (!this._parentNeighbor) {
-      throw createException(NODE_IS_ROOT);
+      throw new Error("Node has no parent");
     }
     return this._parentNeighbor;
   }
@@ -58,7 +52,7 @@ export class Neighbors {
 
   parentNode(): DirectionNode {
     if (this.isRoot()) {
-      throw createException(NODE_IS_ROOT);
+      throw new Error("Node has no parent");
     }
     return this.parent().node();
   }
@@ -90,7 +84,7 @@ export class Neighbors {
 
   hasNodes(axis: Axis): [Direction, Direction] {
     if (axis === Axis.NULL) {
-      throw createException(BAD_AXIS, axis);
+      throw new Error("axis must not be null");
     }
 
     const result: [Direction, Direction] = [Direction.NULL, Direction.NULL];
@@ -206,7 +200,7 @@ export class Neighbors {
   separationAt(inDirection: Direction): number {
     // Exclude some directions that cannot be calculated.
     if (!isCardinalDirection(inDirection)) {
-      throw createException(BAD_NODE_DIRECTION);
+      throw new Error("Direction for separation must be cardinal");
     }
 
     // If the given direction is the parent's direction, use
@@ -218,7 +212,7 @@ export class Neighbors {
     }
 
     if (!this.node().neighbors().hasNode(inDirection)) {
-      throw createException(NO_NODE_FOUND);
+      throw new Error("Node must have a child in the given direction")
     }
 
     return this.at(inDirection).separation;

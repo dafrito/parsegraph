@@ -1,6 +1,3 @@
-import createException, { BAD_NODE_DIRECTION } from "../../Exception";
-
-import { Size } from "../../Size";
 import { Extent } from "./Extent";
 
 import { Direction, reverseDirection } from "../../Direction";
@@ -20,7 +17,7 @@ export class Layout {
   private _groupYPos: number;
   private _groupScale: number;
   private _node: DirectionNode;
-  private _size: Size;
+  private _size: number[];
   private _layoutPhase: LayoutPhase;
 
   constructor(node: DirectionNode) {
@@ -267,7 +264,7 @@ export class Layout {
 
   extentsAt(atDirection: Direction): Extent {
     if (atDirection === Direction.NULL) {
-      throw createException(BAD_NODE_DIRECTION);
+      throw new Error("Cannot get extents at null direction");
     }
     return this._extents[atDirection - Direction.DOWNWARD];
   }
@@ -331,7 +328,7 @@ export class Layout {
     bodySize[1] = this._size[1] * groupScale;
   }
 
-  inNodeBody(x: number, y: number, userScale: number, bodySize: Size): boolean {
+  inNodeBody(x: number, y: number, userScale: number, bodySize: number[]): boolean {
     this.size(bodySize);
     const s = bodySize;
     const ax = this.absoluteX();
@@ -356,7 +353,7 @@ export class Layout {
     x: number,
     y: number,
     userScale: number,
-    extentSize: Size
+    extentSize: number[]
   ): boolean {
     const ax = this.absoluteX();
     const ay = this.absoluteY();
@@ -401,7 +398,7 @@ export class Layout {
       userScale = 1;
     }
 
-    const extentSize: Size = [NaN, NaN];
+    const extentSize: number[] = [NaN, NaN];
     const candidates: DirectionNode[] = [this.node()];
 
     const addCandidate = (node: DirectionNode, direction: Direction) => {

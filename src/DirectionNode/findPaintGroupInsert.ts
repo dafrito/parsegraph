@@ -1,7 +1,7 @@
 import { DirectionNode } from "./DirectionNode";
 import { findClosestPaintGroup } from "./findClosestPaintGroup";
 import makeLimit from "./makeLimit";
-import { comesBefore } from ".";
+import { comesBefore } from "./comesBefore";
 import { getLastPaintGroup } from "./getLastPaintGroup";
 
 export const findPaintGroupInsert = (

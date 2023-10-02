@@ -1,4 +1,3 @@
-import createException, { NO_NODE_FOUND } from "./Exception";
 import { Direction, readDirection, reverseDirection } from "./Direction";
 import { DirectionNode } from "./DirectionNode";
 
@@ -65,9 +64,15 @@ export class DirectionCaret<Value> {
     return new DirectionCaret<Value>(this.node());
   }
 
+  /**
+   * Returns the caret's current node.
+   * 
+   * @returns {DirectionNode<Value>} the current node
+   * @throws if the caret has no node.
+   */
   node(): DirectionNode<Value> {
     if (this._nodes.length === 0) {
-      throw createException(NO_NODE_FOUND);
+      throw new Error("Caret has no node");
     }
     return this._nodes[this._nodes.length - 1];
   }
@@ -153,7 +158,7 @@ export class DirectionCaret<Value> {
       .neighbors()
       .nodeAt(readDirection(toDirection));
     if (!dest) {
-      throw createException(NO_NODE_FOUND);
+      throw new Error("No node to move to in that direction");
     }
     this.setNode(dest);
   }
@@ -205,11 +210,11 @@ export class DirectionCaret<Value> {
    */
   restore(id: string): void {
     if (!this._savedNodes) {
-      throw createException(NO_NODE_FOUND);
+      throw new Error("No nodes have been saved");
     }
     const loadedNode: DirectionNode<Value> = this._savedNodes[id];
     if (loadedNode == null) {
-      throw createException(NO_NODE_FOUND);
+      throw new Error("No node found for id: " + id);
     }
     this.setNode(loadedNode);
   }
@@ -256,7 +261,7 @@ export class DirectionCaret<Value> {
    */
   pop(): void {
     if (this._nodes.length <= 1) {
-      throw createException(NO_NODE_FOUND);
+      throw new Error("No more nodes to pop");
     }
     this._nodes.pop();
   }

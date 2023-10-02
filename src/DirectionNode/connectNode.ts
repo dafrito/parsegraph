@@ -1,9 +1,3 @@
-import createException, {
-  BAD_NODE_DIRECTION,
-  NO_OUTWARD_CONNECT,
-  NO_PARENT_CONNECT,
-} from "../Exception";
-
 import { Direction, reverseDirection } from "../Direction";
 
 import Alignment from "./Neighbors/Alignment";
@@ -33,13 +27,13 @@ export const connectNode = (
 ): DirectionNode => {
   // Ensure the node can be connected in the given direction.
   if (inDirection == Direction.OUTWARD) {
-    throw createException(NO_OUTWARD_CONNECT);
+    throw new Error("By rule, nodes cannot be spawned in the outward direction.");
   }
   if (inDirection == Direction.NULL) {
-    throw createException(BAD_NODE_DIRECTION);
+    throw new Error("Direction must not be null");
   }
   if (inDirection == parent.neighbors().parentDirection()) {
-    throw createException(NO_PARENT_CONNECT);
+    throw new Error("Cannot connect a node in the parent's direction");
   }
   if (parent.neighbors().hasNode(inDirection)) {
     parent.disconnect(inDirection);

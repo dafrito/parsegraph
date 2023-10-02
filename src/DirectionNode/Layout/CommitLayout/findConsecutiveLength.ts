@@ -2,10 +2,10 @@ import { DirectionNode } from "../../DirectionNode";
 import {
   Direction,
   isCardinalDirection,
+  nameDirection,
   getDirectionAxis,
   Axis,
 } from "../../../Direction";
-import createException, { BAD_NODE_DIRECTION } from "../../../Exception";
 
 export const findConsecutiveLength = (
   node: DirectionNode,
@@ -13,13 +13,13 @@ export const findConsecutiveLength = (
 ): number => {
   // Exclude some directions that cannot be calculated.
   if (!isCardinalDirection(inDirection)) {
-    throw createException(BAD_NODE_DIRECTION);
+    throw new Error("Given direction is not cardinal: " + nameDirection(inDirection));
   }
 
   const directionAxis: Axis = getDirectionAxis(inDirection);
   if (directionAxis === Axis.NULL) {
     // This should be impossible.
-    throw createException(BAD_NODE_DIRECTION);
+    throw new Error("Cardinal direction somehow has no axis?");
   }
 
   // Calculate the length, starting from the center of this node.

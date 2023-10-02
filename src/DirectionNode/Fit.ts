@@ -1,5 +1,3 @@
-import createException, { BAD_NODE_FIT } from "../Exception";
-
 export enum Fit {
   NULL = 14,
   EXACT,
@@ -19,7 +17,7 @@ export function nameFit(given: Fit): string {
     case Fit.NAIVE:
       return "NAIVE";
   }
-  throw createException(BAD_NODE_FIT);
+  throw new Error("Unknown Fit: " + given);
 }
 
 export function readFit(given: string): Fit {
