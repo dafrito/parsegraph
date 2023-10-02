@@ -23,7 +23,7 @@ export class Neighbors {
   }
 
   assignParent(fromNode?: DirectionNode, parentDirection?: Direction): void {
-    if (arguments.length === 0 || !fromNode) {
+    if (!fromNode) {
       // Clearing the parent.
       this._parentNeighbor = undefined;
       return;

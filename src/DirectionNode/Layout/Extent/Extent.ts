@@ -46,12 +46,9 @@ export class Extent {
     return this._offset;
   }
 
-  forEach(func: Function, thisArg?: any): void {
-    if (arguments.length === 1 || thisArg === undefined) {
-      thisArg = this;
-    }
+  forEach(func: (length: number, size: number, index: number)=>void): void {
     for (let i = 0; i < this._numBounds; ++i) {
-      func.call(thisArg, this.boundLengthAt(i), this.boundSizeAt(i), i);
+      func(this.boundLengthAt(i), this.boundSizeAt(i), i);
     }
   }
 
@@ -434,12 +431,12 @@ export class Extent {
   }
 
   scale(factor: number): void {
-    this.forEach(function (length: number, size: number, i: number) {
+    this.forEach((length: number, size: number, i: number) => {
       this.setBoundLengthAt(i, length * factor);
       if (!isNaN(this.boundSizeAt(i))) {
         this.setBoundSizeAt(i, size * factor);
       }
-    }, this);
+    });
   }
 
   separation(

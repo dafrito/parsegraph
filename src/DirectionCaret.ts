@@ -296,24 +296,6 @@ export class DirectionCaret<Value> {
     }
   }
 
-  overlapAxis(...args: any[]): void {
-    if (args.length === 0) {
-      this.node().neighbors().setAxisOverlap(AxisOverlap.ALLOWED);
-      return;
-    }
-    if (args.length === 1) {
-      this.node().neighbors().setAxisOverlap(readAxisOverlap(args[0]));
-      return;
-    }
-    const inDirection: Direction = readDirection(args[0]);
-    const newAxisOverlap: AxisOverlap = readAxisOverlap(args[1]);
-    this.node().neighbors().setAxisOverlap(inDirection, newAxisOverlap);
-  }
-
-  axisOverlap(...args: any[]): void {
-    return this.overlapAxis(...args);
-  }
-
   shrink(inDirection?: Direction | string): void {
     let node = this.node();
     if (inDirection) {
@@ -418,12 +400,5 @@ export class DirectionCaret<Value> {
       return this.node().neighbors().nodeAt(readDirection(inDirection));
     }
     throw new Error("No node at direction");
-  }
-
-  id(val?: string | number) {
-    if (arguments.length === 0) {
-      return this.node().id();
-    }
-    this.node().setId(val);
   }
 }

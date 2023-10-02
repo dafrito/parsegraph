@@ -30,9 +30,9 @@ describe("Caret", function () {
     assert.isFalse(child.neighbors().isRoot());
     const car = new DirectionCaret(child);
     car.move(Direction.FORWARD);
-    assert.equal(car.id(), "root");
+    assert.equal(car.node().id(), "root");
     car.move(Direction.BACKWARD);
-    assert.equal(car.id(), "child");
+    assert.equal(car.node().id(), "child");
   });
 
   it("moveToParent", () => {
