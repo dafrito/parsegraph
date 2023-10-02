@@ -1,6 +1,7 @@
 # Build directory
 parsegraph/
 .DS_Store
+dependencygraph.svg
 
 # Logs
 logs

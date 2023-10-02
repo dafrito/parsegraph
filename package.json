@@ -54,6 +54,7 @@
     "build:watch": "yarn build --watch",
     "build:prod": "NODE_ENV=production webpack --mode production --config config/webpack.prod.js",
     "build:prod:watch": "NODE_ENV=production yarn build:prod --watch",
+    "dependencygraph": "ts_dependency_graph --start src/index.ts --graph_folder | dot -T svg > dependencygraph.svg",
     "test": "jest --env=jsdom --no-cache",
     "test:watch": "yarn test --watch",
     "test:cov": "yarn test --coverage --coverageDirectory=dist/coverage",
