@@ -51,73 +51,73 @@ export function paintGroupBounds(nodeRoot: DirectionNode) {
           case Direction.UPWARD:
             parentBounds.top = Math.max(
               parentBounds.top,
-              childBounds.top + neighbor.separation
+              childBounds.top + neighbor.separation()
             );
             parentBounds.left = Math.max(
               parentBounds.left,
-              childBounds.left - neighbor.alignmentOffset
+              childBounds.left - neighbor.alignmentOffset()
             );
             parentBounds.right = Math.max(
               parentBounds.right,
-              childBounds.right + neighbor.alignmentOffset
+              childBounds.right + neighbor.alignmentOffset()
             );
             parentBounds.bottom = Math.max(
               parentBounds.bottom,
-              childBounds.bottom - neighbor.separation
+              childBounds.bottom - neighbor.separation()
             );
             break;
           case Direction.DOWNWARD:
             parentBounds.top = Math.max(
               parentBounds.top,
-              childBounds.top - neighbor.separation
+              childBounds.top - neighbor.separation()
             );
             parentBounds.left = Math.max(
               parentBounds.left,
-              childBounds.left - neighbor.alignmentOffset
+              childBounds.left - neighbor.alignmentOffset()
             );
             parentBounds.right = Math.max(
               parentBounds.right,
-              childBounds.right + neighbor.alignmentOffset
+              childBounds.right + neighbor.alignmentOffset()
             );
             parentBounds.bottom = Math.max(
               parentBounds.bottom,
-              childBounds.bottom + neighbor.separation
+              childBounds.bottom + neighbor.separation()
             );
             break;
           case Direction.FORWARD:
             parentBounds.top = Math.max(
               parentBounds.top,
-              childBounds.top - neighbor.alignmentOffset
+              childBounds.top - neighbor.alignmentOffset()
             );
             parentBounds.left = Math.max(
               parentBounds.left,
-              childBounds.left - neighbor.separation
+              childBounds.left - neighbor.separation()
             );
             parentBounds.right = Math.max(
               parentBounds.right,
-              childBounds.right + neighbor.separation
+              childBounds.right + neighbor.separation()
             );
             parentBounds.bottom = Math.max(
               parentBounds.bottom,
-              childBounds.bottom + neighbor.alignmentOffset
+              childBounds.bottom + neighbor.alignmentOffset()
             );
             break;
           case Direction.BACKWARD:
             parentBounds.top = Math.max(
               parentBounds.top,
-              childBounds.top - neighbor.alignmentOffset
+              childBounds.top - neighbor.alignmentOffset()
             );
             parentBounds.left = Math.max(
               parentBounds.left,
-              childBounds.left + neighbor.separation
+              childBounds.left + neighbor.separation()
             );
             parentBounds.right = Math.max(
               parentBounds.right,
-              childBounds.right - neighbor.separation
+              childBounds.right - neighbor.separation()
             );
             parentBounds.bottom = Math.max(
               parentBounds.bottom,
-              childBounds.bottom + neighbor.alignmentOffset
+              childBounds.bottom + neighbor.alignmentOffset()
             );
             break;
           default:

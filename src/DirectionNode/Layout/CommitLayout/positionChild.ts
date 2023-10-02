@@ -42,9 +42,9 @@ export const positionChild = (
   const reversedDirection: Direction = reverseDirection(childDirection);
 
   // Save alignment parameters.
-  node.neighbors().at(childDirection).alignmentOffset = alignment;
+  node.neighbors().at(childDirection).setAlignmentOffset(alignment);
   // console.log("Alignment = " + alignment);
-  node.neighbors().at(childDirection).separation = separation;
+  node.neighbors().at(childDirection).setSeparation(separation);
 
   // Determine the line length.
   let extentSize: number;

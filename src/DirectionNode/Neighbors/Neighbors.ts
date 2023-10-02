@@ -210,7 +210,7 @@ export class Neighbors {
       throw new Error("Node must have a child in the given direction")
     }
 
-    return this.at(inDirection).separation;
+    return this.at(inDirection).separation();
   }
 
   getAlignment(inDirection: Direction): Alignment {

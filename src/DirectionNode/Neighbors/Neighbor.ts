@@ -10,8 +10,8 @@ export class Neighbor {
   private _neighbor: DirectionNode | undefined;
   private _alignment: Alignment;
   private _allowAxisOverlap: AxisOverlap;
-  alignmentOffset: number;
-  separation: number;
+  private _alignmentOffset: number;
+  private _separation: number;
   private _lineLength: number;
   private _xPos: number;
   private _yPos: number;
@@ -21,12 +21,28 @@ export class Neighbor {
     this._direction = dir;
     this._neighbor = undefined;
     this._alignment = Alignment.NULL;
-    this.alignmentOffset = 0;
+    this._alignmentOffset = 0;
     this._allowAxisOverlap = AxisOverlap.DEFAULT;
-    this.separation = 0;
+    this._separation = 0;
     this._lineLength = 0;
     this._xPos = NaN;
     this._yPos = NaN;
+  }
+
+  separation() {
+    return this._separation;
+  }
+
+  setSeparation(separation: number) {
+    this._separation = separation;
+  }
+
+  alignmentOffset() {
+    return this._alignmentOffset;
+  }
+
+  setAlignmentOffset(alignmentOffset: number) {
+    this._alignmentOffset = alignmentOffset;
   }
 
   lineLength() {
