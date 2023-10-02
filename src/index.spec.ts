@@ -287,7 +287,7 @@ describe("Package", function () {
     const caret = makeCaret(BLOCK);
     caret.spawn(BACKWARD, BUD);
     commitLayout(caret.node());
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
 
     const rootNode = caret.node();
     const layout = caret.node().layout();
@@ -345,7 +345,7 @@ describe("Package", function () {
     const caret = makeCaret(BLOCK);
     caret.spawn(DOWNWARD, BUD);
     commitLayout(caret.node());
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
 
     const layout = caret.node().layout();
 
@@ -396,7 +396,7 @@ describe("Package", function () {
     // Build the graph.
     const caret = makeCaret(BUD);
     caret.spawn(DOWNWARD, BLOCK);
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
     commitLayout(caret.node());
 
     const layout = caret.node().layout();
@@ -459,7 +459,7 @@ describe("Package", function () {
       caret.spawnMove(DOWNWARD, BLOCK);
     }
     caret.pop();
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
     commitLayout(caret.node());
 
     const rootNode = caret.node();
@@ -528,7 +528,7 @@ describe("Package", function () {
     // Build the graph.
     const caret = makeCaret(BLOCK);
     caret.spawn(UPWARD, BUD);
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
     commitLayout(caret.node());
 
     const rootNode = caret.node();
@@ -591,7 +591,7 @@ describe("Package", function () {
 
     caret.spawn(UPWARD, BUD);
     caret.spawn(DOWNWARD, BUD);
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
     commitLayout(caret.node());
 
     const rootNode = caret.node();
@@ -653,7 +653,7 @@ describe("Package", function () {
     const caret = makeCaret(BLOCK);
     caret.spawn(FORWARD, BUD);
     caret.spawn(BACKWARD, BUD);
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
     commitLayout(caret.node());
 
     // Run comparison tests.
@@ -716,7 +716,7 @@ describe("Package", function () {
     caret.spawn(FORWARD, BUD);
     caret.spawn(UPWARD, BUD);
     caret.spawn(DOWNWARD, BUD);
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
     commitLayout(caret.node());
 
     // Run comparison tests.
@@ -1022,7 +1022,7 @@ describe("Package", function () {
     caret.fitExact();
     caret.spawnMove(FORWARD, BUD);
     caret.shrink();
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
     commitLayout(caret.node());
 
     // Run comparison tests.
@@ -1152,7 +1152,7 @@ describe("Package", function () {
     caret.spawnMove(DOWNWARD, BUD);
     caret.shrink();
     caret.spawn(DOWNWARD, BLOCK);
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
     commitLayout(caret.node());
 
     // Run comparison tests.
@@ -1194,7 +1194,7 @@ describe("Package", function () {
     caret.spawn(BACKWARD, BUD);
     caret.spawn(UPWARD, BUD);
     caret.spawn(DOWNWARD, BUD);
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
     commitLayout(caret.node());
 
     // Run comparison tests.

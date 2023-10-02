@@ -102,7 +102,7 @@ describe("DirectionNode", function () {
     const creased = caret.spawnMove(Direction.FORWARD);
     caret.crease();
     const grandchild = caret.spawnMove(Direction.FORWARD);
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
     assert.notEqual(
       creased.siblings().next(),
       creased,
@@ -238,7 +238,7 @@ describe("DirectionCaret", function () {
       throw new Error("nodeAt must return parent if possible");
     }
     caret.move("u");
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
   });
 
   it("Multiple crease still creates valid paint group chain", function () {
@@ -300,7 +300,7 @@ describe("DirectionCaret", function () {
       n = n.neighbors().nodeAt(Direction.DOWNWARD);
     }
     second.paintGroups().uncrease();
-    caret.moveToRoot();
+    caret.moveTo(caret.root());
     // console.log(paintGroup().dump(caret.root()));
   });
 
@@ -973,7 +973,7 @@ describe("DirectionCaret", function () {
     car.spawn("d", "u");
 
     // Now we have the initial layout, add the object.
-    car.moveToRoot();
+    car.moveTo(car.root());
     assert.deepEqual(car.node(), root);
     car.disconnect("d");
     car.pull("f");

@@ -35,14 +35,14 @@ describe("Caret", function () {
     assert.equal(car.node().id(), "child");
   });
 
-  it("moveToParent", () => {
+  it("moving to root", () => {
     const car = new DirectionCaret("root");
     car.node().setId("root");
     const n = car.node();
     car.spawnMove("f", "b");
     assert.notEqual(n, car.node());
     car.node().setId("child");
-    car.moveToParent();
+    car.moveTo(car.root());
     assert.equal(car.value(), "root");
   });
 
@@ -65,11 +65,11 @@ describe("Caret", function () {
     car.spawnMove("i", "b");
     assert.isFalse(car.node().neighbors().isRoot());
     assert.isTrue(car.node().neighbors().isRootlike());
-    car.moveToParent();
+    car.moveTo(car.parent());
     assert.isFalse(car.node().neighbors().isRoot());
     assert.isFalse(car.node().neighbors().isRootlike());
 
-    car.moveToRoot();
+    car.moveTo(car.root());
     assert.equal(car.value(), "root");
   });
 });

@@ -21,7 +21,7 @@ let nextID = 0;
  * <ul>
  * <li>connect/disconnect</li>
  * <li>spawn/erase</li>
- * <li>move, moveToParent, moveToRoot</li>
+ * <li>move</li>
  * <li>save/restore</li>
  * <li>push/pop</li>
  * </ul>
@@ -160,7 +160,7 @@ export class DirectionCaret<Value> {
     if (!dest) {
       throw new Error("No node to move to in that direction");
     }
-    this.setNode(dest);
+    this.moveTo(dest);
   }
 
   /**
@@ -216,41 +216,39 @@ export class DirectionCaret<Value> {
     if (loadedNode == null) {
       throw new Error("No node found for id: " + id);
     }
-    this.setNode(loadedNode);
+    this.moveTo(loadedNode);
   }
 
   /**
-   * Alias for {@link restore}.
+   * Move directly to the given node.
    *
-   * @param {string} id - the name of the saved node to which to move the caret.
+   * @param {DirectionNode} node - the node to move to.
    */
-  moveTo(id: string): void {
-    this.restore(id);
-  }
-
-  /**
-   * Returns to this caret's original root node.
-   */
-  moveToRoot(): void {
-    this.setNode(this._nodeRoot);
-  }
-
-  protected setNode(node: DirectionNode): void {
+  moveTo(node: DirectionNode): void {
     this._nodes[this._nodes.length - 1] = node;
   }
 
   /**
-   * Moves the caret to the current node's parent.
+   * Returns this caret's original root node.
    *
-   * @throws if the current node is root.
+   * @return {DirectionNode} this caret's original node.
    */
-  moveToParent(): void {
+  origin(): DirectionNode {
+    return this._nodeRoot;
+  }
+
+  /**
+   * Returns the current node's parent node.
+   *
+   * @return {DirectionNode} the parent of the current node
+   */
+  parent(): DirectionNode {
     if (this.node().neighbors().isRoot()) {
       throw new Error(
-        "cannot move to parent of root (node is " + this.node().id() + ")"
+        "cannot get parent of root (node is " + this.node().id() + ")"
       );
     }
-    this.setNode(this.node().neighbors().parentNode());
+    return this.node().neighbors().parentNode();
   }
 
   /**
