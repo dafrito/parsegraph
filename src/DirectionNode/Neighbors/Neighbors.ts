@@ -243,7 +243,7 @@ export class Neighbors {
         .axisOverlap(reverseDirection(this.parentDirection()));
     }
     if (this.hasNode(inDirection)) {
-      return this.at(inDirection).allowAxisOverlap;
+      return this.at(inDirection).axisOverlap();
     }
     return AxisOverlap.NULL;
   }
@@ -260,7 +260,7 @@ export class Neighbors {
           inDirection as AxisOverlap
         );
     }
-    this.ensure(inDirection as Direction).allowAxisOverlap = newAxisOverlap;
+    this.ensure(inDirection as Direction).setAxisOverlap(newAxisOverlap);
     this.node().invalidate();
   }
 
