@@ -189,7 +189,7 @@ export class Neighbors {
     if (!this.hasNode(direction)) {
       return 0;
     }
-    return this.at(direction).lineLength;
+    return this.at(direction).lineLength();
   }
 
   separationAt(inDirection: Direction): number {

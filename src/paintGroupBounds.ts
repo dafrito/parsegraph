@@ -130,25 +130,25 @@ export function paintGroupBounds(nodeRoot: DirectionNode) {
           case Direction.UPWARD:
             parentBounds.top = Math.max(
               parentBounds.top,
-              parentSize[1] / 2 + neighbor.lineLength
+              parentSize[1] / 2 + neighbor.lineLength()
             );
             break;
           case Direction.DOWNWARD:
             parentBounds.bottom = Math.max(
               parentBounds.bottom,
-              parentSize[1] / 2 + neighbor.lineLength
+              parentSize[1] / 2 + neighbor.lineLength()
             );
             break;
           case Direction.FORWARD:
             parentBounds.right = Math.max(
               parentBounds.right,
-              parentSize[0] / 2 + neighbor.lineLength
+              parentSize[0] / 2 + neighbor.lineLength()
             );
             break;
           case Direction.BACKWARD:
             parentBounds.left = Math.max(
               parentBounds.left,
-              parentSize[0] / 2 + neighbor.lineLength
+              parentSize[0] / 2 + neighbor.lineLength()
             );
             break;
           default:

@@ -12,7 +12,7 @@ export class Neighbor {
   private _allowAxisOverlap: AxisOverlap;
   alignmentOffset: number;
   separation: number;
-  lineLength: number;
+  private _lineLength: number;
   private _xPos: number;
   private _yPos: number;
 
@@ -24,9 +24,17 @@ export class Neighbor {
     this.alignmentOffset = 0;
     this._allowAxisOverlap = AxisOverlap.DEFAULT;
     this.separation = 0;
-    this.lineLength = 0;
+    this._lineLength = 0;
     this._xPos = NaN;
     this._yPos = NaN;
+  }
+
+  lineLength() {
+    return this._lineLength;
+  }
+
+  setLineLength(lineLength: number) {
+    this._lineLength = lineLength;
   }
 
   axisOverlap() {

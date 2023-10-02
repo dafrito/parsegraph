@@ -43,7 +43,7 @@ const drawLine = (
   const length =
     directionSign(direction) *
     parentScale *
-    (directionData.lineLength -
+    (directionData.lineLength() -
       (isVerticalDirection(direction) ? size[1] : size[0]) / 2);
   if (isVerticalDirection(direction)) {
     painter(

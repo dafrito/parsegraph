@@ -66,7 +66,7 @@ export const positionChild = (
   }
   const lineLength =
     separation - node.neighbors().nodeAt(childDirection).scale() * extentSize;
-  node.neighbors().at(childDirection).lineLength = lineLength;
+  node.neighbors().at(childDirection).setLineLength(lineLength);
   // console.log(
   //   "Line length: " + lineLength + ",
   //   separation: " + separation + ",
