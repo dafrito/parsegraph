@@ -1,3 +1,24 @@
+## version 4.0.0
+
+October 3, 2023 release
+
+Removing non-essential classes and functions:
+
+- Removed Exception
+- Removed Size
+- Removed Rect
+- Removed exposing some functions that are internally used by algorithms
+- Removed some function overloading/arguments usage
+- Made many private fields actually private
+- Removed caret's creased() - just use isCreased()
+- Removed moveToRoot; moveTo now takes a DirectionNode to jump to. Added origin that can be used to reproduce moveToRoot
+- Moved some methods into Neighbor from Neighbors or DirectionNode
+- Moved PaintGroups files into their own folder
+
+## version 3.0.4
+
+more build improvements
+
 ## version 3.0.2, 3.0.3
 
 October 1, 2023 release
