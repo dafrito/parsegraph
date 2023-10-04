@@ -265,10 +265,10 @@ export class DirectionCaret<Value> {
   }
 
   /*
-   * Returns the initially provided node.
+   * Returns the current node's root node.
    */
   root(): DirectionNode<Value> {
-    return this._nodeRoot;
+    return this.node().neighbors().root();
   }
 
   align(
