@@ -1,14 +1,7 @@
 import { Direction, readDirection, reverseDirection } from "./Direction";
 import { DirectionNode } from "./DirectionNode";
 
-import {
-  PreferredAxis,
-  Fit,
-  AxisOverlap,
-  readAxisOverlap,
-  Alignment,
-  readAlignment,
-} from "./DirectionNode";
+import { PreferredAxis, Fit, Alignment, readAlignment } from "./DirectionNode";
 
 // The scale at which shrunk nodes are shrunk.
 export const SHRINK_SCALE = 0.85;
