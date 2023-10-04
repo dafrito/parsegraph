@@ -324,11 +324,15 @@ export class CommitLayout {
       this.paintGroup = this.rootPaintGroup;
     }
 
-    const layout = this.paintGroup?.layout();
-    if (layout) {
-      layout.invalidateAbsolutePos();
-      layout.commitAbsolutePos();
-    }
+    let n = this.paintGroup;
+    do {
+      const layout = n.layout();
+      if (layout) {
+        layout.invalidateAbsolutePos();
+        layout.commitAbsolutePos();
+      }
+      n = n.siblings().next();
+    } while (n != this.paintGroup);
 
     this.paintGroup = this.paintGroup?.paintGroup().next() as DirectionNode;
     if (this.paintGroup === this.rootPaintGroup) {
