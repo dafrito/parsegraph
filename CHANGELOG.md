@@ -1,3 +1,8 @@
+## version 5.0.0
+
+Fixed caret.root to return caret.node.neighbors.root and not the first node the
+caret used.
+
 ## version 4.0.0
 
 October 3, 2023 release
