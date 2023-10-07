@@ -152,7 +152,7 @@ export function getPerpendicularAxis(axisOrDirection: Direction | Axis): Axis {
       return Axis.Z;
     default:
       // Assume it's a direction.
-      return getPerpendicularAxis(getDirectionAxis(axisOrDirection));
+      return getPerpendicularAxis(getDirectionAxis(axisOrDirection as Direction));
   }
 }
 

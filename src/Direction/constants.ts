@@ -43,10 +43,10 @@ export enum Axis {
   /**
    * Upward and downward axis.
    */
-  VERTICAL,
+  VERTICAL = NUM_DIRECTIONS + 1,
 
   /**
    * Inward and outward axis.
    */
-  Z,
+  Z = NUM_DIRECTIONS + 2,
 }
