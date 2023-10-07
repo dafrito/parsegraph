@@ -83,7 +83,10 @@ export class Neighbors {
   }
 
   hasNodes(axis: Axis): [Direction | undefined, Direction | undefined] {
-    const result: [Direction | undefined, Direction | undefined] = [undefined, undefined];
+    const result: [Direction | undefined, Direction | undefined] = [
+      undefined,
+      undefined,
+    ];
 
     if (this.hasNode(getNegativeDirection(axis))) {
       result[0] = getNegativeDirection(axis);
@@ -249,7 +252,9 @@ export class Neighbors {
   axisOverlap(inDirection?: Direction): AxisOverlap {
     if (inDirection === undefined) {
       if (this.isRoot()) {
-        throw new Error("Axis overlap must be set to a parent if no direction is given");
+        throw new Error(
+          "Axis overlap must be set to a parent if no direction is given"
+        );
       }
       return this.parentNode()
         .neighbors()
@@ -267,7 +272,9 @@ export class Neighbors {
   ): void {
     if (newAxisOverlap === undefined) {
       if (this.isRoot()) {
-        throw new Error("Axis overlap must be set to a parent if no direction is given");
+        throw new Error(
+          "Axis overlap must be set to a parent if no direction is given"
+        );
       }
       return this.parentNode()
         .neighbors()

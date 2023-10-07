@@ -44,11 +44,17 @@ export const layoutAxis = (
   }
   // Change the node direction to null if there is no node in that
   // direction.
-  if (firstDirection !== undefined && !node.neighbors().hasNode(firstDirection)) {
-    firstDirection = undefined
+  if (
+    firstDirection !== undefined &&
+    !node.neighbors().hasNode(firstDirection)
+  ) {
+    firstDirection = undefined;
   }
-  if (secondDirection !== undefined && !node.neighbors().hasNode(secondDirection)) {
-    secondDirection = undefined
+  if (
+    secondDirection !== undefined &&
+    !node.neighbors().hasNode(secondDirection)
+  ) {
+    secondDirection = undefined;
   }
 
   // Return if there are no directions.
@@ -65,7 +71,9 @@ export const layoutAxis = (
     } else {
       // It must be the second direction.
       if (secondDirection === undefined) {
-        throw new Error("secondDirection for layout must be defined if firstDirection is undefined");
+        throw new Error(
+          "secondDirection for layout must be defined if firstDirection is undefined"
+        );
       }
       firstAxisDirection = secondDirection;
     }

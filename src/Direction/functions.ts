@@ -27,7 +27,7 @@ export function readDirection(given: string | Direction): Direction {
     }
   }
 
-  throw new Error("Unrecognized direction: " + given)
+  throw new Error("Unrecognized direction: " + given);
 }
 
 export function nameDirection(given: Direction): string {

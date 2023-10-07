@@ -265,7 +265,9 @@ export class Layout {
   extentsAt(atDirection: Direction): Extent {
     const rv = this._extents[atDirection - Direction.DOWNWARD];
     if (rv === undefined) {
-      throw new Error("No extents for direction: " + nameDirection(atDirection));
+      throw new Error(
+        "No extents for direction: " + nameDirection(atDirection)
+      );
     }
     return rv;
   }

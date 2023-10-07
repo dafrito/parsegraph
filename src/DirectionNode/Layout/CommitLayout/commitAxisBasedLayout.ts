@@ -21,7 +21,7 @@ const getParentDirection = (node: DirectionNode) => {
     throw new Error("A non-root node must have a parent direction");
   }
   return parentDir;
-}
+};
 
 export const commitAxisBasedLayout = (
   painter: LayoutPainter,
@@ -33,14 +33,11 @@ export const commitAxisBasedLayout = (
   if (
     node.siblings().canonicalLayoutPreference() == PreferredAxis.PERPENDICULAR
   ) {
-    const firstAxis: Axis = getPerpendicularAxis(
-      getParentDirection(node)
-    );
+    const firstAxis: Axis = getPerpendicularAxis(getParentDirection(node));
 
     // Check for nodes perpendicular to parent's direction
-    const hasFirstAxisNodes: [Direction | undefined, Direction | undefined] = node
-      .neighbors()
-      .hasNodes(firstAxis);
+    const hasFirstAxisNodes: [Direction | undefined, Direction | undefined] =
+      node.neighbors().hasNodes(firstAxis);
     const oppositeFromParent: Direction = reverseDirection(
       getParentDirection(node)
     );
@@ -81,9 +78,8 @@ export const commitAxisBasedLayout = (
     );
 
     // Check for nodes perpendicular to parent's direction
-    const perpendicularNodes: [Direction | undefined, Direction | undefined] = node
-      .neighbors()
-      .hasNodes(getPerpendicularAxis(getParentDirection(node)));
+    const perpendicularNodes: [Direction | undefined, Direction | undefined] =
+      node.neighbors().hasNodes(getPerpendicularAxis(getParentDirection(node)));
 
     if (node.neighbors().hasNode(oppositeFromParent)) {
       // Layout the second-axis child.
