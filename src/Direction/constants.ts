@@ -11,13 +11,12 @@
  * @see {@link Extent}
  */
 export enum Direction {
-  NULL = -1,
-  INWARD,
-  OUTWARD,
-  DOWNWARD,
-  UPWARD,
-  BACKWARD,
-  FORWARD,
+  INWARD = 0,
+  OUTWARD = 1,
+  DOWNWARD = 2,
+  UPWARD = 3,
+  BACKWARD = 4,
+  FORWARD = 5,
 }
 
 export const INWARD = Direction.INWARD;
@@ -36,12 +35,10 @@ export const NUM_DIRECTIONS = 6;
  * The list of axes.
  */
 export enum Axis {
-  NULL = 6,
-
   /**
    * Forward and backward axis.
    */
-  HORIZONTAL,
+  HORIZONTAL = NUM_DIRECTIONS,
 
   /**
    * Upward and downward axis.

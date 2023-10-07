@@ -31,10 +31,10 @@ export const connectNode = (
       "By rule, nodes cannot be spawned in the outward direction."
     );
   }
-  if (inDirection == Direction.NULL) {
-    throw new Error("Direction must not be null");
+  if (inDirection === undefined) {
+    throw new Error("Direction must not be undefined");
   }
-  if (inDirection == parent.neighbors().parentDirection()) {
+  if (inDirection === parent.neighbors().parentDirection()) {
     throw new Error("Cannot connect a node in the parent's direction");
   }
   if (parent.neighbors().hasNode(inDirection)) {

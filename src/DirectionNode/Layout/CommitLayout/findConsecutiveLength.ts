@@ -18,12 +18,6 @@ export const findConsecutiveLength = (
     );
   }
 
-  const directionAxis: Axis = getDirectionAxis(inDirection);
-  if (directionAxis === Axis.NULL) {
-    // This should be impossible.
-    throw new Error("Cardinal direction somehow has no axis?");
-  }
-
   // Calculate the length, starting from the center of this node.
   let total: number = 0;
   let scale: number = 1.0;

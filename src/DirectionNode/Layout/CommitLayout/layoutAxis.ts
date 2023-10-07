@@ -31,39 +31,42 @@ const secondSize: number[] = [NaN, NaN];
 export const layoutAxis = (
   painter: LayoutPainter,
   node: DirectionNode,
-  firstDirection: Direction,
-  secondDirection: Direction,
+  firstDirection: Direction | undefined,
+  secondDirection: Direction | undefined,
   allowAxisOverlap: boolean,
   lineThickness: number,
   bodySize: number[]
 ): boolean => {
-  if (firstDirection === secondDirection && firstDirection != Direction.NULL) {
+  if (firstDirection === secondDirection && firstDirection !== undefined) {
     throw new Error(
       "First and second directions cannot be the same unless they are both null"
     );
   }
   // Change the node direction to null if there is no node in that
   // direction.
-  if (!node.neighbors().hasNode(firstDirection)) {
-    firstDirection = Direction.NULL;
+  if (firstDirection !== undefined && !node.neighbors().hasNode(firstDirection)) {
+    firstDirection = undefined
   }
-  if (!node.neighbors().hasNode(secondDirection)) {
-    secondDirection = Direction.NULL;
+  if (secondDirection !== undefined && !node.neighbors().hasNode(secondDirection)) {
+    secondDirection = undefined
   }
 
   // Return if there are no directions.
-  if (firstDirection == Direction.NULL && secondDirection == Direction.NULL) {
+  if (firstDirection === undefined && secondDirection === undefined) {
     return false;
   }
 
   // Test if this node has a first-axis child in only one direction.
-  if (firstDirection == Direction.NULL || secondDirection == Direction.NULL) {
+  if (firstDirection === undefined || secondDirection === undefined) {
     // Find the direction of the only first-axis child.
     let firstAxisDirection: Direction;
-    if (firstDirection != Direction.NULL) {
+    if (firstDirection !== undefined) {
       firstAxisDirection = firstDirection;
     } else {
       // It must be the second direction.
+      if (secondDirection === undefined) {
+        throw new Error("secondDirection for layout must be defined if firstDirection is undefined");
+      }
       firstAxisDirection = secondDirection;
     }
 

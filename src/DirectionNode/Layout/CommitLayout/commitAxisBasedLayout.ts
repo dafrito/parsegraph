@@ -12,6 +12,17 @@ import { layoutAxis } from "./layoutAxis";
 import { LayoutPainter } from "./LayoutPainter";
 import { layoutSingle } from "./layoutSingle";
 
+const getParentDirection = (node: DirectionNode) => {
+  if (node.neighbors().isRoot()) {
+    throw new Error("Node is root and has no parent direction");
+  }
+  const parentDir = node.neighbors().parentDirection();
+  if (undefined === parentDir) {
+    throw new Error("A non-root node must have a parent direction");
+  }
+  return parentDir;
+}
+
 export const commitAxisBasedLayout = (
   painter: LayoutPainter,
   node: DirectionNode,
@@ -23,15 +34,15 @@ export const commitAxisBasedLayout = (
     node.siblings().canonicalLayoutPreference() == PreferredAxis.PERPENDICULAR
   ) {
     const firstAxis: Axis = getPerpendicularAxis(
-      node.neighbors().parentDirection()
+      getParentDirection(node)
     );
 
     // Check for nodes perpendicular to parent's direction
-    const hasFirstAxisNodes: [Direction, Direction] = node
+    const hasFirstAxisNodes: [Direction | undefined, Direction | undefined] = node
       .neighbors()
       .hasNodes(firstAxis);
     const oppositeFromParent: Direction = reverseDirection(
-      node.neighbors().parentDirection()
+      getParentDirection(node)
     );
     if (
       layoutAxis(
@@ -66,13 +77,13 @@ export const commitAxisBasedLayout = (
   } else {
     // Layout this node's second-axis child, if that child exists.
     const oppositeFromParent: Direction = reverseDirection(
-      node.neighbors().parentDirection()
+      getParentDirection(node)
     );
 
     // Check for nodes perpendicular to parent's direction
-    const perpendicularNodes: [Direction, Direction] = node
+    const perpendicularNodes: [Direction | undefined, Direction | undefined] = node
       .neighbors()
-      .hasNodes(getPerpendicularAxis(node.neighbors().parentDirection()));
+      .hasNodes(getPerpendicularAxis(getParentDirection(node)));
 
     if (node.neighbors().hasNode(oppositeFromParent)) {
       // Layout the second-axis child.
@@ -80,8 +91,8 @@ export const commitAxisBasedLayout = (
         layoutSingle(
           node,
           oppositeFromParent,
-          perpendicularNodes[0] === Direction.NULL &&
-            perpendicularNodes[1] === Direction.NULL,
+          perpendicularNodes[0] === undefined &&
+            perpendicularNodes[1] === undefined,
           lineThickness,
           bodySize,
           painter

@@ -1,6 +1,6 @@
 import { Extent } from "./Extent";
 
-import { Direction, reverseDirection } from "../../Direction";
+import { Direction, nameDirection, reverseDirection } from "../../Direction";
 import { findPaintGroup } from "../../DirectionNode/PaintGroups/findPaintGroup";
 import { DirectionNode } from "../../DirectionNode/DirectionNode";
 import { LayoutPhase } from "./LayoutPhase";
@@ -96,7 +96,7 @@ export class Layout {
         break;
       }
 
-      nodeList.push(reverseDirection(node.neighbors().parentDirection()));
+      nodeList.push(node.neighbors().parent().direction());
       node = node.neighbors().parentNode();
     }
 
@@ -208,7 +208,7 @@ export class Layout {
         break;
       }
 
-      nodeList.push(reverseDirection(node.neighbors().parentDirection()));
+      nodeList.push(reverseDirection(node.neighbors().parent().direction()));
       node = node.neighbors().parentNode();
     }
 
@@ -263,10 +263,11 @@ export class Layout {
   }
 
   extentsAt(atDirection: Direction): Extent {
-    if (atDirection === Direction.NULL) {
-      throw new Error("Cannot get extents at null direction");
+    const rv = this._extents[atDirection - Direction.DOWNWARD];
+    if (rv === undefined) {
+      throw new Error("No extents for direction: " + nameDirection(atDirection));
     }
-    return this._extents[atDirection - Direction.DOWNWARD];
+    return rv;
   }
 
   extentOffsetAt(atDirection: Direction): number {

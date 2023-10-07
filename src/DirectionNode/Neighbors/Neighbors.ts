@@ -43,9 +43,9 @@ export class Neighbors {
     return this._parentNeighbor;
   }
 
-  parentDirection(): Direction {
+  parentDirection(): Direction | undefined {
     if (this.isRoot()) {
-      return Direction.NULL;
+      return undefined;
     }
     return reverseDirection(this.parent().direction());
   }
@@ -73,7 +73,7 @@ export class Neighbors {
   }
 
   hasNode(atDirection: Direction): boolean {
-    if (atDirection == Direction.NULL) {
+    if (atDirection === undefined) {
       return false;
     }
     if (this.at(atDirection) && this.at(atDirection).neighbor()) {
@@ -82,12 +82,8 @@ export class Neighbors {
     return !this.isRoot() && this.parent()?.reverseDirection() === atDirection;
   }
 
-  hasNodes(axis: Axis): [Direction, Direction] {
-    if (axis === Axis.NULL) {
-      throw new Error("axis must not be null");
-    }
-
-    const result: [Direction, Direction] = [Direction.NULL, Direction.NULL];
+  hasNodes(axis: Axis): [Direction | undefined, Direction | undefined] {
+    const result: [Direction | undefined, Direction | undefined] = [undefined, undefined];
 
     if (this.hasNode(getNegativeDirection(axis))) {
       result[0] = getNegativeDirection(axis);
@@ -220,15 +216,29 @@ export class Neighbors {
     return Alignment.NULL;
   }
 
+  private getParentDirection() {
+    if (this.isRoot()) {
+      throw new Error("Node has no parent");
+    }
+    const parentDir = this.parentDirection();
+    if (undefined === parentDir) {
+      throw new Error("Node is not root but has no parent direction");
+    }
+    return parentDir;
+  }
+
   align(
     inDirection: Direction | Alignment,
     newAlignmentMode?: Alignment
   ): void {
     if (newAlignmentMode === undefined) {
+      if (this.isRoot()) {
+        throw new Error("Alignment must have a parent if self-directed");
+      }
       return this.parentNode()
         .neighbors()
         .align(
-          reverseDirection(this.parentDirection()),
+          reverseDirection(this.getParentDirection()),
           inDirection as Alignment
         );
     }
@@ -238,9 +248,12 @@ export class Neighbors {
 
   axisOverlap(inDirection?: Direction): AxisOverlap {
     if (inDirection === undefined) {
+      if (this.isRoot()) {
+        throw new Error("Axis overlap must be set to a parent if no direction is given");
+      }
       return this.parentNode()
         .neighbors()
-        .axisOverlap(reverseDirection(this.parentDirection()));
+        .axisOverlap(reverseDirection(this.getParentDirection()));
     }
     if (this.hasNode(inDirection)) {
       return this.at(inDirection).axisOverlap();
@@ -253,10 +266,13 @@ export class Neighbors {
     newAxisOverlap?: AxisOverlap
   ): void {
     if (newAxisOverlap === undefined) {
+      if (this.isRoot()) {
+        throw new Error("Axis overlap must be set to a parent if no direction is given");
+      }
       return this.parentNode()
         .neighbors()
         .setAxisOverlap(
-          reverseDirection(this.parentDirection()),
+          reverseDirection(this.getParentDirection()),
           inDirection as AxisOverlap
         );
     }

@@ -27,13 +27,11 @@ export function readDirection(given: string | Direction): Direction {
     }
   }
 
-  return Direction.NULL;
+  throw new Error("Unrecognized direction: " + given)
 }
 
 export function nameDirection(given: Direction): string {
   switch (given) {
-    case Direction.NULL:
-      return "NULL";
     case Direction.FORWARD:
       return "FORWARD";
     case Direction.BACKWARD:
@@ -52,8 +50,6 @@ export const isDirection = nameDirection;
 
 export function reverseDirection(given: Direction): Direction {
   switch (given) {
-    case Direction.NULL:
-      return Direction.NULL;
     case Direction.FORWARD:
       return Direction.BACKWARD;
     case Direction.BACKWARD:
@@ -71,7 +67,6 @@ export function reverseDirection(given: Direction): Direction {
 
 export function isCardinalDirection(given: Direction): boolean {
   switch (given) {
-    case Direction.NULL:
     case Direction.INWARD:
     case Direction.OUTWARD:
       return false;
@@ -115,8 +110,6 @@ export function alternateDirection(given: Direction): Direction {
 
 export function nameAxis(given: Axis): string {
   switch (given) {
-    case Axis.NULL:
-      return "NULL";
     case Axis.VERTICAL:
       return "VERTICAL";
     case Axis.HORIZONTAL:
@@ -137,9 +130,8 @@ export function getDirectionAxis(given: Direction): Axis {
     case Direction.INWARD:
     case Direction.OUTWARD:
       return Axis.Z;
-    case Direction.NULL:
-      return Axis.NULL;
   }
+  throw new Error("Unknown direction: " + given);
 }
 
 export function isVerticalDirection(given: Direction): boolean {
@@ -158,8 +150,6 @@ export function getPerpendicularAxis(axisOrDirection: Direction | Axis): Axis {
       return Axis.HORIZONTAL;
     case Axis.Z:
       return Axis.Z;
-    case Axis.NULL:
-      return Axis.NULL;
     default:
       // Assume it's a direction.
       return getPerpendicularAxis(getDirectionAxis(axisOrDirection));
@@ -174,9 +164,8 @@ export function getPositiveDirection(given: Axis) {
       return Direction.DOWNWARD;
     case Axis.Z:
       return Direction.OUTWARD;
-    case Axis.NULL:
-      throw new Error("Null axis has no positive or negative direction");
   }
+  throw new Error("Unknown axis: " + nameAxis(given));
 }
 
 export function getNegativeDirection(given: Axis): Direction {
