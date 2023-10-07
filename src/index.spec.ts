@@ -1,7 +1,4 @@
-import {
-  Direction,
-  Axis,
-} from "../src/Direction";
+import { Direction, Axis } from "../src/Direction";
 
 import { DirectionNode } from "../src/DirectionNode";
 
