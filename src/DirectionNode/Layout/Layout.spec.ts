@@ -64,4 +64,60 @@ describe("Layout", () => {
       })
     })
   })
+
+  it("absolute pos is set on commit even if creased", () => {
+    const root = new DirectionNode("root");
+    let current = root;
+    let nodes = [root];
+    for(let i = 0; i < 2; ++i) {
+      const n = new DirectionNode("" + i);
+      nodes.push(n);
+      n.paintGroups().crease();
+      current.connect(Direction.FORWARD, n);
+      current = n;
+    }
+
+    const layout = new CommitLayout(root, {
+      size:(_: DirectionNode, bodySize: number[]) => {
+        bodySize[0] = 2;
+        bodySize[1] = 2;
+      },
+      getSeparation: () => 1
+    });
+    while (layout.crank());
+
+    root.paintGroup().forEach(pg => {
+      pg.siblings().forEachNode(n => {
+        expect(n.layout().needsAbsolutePos()).toBe(false);
+      })
+    })
+  })
+
+  it("absolute pos is set on commit even if built backwards", () => {
+    let root = new DirectionNode("root");
+    let current = root;
+    let nodes = [root];
+    for(let i = 0; i < 2; ++i) {
+      const n = new DirectionNode("" + i);
+      nodes.push(n);
+      n.paintGroups().crease();
+      n.connect(Direction.BACKWARD, root);
+      root = n;
+    }
+
+    const layout = new CommitLayout(root, {
+      size:(_: DirectionNode, bodySize: number[]) => {
+        bodySize[0] = 2;
+        bodySize[1] = 2;
+      },
+      getSeparation: () => 1
+    });
+    while (layout.crank());
+
+    root.paintGroup().forEach(pg => {
+      pg.siblings().forEachNode(n => {
+        expect(n.layout().needsAbsolutePos()).toBe(false);
+      })
+    })
+  })
 })
