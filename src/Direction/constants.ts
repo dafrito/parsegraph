@@ -19,13 +19,6 @@ export enum Direction {
   FORWARD = 5,
 }
 
-export const INWARD = Direction.INWARD;
-export const OUTWARD = Direction.OUTWARD;
-export const DOWNWARD = Direction.DOWNWARD;
-export const UPWARD = Direction.UPWARD;
-export const BACKWARD = Direction.BACKWARD;
-export const FORWARD = Direction.FORWARD;
-
 /**
  * The number of axis directions.
  */

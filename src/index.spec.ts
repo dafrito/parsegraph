@@ -1,10 +1,6 @@
 import {
   Direction,
   Axis,
-  FORWARD,
-  DOWNWARD,
-  UPWARD,
-  BACKWARD,
 } from "../src/Direction";
 
 import { DirectionNode } from "../src/DirectionNode";
@@ -19,6 +15,7 @@ import { assert } from "chai";
 const BUD = "u";
 const BLOCK = "b";
 const SHRINK_SCALE = 0.85;
+const { UPWARD, BACKWARD, FORWARD, DOWNWARD } = Direction;
 
 const makeNode = (value?: any) => {
   const n = new DirectionNode();
