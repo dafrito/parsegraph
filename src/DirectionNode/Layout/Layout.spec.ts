@@ -102,7 +102,6 @@ describe("Layout", () => {
 
   it("absolute pos is set on commit even if built backwards", () => {
     let root = new DirectionNode("root");
-    const current = root;
     const nodes = [root];
     for (let i = 0; i < 2; ++i) {
       const n = new DirectionNode("" + i);

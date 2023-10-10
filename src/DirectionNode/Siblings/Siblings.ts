@@ -4,7 +4,7 @@ import {
   getDirectionAxis,
   Axis,
 } from "../../Direction";
-import { PreferredAxis, namePreferredAxis } from "./PreferredAxis";
+import { PreferredAxis } from "./PreferredAxis";
 import { DirectionNode } from "../DirectionNode";
 
 const MAX_SIBLINGS = 100000;
@@ -466,7 +466,7 @@ export class Siblings {
     if (curCanon === newCanon) {
       return;
     }
-    //console.log("Changing", namePreferredAxis(curCanon), "to", namePreferredAxis(newCanon));
+    // console.log("Changing", namePreferredAxis(curCanon), "to", namePreferredAxis(newCanon));
 
     const parentDir = this.node().neighbors().parent()?.direction();
     if (!parentDir) {

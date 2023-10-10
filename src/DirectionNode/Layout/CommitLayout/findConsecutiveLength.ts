@@ -3,8 +3,6 @@ import {
   Direction,
   isCardinalDirection,
   nameDirection,
-  getDirectionAxis,
-  Axis,
 } from "../../../Direction";
 
 export const findConsecutiveLength = (

@@ -59,7 +59,11 @@ describe("Siblings", () => {
     // Paint the graph; build the scene.
     while (cld.crank());
 
-    root.neighbors().nodeAt(Direction.FORWARD).siblings().pull(Direction.FORWARD);
+    root
+      .neighbors()
+      .nodeAt(Direction.FORWARD)
+      .siblings()
+      .pull(Direction.FORWARD);
 
     cld.reset(root);
     while (cld.crank());
