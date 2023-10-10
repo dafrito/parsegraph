@@ -4,7 +4,7 @@ import {
   getDirectionAxis,
   Axis,
 } from "../../Direction";
-import { PreferredAxis } from "./PreferredAxis";
+import { PreferredAxis, namePreferredAxis } from "./PreferredAxis";
 import { DirectionNode } from "../DirectionNode";
 
 const MAX_SIBLINGS = 100000;
@@ -466,6 +466,7 @@ export class Siblings {
     if (curCanon === newCanon) {
       return;
     }
+    //console.log("Changing", namePreferredAxis(curCanon), "to", namePreferredAxis(newCanon));
 
     const parentDir = this.node().neighbors().parent()?.direction();
     if (!parentDir) {
@@ -475,15 +476,20 @@ export class Siblings {
     const paxis = getDirectionAxis(parentDir);
     if (curCanon === PreferredAxis.PARENT) {
       if (paxis === Axis.HORIZONTAL) {
+        // parent is horizontal, we're aligned horizontal, and we want vertical
         this.horzToVert();
       } else {
+        // parent is vertical, we're aligned vertical, and we want horizontal
         this.vertToHorz();
       }
     } else {
+      // curCanon is perpendicular
       if (paxis === Axis.VERTICAL) {
-        this.vertToHorz();
-      } else {
+        // parent is vertical, we're aligned horizontal, and we want vertical
         this.horzToVert();
+      } else {
+        // parent is horizontal, we're aligned vertical, and we want horizontal
+        this.vertToHorz();
       }
     }
 
