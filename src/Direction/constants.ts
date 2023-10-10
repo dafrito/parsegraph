@@ -15,8 +15,8 @@ export enum Direction {
   OUTWARD = 1,
   DOWNWARD = 2,
   UPWARD = 3,
-  BACKWARD = 4,
-  FORWARD = 5,
+  FORWARD = 4,
+  BACKWARD = 5,
 }
 
 /**
