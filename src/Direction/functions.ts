@@ -46,7 +46,6 @@ export function nameDirection(given: Direction): string {
       return "OUTWARD";
   }
 }
-export const isDirection = nameDirection;
 
 export function reverseDirection(given: Direction): Direction {
   switch (given) {
