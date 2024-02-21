@@ -25,8 +25,8 @@ while (layout.crank());
 
 // Render the graph.
 rootNode.paintGroup().forEach((pg: DirectionNode) => {
-  pg.forEachNode(node => {
-    paintNodeLines(node, (x, y, w, h) => {
+  pg.siblings().forEach(node => {
+    paintNodeLines(node, 1, (x, y, w, h) => {
       // TODO Draw lines from node to neighbor.
     });
     paintNodeBounds(node, (x, y, w, h) => {
@@ -39,19 +39,19 @@ rootNode.paintGroup().forEach((pg: DirectionNode) => {
 
 # What is parsegraph?
 
-Parsegraph is a platform-independent library to paint a graph of connected
-values in up to five directions.
+Parsegraph is a graphics-independent library to lay out a graph of connected
+DirectionNodes in up to five directions:
+
+- forward
+- backward
+- upward
+- downward
+- inward
 
 # What is DirectionNode?
 
 A DirectionNode is a class that can have DirectionNode "neighbors" in up to five
 directions:
-
-- inward
-- upward
-- downward
-- forward
-- backward
 
 A DirectionNode can also hold a value, optionally of a given type.
 
