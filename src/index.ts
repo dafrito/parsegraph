@@ -4,3 +4,4 @@ export * from "./DirectionCaret";
 export * from "./paintGroupBounds";
 export * from "./paintNodeLines";
 export * from "./paintNodeBounds";
+export * from "./serializeParsegraph";
