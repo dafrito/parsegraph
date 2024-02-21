@@ -68,11 +68,24 @@ const drawLine = (
   }
 };
 
+/**
+ * Paints a given node's lines using the provided painter.
+ * 
+ * The painter will be called for each child direction of the given node, providing
+ * the bounds of the drawn line that connects the parent to its child.
+ * 
+ * @param {DirectionNode} node the parent node
+ * @param {number} lineThickness the size of the connecting line
+ * @param {BoundsPainter} painter 
+ */
 export function paintNodeLines(
   node: DirectionNode,
   lineThickness: number,
   painter: BoundsPainter
 ) {
+  if (!(node instanceof DirectionNode) || arguments.length !== 3 || isNaN(lineThickness) || typeof painter !== "function") {
+    throw new Error("Usage: paintNodeLines(node, lineThickness, painter)")
+  }
   forEachCardinalDirection((dir: Direction) => {
     drawLine(lineThickness, painter, dir, node);
   });
