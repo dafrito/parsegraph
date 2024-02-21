@@ -40,7 +40,7 @@ export class Siblings {
     this._layoutPreference = PreferredAxis.HORIZONTAL;
   }
 
-  forEachNode(func: (node: DirectionNode) => void): void {
+  forEach(func: (node: DirectionNode) => void): void {
     let node: DirectionNode = this.node();
     do {
       func(node);

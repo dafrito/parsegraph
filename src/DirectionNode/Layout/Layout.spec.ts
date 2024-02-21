@@ -66,7 +66,7 @@ describe("Layout", () => {
     while (layout.crank());
 
     root.paintGroup().forEach((pg) => {
-      pg.siblings().forEachNode((n) => {
+      pg.siblings().forEach((n) => {
         expect(n.layout().needsAbsolutePos()).toBe(false);
       });
     });
@@ -94,7 +94,7 @@ describe("Layout", () => {
     while (layout.crank());
 
     root.paintGroup().forEach((pg) => {
-      pg.siblings().forEachNode((n) => {
+      pg.siblings().forEach((n) => {
         expect(n.layout().needsAbsolutePos()).toBe(false);
       });
     });
@@ -121,7 +121,7 @@ describe("Layout", () => {
     while (layout.crank());
 
     root.paintGroup().forEach((pg) => {
-      pg.siblings().forEachNode((n) => {
+      pg.siblings().forEach((n) => {
         expect(n.layout().needsAbsolutePos()).toBe(false);
       });
     });

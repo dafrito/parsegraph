@@ -64,7 +64,7 @@ const demo = (rootNode: DirectionNode): Metrics => {
   // Render the graph.
   rootNode.paintGroup().forEach((pg: DirectionNode) => {
     ++m.paintGroupRenders;
-    pg.siblings().forEachNode((node) => {
+    pg.siblings().forEach((node) => {
       paintNodeBounds(node, () => {
         // Draw the node.
         ++m.renders;
@@ -103,7 +103,7 @@ const demo2 = (rootNode: DirectionNode): Metrics2 => {
       // TODO pre-render content as necessary
       // This is optional.
       ++m.paints;
-      pg.siblings().forEachNode(() => {
+      pg.siblings().forEach(() => {
         ++m.paintedNodes;
       });
       return false;
@@ -118,7 +118,7 @@ const demo2 = (rootNode: DirectionNode): Metrics2 => {
   // Render the graph.
   rootNode.paintGroup().forEach((pg: DirectionNode) => {
     ++m.paintGroupRenders;
-    pg.siblings().forEachNode((node) => {
+    pg.siblings().forEach((node) => {
       paintNodeBounds(node, () => {
         // Draw the node.
         ++m.renders;
@@ -176,7 +176,7 @@ const demoMultiple = (rootNode: DirectionNode): (() => Metrics) => {
     // Render the graph.
     rootNode.paintGroup().forEach((pg: DirectionNode) => {
       ++m.paintGroupRenders;
-      pg.siblings().forEachNode((node) => {
+      pg.siblings().forEach((node) => {
         paintNodeBounds(node, () => {
           // Draw the node.
           ++m.renders;
@@ -231,7 +231,7 @@ describe("CommitLayout", () => {
     // Render the graph.
     let renderCounts = 0;
     rootNode.paintGroup().forEach((pg: DirectionNode) => {
-      pg.siblings().forEachNode((node) => {
+      pg.siblings().forEach((node) => {
         paintNodeBounds(node, () => {
           // Draw the node.
           ++renderCounts;
@@ -289,7 +289,7 @@ describe("CommitLayout", () => {
     // Render the graph.
     let renderCounts = 0;
     rootNode.paintGroup().forEach((pg: DirectionNode) => {
-      pg.siblings().forEachNode((node) => {
+      pg.siblings().forEach((node) => {
         paintNodeBounds(node, () => {
           // Draw the node.
           ++renderCounts;
@@ -349,7 +349,7 @@ describe("CommitLayout", () => {
     // Render the graph.
     let renderCounts = 0;
     rootNode.paintGroup().forEach((pg: DirectionNode) => {
-      pg.siblings().forEachNode((node) => {
+      pg.siblings().forEach((node) => {
         paintNodeBounds(node, () => {
           // Draw the node.
           ++renderCounts;
@@ -886,7 +886,7 @@ describe("CommitLayout", () => {
     // Render the graph.
     let renderCounts = 0;
     rootNode.paintGroup().forEach((pg: DirectionNode) => {
-      pg.siblings().forEachNode((node) => {
+      pg.siblings().forEach((node) => {
         paintNodeBounds(node, () => {
           // Draw the node.
           ++renderCounts;

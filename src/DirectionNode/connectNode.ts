@@ -64,7 +64,7 @@ export const connectNode = (
     node.paintGroups().setPaintGroupNode(parent.paintGroups().paintGroupNode());
     node
       .siblings()
-      .forEachNode((n) =>
+      .forEach((n) =>
         n.paintGroups().setPaintGroupNode(parent.paintGroups().paintGroupNode())
       );
     if (node.paintGroups().paintGroup().next() !== node) {

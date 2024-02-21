@@ -14,7 +14,7 @@ interface DirectionNodeData {
 const serializeParsegraph = (root: DirectionNode) => {
   const nodes: { [key: string]: DirectionNodeData } = {};
   root.paintGroup().forEach((pg) => {
-    pg.siblings().forEachNode((node) => {
+    pg.siblings().forEach((node) => {
       nodes[node.id()] = {
         value: node.value(),
         scale: node.scale(),
