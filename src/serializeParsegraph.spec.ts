@@ -19,7 +19,7 @@ describe("serializeParsegraph", () => {
     let node = root;
     const numChildren = 3;
     for (let i = 0; i < numChildren; ++i) {
-      const child = new DirectionNode(i);
+      const child = new DirectionNode("" + i);
       node.connect(Direction.FORWARD, child);
       node = child;
     }
@@ -41,7 +41,7 @@ describe("serializeParsegraph", () => {
     let node = root;
     const numChildren = 3;
     for (let i = 0; i < numChildren; ++i) {
-      const child = new DirectionNode(i);
+      const child = new DirectionNode("" + i);
       child.setScale(0.5);
       node.connect(Direction.FORWARD, child);
       node = child;
@@ -66,11 +66,11 @@ describe("serializeParsegraph", () => {
     let node = root;
     const numChildren = 3;
     for (let i = 0; i < numChildren; ++i) {
-      const child = new DirectionNode(i);
+      const child = new DirectionNode("" + i);
 
       let par = child;
       for (let x = 0; x < numChildren; ++x) {
-        const cell = new DirectionNode(x);
+        const cell = new DirectionNode("" + x);
         par.connect(x === 0 ? Direction.UPWARD : Direction.FORWARD, cell);
         par = cell;
       }
@@ -107,11 +107,11 @@ describe("serializeParsegraph", () => {
     let node = root;
     const numChildren = 3;
     for (let i = 0; i < numChildren; ++i) {
-      const child = new DirectionNode(i);
+      const child = new DirectionNode("" + i);
 
       let par = child;
       for (let x = 0; x < numChildren; ++x) {
-        const cell = new DirectionNode(x);
+        const cell = new DirectionNode("" + x);
         par.connect(x === 0 ? Direction.UPWARD : Direction.FORWARD, cell);
         if (x === 0) {
           cell.paintGroups().crease();

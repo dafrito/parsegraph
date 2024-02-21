@@ -1,8 +1,18 @@
-import { Alignment, reverseDirection } from ".";
+import { Alignment, Direction, PreferredAxis, reverseDirection } from ".";
 import { DirectionNode } from "./DirectionNode/DirectionNode";
 
+interface DirectionNodeData {
+  value: any;
+  scale: number;
+  layoutPreference: PreferredAxis;
+  parentId: null | string | number;
+  parentDir: null | Direction;
+  alignment: Alignment;
+  paintGroup: boolean;
+}
+
 const serializeParsegraph = (root: DirectionNode) => {
-  const nodes = {};
+  const nodes: { [key: string]: DirectionNodeData } = {};
   root.paintGroup().forEach((pg) => {
     pg.siblings().forEachNode((node) => {
       nodes[node.id()] = {
@@ -31,8 +41,8 @@ const serializeParsegraph = (root: DirectionNode) => {
   return nodes;
 };
 
-const deserializeParsegraph = (json: any): DirectionNode => {
-  const nodes = {};
+const deserializeParsegraph = (json: { [key: string]: DirectionNodeData }): DirectionNode => {
+  const nodes: { [key: string]: DirectionNode } = {};
   let root = null;
   Object.keys(json).forEach((id) => {
     const nodeData = json[id];
