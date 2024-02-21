@@ -3,6 +3,7 @@
 - Fixed demo's use of paintNodeLines, pg.siblings().forEach
 - Make initial node ID's more unique, but still not UUIDs
 - Add serializeParsegraph, deserializeParsegraph
+- Renamed siblings().forEachNode to siblings().forEach
 
 ## version 5.0.0
 
