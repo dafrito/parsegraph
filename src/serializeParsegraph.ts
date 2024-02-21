@@ -1,4 +1,4 @@
-import { Direction, Alignment, reverseDirection } from ".";
+import { Alignment, reverseDirection } from ".";
 import { DirectionNode } from "./DirectionNode/DirectionNode";
 
 const serializeParsegraph = (root: DirectionNode) => {
@@ -13,13 +13,14 @@ const serializeParsegraph = (root: DirectionNode) => {
           ? null
           : node.neighbors().parentNode().id(),
         parentDir: node.neighbors().isRoot()
-          ? Direction.NULL
+          ? null
           : node.neighbors().parentDirection(),
         alignment: node.neighbors().isRoot()
           ? Alignment.NONE
           : node
               .neighbors()
-              .parent()
+              .parentNode()
+              .neighbors()
               .getAlignment(
                 reverseDirection(node.neighbors().parentDirection())
               ),
