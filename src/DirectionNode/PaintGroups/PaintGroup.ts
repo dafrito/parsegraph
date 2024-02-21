@@ -4,12 +4,27 @@ import { getLastPaintGroup } from "./getLastPaintGroup";
 import makeLimit from "./makeLimit";
 import { DirectionNode } from "../DirectionNode";
 
+/**
+ * Represents a paint group.
+ * 
+ * Nodes within a paint group are painted separately. Paint groups
+ * are an optimization strategy that is intended to isolate nodes
+ * that change at a common rate.
+ */
 export class PaintGroup {
   private _next: DirectionNode;
   private _prev: DirectionNode;
   private _node: DirectionNode;
   private _explicit: boolean;
 
+  /**
+   * Creates a new paint group for the given node. In general, you should
+   * not need this approach; call node.paintGroups().crease()
+   * 
+   * @param {DirectionNode} node the node that will become a paint group
+   * @param {boolean} explicit whether the node is an explicit paint group, or merely
+   * a paint group because it is a root node.
+   */
   constructor(node: DirectionNode, explicit: boolean) {
     this._node = node;
     this._next = this._node;
@@ -86,6 +101,11 @@ export class PaintGroup {
     ];
   }
 
+  /**
+   * Returns the corresponding DirectionNode.
+   * 
+   * @return {DirectionNode} the node that corresponds to this paint group.
+   */
   node() {
     return this._node;
   }
