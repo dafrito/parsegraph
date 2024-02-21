@@ -1,7 +1,10 @@
-import { assert } from 'chai';
-import { Direction, Alignment } from '.';
-import { DirectionNode } from './DirectionNode/DirectionNode';
-import { serializeParsegraph, deserializeParsegraph} from './serializeParsegraph';
+import { assert } from "chai";
+import { Direction, Alignment } from ".";
+import { DirectionNode } from "./DirectionNode/DirectionNode";
+import {
+  serializeParsegraph,
+  deserializeParsegraph,
+} from "./serializeParsegraph";
 
 describe("serializeParsegraph", () => {
   it("works", () => {
@@ -88,7 +91,10 @@ describe("serializeParsegraph", () => {
 
       if (i > 0) {
         assert.isOk(testNode.neighbors().nodeAt(Direction.UPWARD));
-        assert.equal(Alignment.CENTER, testNode.neighbors().getAlignment(Direction.UPWARD));
+        assert.equal(
+          Alignment.CENTER,
+          testNode.neighbors().getAlignment(Direction.UPWARD)
+        );
       }
 
       testNode = testNode.neighbors().nodeAt(Direction.FORWARD);
@@ -129,13 +135,21 @@ describe("serializeParsegraph", () => {
 
       if (i > 0) {
         assert.isOk(testNode.neighbors().nodeAt(Direction.UPWARD));
-        assert.equal(Alignment.CENTER, testNode.neighbors().getAlignment(Direction.UPWARD));
-        assert.isTrue(testNode.neighbors().nodeAt(Direction.UPWARD).paintGroups().isPaintGroup());
+        assert.equal(
+          Alignment.CENTER,
+          testNode.neighbors().getAlignment(Direction.UPWARD)
+        );
+        assert.isTrue(
+          testNode
+            .neighbors()
+            .nodeAt(Direction.UPWARD)
+            .paintGroups()
+            .isPaintGroup()
+        );
       }
 
       testNode = testNode.neighbors().nodeAt(Direction.FORWARD);
       node = node.neighbors().nodeAt(Direction.FORWARD);
     }
   });
-
 });
