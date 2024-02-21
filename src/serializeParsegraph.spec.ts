@@ -1,4 +1,4 @@
-import { assert, expect } from 'chai';
+import { assert } from 'chai';
 import { Direction, Alignment } from '.';
 import { DirectionNode } from './DirectionNode/DirectionNode';
 import { serializeParsegraph, deserializeParsegraph} from './serializeParsegraph';
