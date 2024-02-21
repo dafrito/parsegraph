@@ -41,7 +41,9 @@ const serializeParsegraph = (root: DirectionNode) => {
   return nodes;
 };
 
-const deserializeParsegraph = (json: { [key: string]: DirectionNodeData }): DirectionNode => {
+const deserializeParsegraph = (json: {
+  [key: string]: DirectionNodeData;
+}): DirectionNode => {
   const nodes: { [key: string]: DirectionNode } = {};
   let root = null;
   Object.keys(json).forEach((id) => {
