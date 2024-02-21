@@ -12,6 +12,7 @@ import { Neighbors } from "./Neighbors/Neighbors";
 import { connectNode } from "./connectNode";
 import { disconnectNode } from "./disconnectNode";
 
+const nodeIdPrefix = Date.now() + Math.random() + "-";
 let nodeCount = 0;
 export class DirectionNode<Value = any> {
   private _layout?: Layout;
@@ -27,7 +28,7 @@ export class DirectionNode<Value = any> {
   private _value?: Value;
 
   constructor(value?: Value) {
-    this._id = nodeCount++;
+    this._id = nodeIdPrefix + nodeCount++;
     this._value = undefined;
     this._nodeFit = Fit.LOOSE;
     this._rightToLeft = false;
