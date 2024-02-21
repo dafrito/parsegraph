@@ -1,3 +1,9 @@
+## version 6.0.1
+
+- Fixed demo's use of paintNodeLines, pg.siblings().forEach
+- Make initial node ID's more unique, but still not UUIDs
+- Add serializeParsegraph, deserializeParsegraph
+
 ## version 5.0.0
 
 Fixed caret.root to return caret.node.neighbors.root and not the first node the
