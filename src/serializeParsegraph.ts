@@ -38,12 +38,17 @@ const serializeParsegraph = (root: DirectionNode) => {
       };
     });
   });
-  return nodes;
+  return { __parsegraph: nodes };
 };
 
 const deserializeParsegraph = (json: {
+  parsegraph: { 
   [key: string]: DirectionNodeData;
-}): DirectionNode => {
+}}): DirectionNode => {
+  if (json.__parsegraph) {
+    json = json.__parsegraph;
+  }
+
   const nodes: { [key: string]: DirectionNode } = {};
   let root = null;
   Object.keys(json).forEach((id) => {
