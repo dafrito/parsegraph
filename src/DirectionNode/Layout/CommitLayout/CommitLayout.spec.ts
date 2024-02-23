@@ -365,6 +365,22 @@ describe("CommitLayout", () => {
     assert.equal(renderCounts, 3);
   });
 
+  it("single node", () => {
+    const buildGraph = () => {
+      const car = new DirectionCaret();
+      return car.root();
+    };
+
+    assert.deepEqual(demo(buildGraph()), {
+      sizes: 1,
+      seps: 0,
+      paints: 1,
+      layouts: 1,
+      renders: 1,
+      paintGroupRenders: 1,
+    });
+  });
+
   it("three neighbors", () => {
     const buildGraph = () => {
       const car = new DirectionCaret("root");

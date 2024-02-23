@@ -1,3 +1,9 @@
+## version 6.1.0
+
+New Parsegraph JSON data format that supports nesting the parsegraph in a
+`__parsegraph` field. The intent is to allow for custom additions to the
+parsegraph without interfering with parsing the graph.
+
 ## version 6.0.1
 
 - Fixed demo's use of paintNodeLines, pg.siblings().forEach
