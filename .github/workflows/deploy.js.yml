@@ -19,7 +19,7 @@ jobs:
         node-version: 20
         registry-url: 'https://registry.npmjs.org'
     - run: yarn
-    - run: yarn lint
+    - run: yarn lint:ci
     - run: yarn test:cov
     - run: yarn build
     - run: yarn doc
