@@ -11,7 +11,11 @@ interface DirectionNodeData {
   paintGroup: boolean;
 }
 
-const serializeParsegraph = (root: DirectionNode) => {
+const serializeParsegraph = (
+  root: DirectionNode
+): {
+  [key: string]: DirectionNodeData;
+} => {
   const nodes: { [key: string]: DirectionNodeData } = {};
   root.paintGroup().forEach((pg) => {
     pg.siblings().forEach((node) => {
@@ -38,15 +42,14 @@ const serializeParsegraph = (root: DirectionNode) => {
       };
     });
   });
-  return { __parsegraph: nodes };
+  return { __parsegraph: nodes } as any;
 };
 
 const deserializeParsegraph = (json: {
-  parsegraph: { 
   [key: string]: DirectionNodeData;
-}}): DirectionNode => {
+}): DirectionNode => {
   if (json.__parsegraph) {
-    json = json.__parsegraph;
+    json = json.__parsegraph as any;
   }
 
   const nodes: { [key: string]: DirectionNode } = {};
