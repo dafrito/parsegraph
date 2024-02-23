@@ -1,9 +1,10 @@
-import { Alignment, Direction, PreferredAxis, reverseDirection } from ".";
+import { Fit, Alignment, Direction, PreferredAxis, reverseDirection } from ".";
 import { DirectionNode } from "./DirectionNode/DirectionNode";
 
 interface DirectionNodeData {
   value: any;
   scale: number;
+  fit: Fit;
   layoutPreference: PreferredAxis;
   parentId: null | string | number;
   parentDir: null | Direction;
