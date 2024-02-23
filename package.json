@@ -59,7 +59,7 @@
     "test:watch": "yarn test --watch",
     "test:cov": "yarn test --coverage --coverageDirectory=dist/coverage",
     "prettier": "prettier --write src",
-    "lint": "yarn prettier && npx eslint --fix 'src/**'",
+    "lint": "yarn prettier && npx eslint --fix ./src/** --ignore-pattern *.spec.js --ignore-pattern *.spec.ts",
     "doc": "typedoc --tsconfig config/tsconfig.browser.json src/index.ts --out ./dist/docs",
     "clean": "./scripts/clean",
     "tar": "./scripts/tar-dev parsegraph",
