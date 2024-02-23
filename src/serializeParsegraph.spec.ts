@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { Direction, Alignment } from ".";
+import { Fit, Direction, Alignment } from ".";
 import { DirectionNode } from "./DirectionNode/DirectionNode";
 import {
   serializeParsegraph,
@@ -101,6 +101,53 @@ describe("serializeParsegraph", () => {
       node = node.neighbors().nodeAt(Direction.FORWARD);
     }
   });
+
+  it("preserves fit", () => {
+    const root = new DirectionNode("Hello!");
+    let node = root;
+    const numChildren = 3;
+    for (let i = 0; i < numChildren; ++i) {
+      const child = new DirectionNode("" + i);
+
+      let par = child;
+      for (let x = 0; x < numChildren; ++x) {
+        const cell = new DirectionNode("" + x);
+        cell.setNodeFit(Fit.EXACT);
+        par.connect(x === 0 ? Direction.UPWARD : Direction.FORWARD, cell);
+        par = cell;
+      }
+      node.neighbors().align(Direction.UPWARD, Alignment.CENTER);
+      node.connect(Direction.FORWARD, child);
+      node = child;
+    }
+    const json = serializeParsegraph(root);
+    const newRoot = deserializeParsegraph(json);
+
+    let testNode = newRoot;
+    node = root;
+    for (let i = 0; i < numChildren; ++i) {
+      assert.isOk(node);
+      assert.isOk(testNode, "i=" + i);
+      assert.equal(node.value(), testNode.value());
+      assert.equal(node.scale(), testNode.scale());
+
+      if (i > 0) {
+        assert.isOk(testNode.neighbors().nodeAt(Direction.UPWARD));
+        assert.equal(
+          Alignment.CENTER,
+          testNode.neighbors().getAlignment(Direction.UPWARD)
+        );
+        assert.equal(
+          Fit.EXACT,
+          testNode.neighbors().nodeAt(Direction.UPWARD).nodeFit()
+        );
+      }
+
+      testNode = testNode.neighbors().nodeAt(Direction.FORWARD);
+      node = node.neighbors().nodeAt(Direction.FORWARD);
+    }
+  });
+
 
   it("preserves creasing", () => {
     const root = new DirectionNode("Hello!");

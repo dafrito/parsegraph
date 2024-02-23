@@ -22,6 +22,7 @@ const serializeParsegraph = (
       nodes[node.id()] = {
         value: node.value(),
         scale: node.scale(),
+        fit: node.nodeFit(),
         layoutPreference: node.siblings().getLayoutPreference(),
         parentId: node.neighbors().isRoot()
           ? null
@@ -75,6 +76,7 @@ const deserializeParsegraph = (json: {
     parentNode.connect(childDir, nodes[id]);
     parentNode.neighbors().align(childDir, json[id].alignment);
     nodes[id].siblings().setLayoutPreference(json[id].layoutPreference);
+    nodes[id].setNodeFit(json[id].fit);
   });
   return root;
 };
