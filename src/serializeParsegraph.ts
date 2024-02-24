@@ -60,6 +60,7 @@ const deserializeParsegraph = (json: {
     const nodeData = json[id];
     const node = new DirectionNode(nodeData.value);
     node.setScale(nodeData.scale);
+    node.setNodeFit(nodeData.fit);
     nodes[id] = node;
     if (nodeData.parentId === null) {
       root = nodes[id];
@@ -67,6 +68,7 @@ const deserializeParsegraph = (json: {
   });
   Object.keys(json).forEach((id) => {
     if (json[id].parentId === null) {
+      nodes[id].siblings().setLayoutPreference(json[id].layoutPreference);
       return;
     }
     const parentNode = nodes[json[id].parentId];
@@ -77,7 +79,6 @@ const deserializeParsegraph = (json: {
     parentNode.connect(childDir, nodes[id]);
     parentNode.neighbors().align(childDir, json[id].alignment);
     nodes[id].siblings().setLayoutPreference(json[id].layoutPreference);
-    nodes[id].setNodeFit(json[id].fit);
   });
   return root;
 };
