@@ -61,6 +61,7 @@ const deserializeParsegraph = (json: {
     const node = new DirectionNode(nodeData.value);
     node.setScale(nodeData.scale);
     node.setNodeFit(nodeData.fit);
+    node.setId(id);
     nodes[id] = node;
     if (nodeData.parentId === null) {
       root = nodes[id];

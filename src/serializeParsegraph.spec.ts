@@ -14,6 +14,14 @@ describe("serializeParsegraph", () => {
     assert.equal(node.value(), newNode.value());
   });
 
+  it("works with ID", () => {
+    const node = new DirectionNode("Hello!");
+    node.setId("test");
+    const json = serializeParsegraph(node);
+    const newNode = deserializeParsegraph(json);
+    assert.equal(node.id(), newNode.id());
+  });
+
   it("works for multiple nodes", () => {
     const root = new DirectionNode("Hello!");
     let node = root;
