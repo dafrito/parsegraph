@@ -1,3 +1,9 @@
+## version 6.1.3
+
+Bug fixes:
+
+- Fixed deserializeParsegraph not setting ID
+
 ## version 6.1.0
 
 New Parsegraph JSON data format that supports nesting the parsegraph in a
