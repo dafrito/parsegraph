@@ -26,7 +26,6 @@ const getParentDirection = (node: DirectionNode) => {
 export const commitAxisBasedLayout = (
   painter: LayoutPainter,
   node: DirectionNode,
-  lineThickness: number,
   bodySize: number[]
 ): boolean => {
   // Layout based upon the axis preference.
@@ -48,7 +47,6 @@ export const commitAxisBasedLayout = (
         hasFirstAxisNodes[0],
         hasFirstAxisNodes[1],
         false,
-        lineThickness,
         bodySize
       )
     ) {
@@ -63,7 +61,6 @@ export const commitAxisBasedLayout = (
           node,
           oppositeFromParent,
           true,
-          lineThickness,
           bodySize,
           painter
         )
@@ -89,7 +86,6 @@ export const commitAxisBasedLayout = (
           oppositeFromParent,
           perpendicularNodes[0] === undefined &&
             perpendicularNodes[1] === undefined,
-          lineThickness,
           bodySize,
           painter
         )
@@ -105,7 +101,6 @@ export const commitAxisBasedLayout = (
         perpendicularNodes[0],
         perpendicularNodes[1],
         true,
-        lineThickness,
         bodySize
       )
     ) {

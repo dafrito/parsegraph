@@ -24,7 +24,6 @@ export const layoutSingle = (
   node: DirectionNode,
   direction: Direction,
   allowAxisOverlap: boolean,
-  lineThickness: number,
   bodySize: number[],
   painter: LayoutPainter
 ): boolean => {
@@ -80,8 +79,7 @@ export const layoutSingle = (
         node.neighbors().nodeAt(direction).scale() *
           child.layout().extentOffsetAt(reversed),
       allowAxisOverlap,
-      node.neighbors().nodeAt(direction).scale(),
-      lineThickness / 2
+      node.neighbors().nodeAt(direction).scale()
     );
   // console.log("Calculated unpadded separation of " +
   //   separationFromChild + ".");

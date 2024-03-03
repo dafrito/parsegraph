@@ -10,8 +10,6 @@ import { addLineBounds } from "./addLineBounds";
 import { commitInwardLayout } from "./commitInwardLayout";
 import { commitRootlikeLayout } from "./commitRootlikeLayout";
 
-const LINE_THICKNESS = 12;
-
 /**
  * Computes the {@link Layout} for {@link DirectionNode} graphs.
  *
@@ -164,19 +162,16 @@ export class CommitLayout {
       return false;
     }
 
-    const thicknessFunc = this.painter().lineThickness;
-    const thickness = thicknessFunc ? thicknessFunc(node) : LINE_THICKNESS;
-
     if (node.neighbors().isRootlike()) {
       if (
-        commitRootlikeLayout(this.painter(), node, thickness, this.bodySize)
+        commitRootlikeLayout(this.painter(), node, this.bodySize)
       ) {
         node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
         return true;
       }
     } else {
       if (
-        commitAxisBasedLayout(this.painter(), node, thickness, this.bodySize)
+        commitAxisBasedLayout(this.painter(), node, this.bodySize)
       ) {
         node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
         return true;

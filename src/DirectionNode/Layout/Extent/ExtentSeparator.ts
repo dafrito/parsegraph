@@ -79,7 +79,7 @@ export default class ExtentSeparator {
     return this._thisBound == this._thisExtent.numBounds();
   }
 
-  consume(extentSeparation: number, axisMinimum: number): number {
+  consume(extentSeparation: number): number {
     // While the iterators still have bounds in both extents.
     while (!this.givenAtEnd() && !this.thisAtEnd()) {
       // Calculate the separation between these bounds.
@@ -93,9 +93,9 @@ export default class ExtentSeparator {
         boundSeparation = thisSize + givenSize;
       } else if (!this._allowAxisOverlap) {
         if (!isNaN(thisSize)) {
-          boundSeparation = thisSize + axisMinimum;
+          boundSeparation = thisSize;
         } else if (!isNaN(givenSize)) {
-          boundSeparation = givenSize + axisMinimum;
+          boundSeparation = givenSize;
         } else {
           // Both extents are empty at this location.
           boundSeparation = 0;

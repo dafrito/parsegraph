@@ -8,7 +8,6 @@ import { layoutAxis } from "./layoutAxis";
 export const commitRootlikeLayout = (
   painter: LayoutPainter,
   node: DirectionNode,
-  lineThickness: number,
   bodySize: number[]
 ): boolean => {
   if (
@@ -24,7 +23,6 @@ export const commitRootlikeLayout = (
         Direction.FORWARD,
         !node.neighbors().hasNode(Direction.UPWARD) &&
           !node.neighbors().hasNode(Direction.DOWNWARD),
-        lineThickness,
         bodySize
       )
     ) {
@@ -40,7 +38,6 @@ export const commitRootlikeLayout = (
         Direction.UPWARD,
         Direction.DOWNWARD,
         true,
-        lineThickness,
         bodySize
       )
     ) {
@@ -56,7 +53,6 @@ export const commitRootlikeLayout = (
         Direction.DOWNWARD,
         !node.neighbors().hasNode(Direction.BACKWARD) &&
           !node.neighbors().hasNode(Direction.FORWARD),
-        lineThickness,
         bodySize
       )
     ) {
@@ -72,7 +68,6 @@ export const commitRootlikeLayout = (
         Direction.BACKWARD,
         Direction.FORWARD,
         true,
-        lineThickness,
         bodySize
       )
     ) {

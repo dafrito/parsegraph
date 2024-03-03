@@ -24,7 +24,6 @@ const secondSize: number[] = [NaN, NaN];
  * @param {Direction} firstDirection - the first direction to lay out
  * @param {Direction} secondDirection - the second direction to lay out
  * @param {boolean} allowAxisOverlap - whether the child can overlap the parent's axis.
- * @param {number} lineThickness - the thickness of lines between nodes
  * @param {Size} bodySize - the size of the node
  * @return {boolean} true if another call is needed, false if done
  */
@@ -34,7 +33,6 @@ export const layoutAxis = (
   firstDirection: Direction | undefined,
   secondDirection: Direction | undefined,
   allowAxisOverlap: boolean,
-  lineThickness: number,
   bodySize: number[]
 ): boolean => {
   if (firstDirection === secondDirection && firstDirection !== undefined) {
@@ -84,7 +82,6 @@ export const layoutAxis = (
         node,
         firstAxisDirection,
         allowAxisOverlap,
-        lineThickness,
         bodySize,
         painter
       )
@@ -124,8 +121,7 @@ export const layoutAxis = (
           firstNode.layout().extentOffsetAt(secondDirection)),
       true,
       node.neighbors().nodeAt(secondDirection).scale() /
-        node.neighbors().nodeAt(firstDirection).scale(),
-      0
+        node.neighbors().nodeAt(firstDirection).scale()
     );
   separationBetweenChildren *= node.neighbors().nodeAt(firstDirection).scale();
 
@@ -204,8 +200,7 @@ export const layoutAxis = (
         node.neighbors().nodeAt(firstDirection).scale() *
           firstNode.layout().extentOffsetAt(secondDirection),
       firstAxisOverlap,
-      node.neighbors().nodeAt(firstDirection).scale(),
-      lineThickness / 2
+      node.neighbors().nodeAt(firstDirection).scale()
     );
 
   let separationFromSecond: number = node
@@ -218,8 +213,7 @@ export const layoutAxis = (
         node.neighbors().nodeAt(secondDirection).scale() *
           secondNode.layout().extentOffsetAt(firstDirection),
       secondAxisOverlap,
-      node.neighbors().nodeAt(secondDirection).scale(),
-      lineThickness / 2
+      node.neighbors().nodeAt(secondDirection).scale()
     );
 
   /* console.log(

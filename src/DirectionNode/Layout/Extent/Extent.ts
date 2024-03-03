@@ -441,16 +441,12 @@ export class Extent {
     positionAdjustment?: number,
     allowAxisOverlap?: boolean,
     givenScale?: number,
-    axisMinimum?: number
   ): number {
     if (positionAdjustment === undefined) {
       positionAdjustment = 0;
     }
     if (allowAxisOverlap === undefined) {
       allowAxisOverlap = true;
-    }
-    if (axisMinimum === undefined) {
-      axisMinimum = 0;
     }
     if (givenScale === undefined) {
       givenScale = 1.0;
@@ -485,7 +481,7 @@ export class Extent {
           !isNaN(boundSeparation) &&
           boundSeparation > extentSeparation
         ) {
-          extentSeparation = boundSeparation + axisMinimum;
+          extentSeparation = boundSeparation
         }
         separator.incrementGivenBound();
       }
@@ -508,7 +504,7 @@ export class Extent {
       }
     }
 
-    extentSeparation = separator.consume(extentSeparation, axisMinimum);
+    extentSeparation = separator.consume(extentSeparation);
 
     if (!allowAxisOverlap) {
       // Calculate the separation between the remaining bounds of given and
@@ -523,7 +519,7 @@ export class Extent {
         if (!isNaN(givenSize)) {
           extentSeparation = Math.max(
             extentSeparation,
-            givenScale * givenSize + axisMinimum
+            givenScale * givenSize
           );
         }
         ++separator._givenBound;
