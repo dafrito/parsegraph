@@ -940,4 +940,77 @@ describe("CommitLayout", () => {
     while (secondCld.crank());
     expect(root.layout().needsCommit()).toEqual(false);
   });
+
+  it("does not add unexpected new size", () => {
+    const car = new DirectionCaret("root");
+
+    const doLayout = () => {
+      const painter = {
+        size: (_: DirectionNode, size: number[]) => {
+          size[0] = 24;
+          size[1] = 24;
+        },
+        getSeparation: () => {
+          return 24;
+        },
+        lineThickness: () => {
+          return 3;
+        }
+      };
+      const cld = new CommitLayout(car.root(), painter);
+      while (cld.crank()) ;
+      expect(car.root().layout().needsCommit()).toEqual(false);
+      const extentSize = [NaN, NaN];
+      car.root().layout().extentSize(extentSize);
+      return extentSize;
+    };
+
+    car.push();
+    car.spawnMove('d');
+    doLayout();
+    car.spawn('b');
+    doLayout();
+    car.spawn('f');
+    doLayout();
+    car.pop();
+
+    car.push();
+    car.spawnMove('u');
+    doLayout();
+    car.spawn('b');
+    doLayout();
+    car.spawn('f');
+    doLayout();
+    car.pop();
+
+    const extentSize = doLayout();
+
+    car.push();
+    car.move('d');
+    doLayout();
+    car.move('f');
+    doLayout();
+    car.spawnMove('u');
+    car.pop();
+
+    const newExtentSize = doLayout();
+    car.root().layout().extentSize(newExtentSize);
+
+    expect(newExtentSize[0]).toEqual(extentSize[0]);
+    expect(newExtentSize[1]).toBeGreaterThan(extentSize[1]);
+
+    car.push();
+    car.move('u');
+    doLayout();
+    car.move('f');
+    doLayout();
+    car.spawnMove('d');
+    car.pop();
+
+    const newerExtentSize = doLayout();
+    car.root().layout().extentSize(newerExtentSize);
+
+    expect(newerExtentSize[0]).toEqual(extentSize[0]);
+    expect(newerExtentSize[1]).toBeGreaterThan(newExtentSize[1]);
+  });
 });
