@@ -1,6 +1,6 @@
 {
   "name": "parsegraph",
-  "version": "6.1.3",
+  "version": "6.1.4",
   "description": "DirectionNode and CommitLayout",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",

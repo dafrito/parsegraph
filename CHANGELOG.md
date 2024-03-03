@@ -1,3 +1,9 @@
+## version 6.1.4
+
+Bug fixes:
+
+- Remove axisMinimum for testing; this has not properly worked and doesn't seem necessary
+
 ## version 6.1.3
 
 Bug fixes:
