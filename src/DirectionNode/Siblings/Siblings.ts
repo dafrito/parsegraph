@@ -455,6 +455,7 @@ export class Siblings {
         this.vertToHorz();
       }
       this._layoutPreference = given;
+      this.node().invalidate();
       return;
     }
 
