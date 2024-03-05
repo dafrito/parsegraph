@@ -265,26 +265,32 @@ export class Siblings {
     return layoutAfter;
   }
 
-  horzToVert() {
+  /**
+   * Returns the first and last child node for each direction.
+   *
+   * @return {Array} <code>[firstVert, lastVert, firstHorz, lastHorz]</code>
+   * @see horzToVert
+   * @see vertToHorz
+   */
+  getFirstAndLastChildren() {
     const parentDir = this.node().neighbors().isRoot()
       ? null
       : this.node().neighbors().parentDirection();
-    const b =
-      parentDir === Direction.BACKWARD
-        ? null
-        : this.node().neighbors().nodeAt(Direction.BACKWARD);
-    const f =
-      parentDir === Direction.FORWARD
-        ? null
-        : this.node().neighbors().nodeAt(Direction.FORWARD);
-    const u =
-      parentDir === Direction.UPWARD
-        ? null
-        : this.node().neighbors().nodeAt(Direction.UPWARD);
-    const d =
-      parentDir === Direction.DOWNWARD
-        ? null
-        : this.node().neighbors().nodeAt(Direction.DOWNWARD);
+
+    const getChild = (dir) => {
+      if (parentDir === dir) {
+        return null;
+      }
+      const child = this.node().neighbors().nodeAt(dir);
+      if (!child || child.paintGroups().isPaintGroup()) {
+        return null;
+      }
+      return child;
+    };
+    const b = getChild(Direction.BACKWARD);
+    const f = getChild(Direction.FORWARD);
+    const u = getChild(Direction.UPWARD);
+    const d = getChild(Direction.DOWNWARD);
     let firstHorz = b || f;
     if (firstHorz) {
       firstHorz = firstHorz.siblings().head();
@@ -295,6 +301,22 @@ export class Siblings {
       firstVert = firstVert.siblings().head();
     }
     const lastVert = u || d;
+    if (!firstHorz || !firstVert) {
+      return [null, null, null, null];
+    }
+    return [firstVert, lastVert, firstHorz, lastHorz];
+  }
+
+  /**
+   * Low-level method to convert this node's layout order from
+   * horizontal to vertical.
+   *
+   * @see setLayoutPreference
+   * @see vertToHorz
+   */
+  horzToVert() {
+    const [firstVert, lastVert, firstHorz, lastHorz] =
+      this.getFirstAndLastChildren();
     if (!firstHorz || !firstVert) {
       return;
     }
@@ -317,37 +339,16 @@ export class Siblings {
     this.verify();
   }
 
+  /**
+   * Low-level method to convert this node's layout order from
+   * vertical to horizontal.
+   *
+   * @see setLayoutPreference
+   * @see horzToVert
+   */
   vertToHorz() {
-    const parentDir = this.node().neighbors().isRoot()
-      ? null
-      : this.node().neighbors().parentDirection();
-    const b =
-      parentDir === Direction.BACKWARD
-        ? null
-        : this.node().neighbors().nodeAt(Direction.BACKWARD);
-    const f =
-      parentDir === Direction.FORWARD
-        ? null
-        : this.node().neighbors().nodeAt(Direction.FORWARD);
-    const u =
-      parentDir === Direction.UPWARD
-        ? null
-        : this.node().neighbors().nodeAt(Direction.UPWARD);
-    const d =
-      parentDir === Direction.DOWNWARD
-        ? null
-        : this.node().neighbors().nodeAt(Direction.DOWNWARD);
-
-    let firstHorz = b || f;
-    if (firstHorz) {
-      firstHorz = firstHorz.siblings().head();
-    }
-    const lastHorz = f || b;
-    let firstVert = d || u;
-    if (firstVert) {
-      firstVert = firstVert.siblings().head();
-    }
-    const lastVert = u || d;
+    const [firstVert, lastVert, firstHorz, lastHorz] =
+      this.getFirstAndLastChildren();
     if (!firstHorz || !firstVert) {
       return;
     }
