@@ -484,10 +484,10 @@ export class Siblings {
         return;
       }
       if (given === PreferredAxis.VERTICAL) {
-        // PREFER_HORIZONTAL_AXIS -> PREFER_VERTICAL_AXIS
+        // console.log("PREFER_HORIZONTAL_AXIS -> PREFER_VERTICAL_AXIS");
         this.horzToVert();
       } else {
-        // PREFER_VERTICAL_AXIS -> PREFER_HORIZONTAL_AXIS
+        // console.log("PREFER_VERTICAL_AXIS -> PREFER_HORIZONTAL_AXIS");
         this.vertToHorz();
       }
       this._layoutPreference = given;
