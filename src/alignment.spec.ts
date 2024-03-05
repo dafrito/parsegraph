@@ -36,12 +36,14 @@ describe("alignment", () => {
       }
     };
 
-    const car = new DirectionCaret(deserializeParsegraph(buggyAlignment as any));
+    const car = new DirectionCaret(
+      deserializeParsegraph(buggyAlignment as any)
+    );
     layout();
-    car.move('f')
-    car.move('f')
-    car.move('u')
-    car.move('u')
+    car.move("f");
+    car.move("f");
+    car.move("u");
+    car.move("u");
     car.disconnect();
     layout();
   });
@@ -60,18 +62,23 @@ describe("alignment", () => {
     };
     const car = new DirectionCaret();
     layout();
-    car.spawnMove('f');
+    car.spawnMove("f");
     layout();
-    car.spawnMove('f');
+    car.spawnMove("f");
     layout();
-    car.spawnMove('f');
+    car.spawnMove("f");
     layout();
     car.push();
-    car.spawnMove('u');
+    car.spawnMove("u");
     layout();
     const id = car.save();
     car.pop();
-    car.node().neighbors().parentNode().neighbors().align(Direction.FORWARD, Alignment.NEGATIVE);
+    car
+      .node()
+      .neighbors()
+      .parentNode()
+      .neighbors()
+      .align(Direction.FORWARD, Alignment.NEGATIVE);
     layout();
     car.restore(id);
     car.disconnect();

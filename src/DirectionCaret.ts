@@ -266,7 +266,7 @@ export class DirectionCaret<Value> {
 
   /**
    * Returns the current node's root node.
-   * 
+   *
    * @return {DirectionNode} the caret's node root.
    */
   root(): DirectionNode<Value> {
@@ -275,12 +275,12 @@ export class DirectionCaret<Value> {
 
   /**
    * Aligns the current node in the given direction.
-   * 
+   *
    * If only the alignment is given, the parent node is aligned in the current
    * direction.
-   * 
-   * @param {Direction} inDirection 
-   * @param {Alignment} newAlignmentMode 
+   *
+   * @param {Direction} inDirection
+   * @param {Alignment} newAlignmentMode
    * @throws if the current node is root (alignment is done by the parent, not the child)
    */
   align(

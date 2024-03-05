@@ -54,7 +54,6 @@ function testLayoutNodes(expected: DirectionNode[], name?: string) {
   }
 }
 
-
 describe("Caret", function () {
   it("spawnMove", () => {
     const car = new DirectionCaret("a");
@@ -622,7 +621,6 @@ describe("Caret", function () {
     // console.log(getLayoutNodes(originalRoot));
     // newRoot.commitLayoutIteratively();
   });
-  
 
   it("Disconnect parent test, forward", function () {
     const car = makeCaret();
@@ -950,7 +948,6 @@ describe("Caret", function () {
       "Paint group should only contain 3 groups"
     );
   });
-
 
   it("double-nested array addition", function () {
     const car = makeCaret();

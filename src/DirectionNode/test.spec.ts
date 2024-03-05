@@ -1,9 +1,7 @@
 import { expect, assert } from "chai";
 import { Direction, readDirection } from "../../src/Direction";
 
-import {
-  DirectionNode,
-} from "../../src/DirectionNode";
+import { DirectionNode } from "../../src/DirectionNode";
 import { DirectionCaret } from "..";
 
 describe("Package", function () {
