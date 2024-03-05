@@ -151,11 +151,12 @@ export class Neighbors {
         return par;
       }
       return undefined as any;
-      // throw new Error("Node not found");
+      //throw new Error("Node not found");
     }
     const node = n.neighbor();
     if (!node) {
-      throw new Error("No node for neighbor");
+      return undefined as any;
+      //throw new Error("No node for neighbor");
     }
     return node;
   }

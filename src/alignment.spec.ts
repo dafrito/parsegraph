@@ -1,8 +1,12 @@
 import { expect } from "chai";
 import data from "./buggy-graph-with-crease.parsegraph.json";
+import buggyAlignment from "./graph-buggy-alignment.parsegraph.json";
 import { deserializeParsegraph } from "./serializeParsegraph";
 import {
+  Alignment,
   CommitLayout,
+  Direction,
+  DirectionCaret,
   DirectionNode,
   PreferredAxis,
   namePreferredAxis,
@@ -19,6 +23,61 @@ const createLayout = (node: DirectionNode) => {
 };
 
 describe("alignment", () => {
+  it("alignment deletion test from srouce", () => {
+    const layout = () => {
+      const TRIGGER = 10000;
+      let total = 0;
+      const root = car.origin();
+      const cld = createLayout(root);
+      while (cld.crank()) {
+        if (total++ > TRIGGER) {
+          throw new Error("looping endlessly");
+        }
+      }
+    };
+
+    const car = new DirectionCaret(deserializeParsegraph(buggyAlignment));
+    layout();
+    car.move('f')
+    car.move('f')
+    car.move('u')
+    car.move('u')
+    car.disconnect();
+    layout();
+  });
+
+  it("alignment deletion test", () => {
+    const layout = () => {
+      const TRIGGER = 10000;
+      let total = 0;
+      const root = car.origin();
+      const cld = createLayout(root);
+      while (cld.crank()) {
+        if (total++ > TRIGGER) {
+          throw new Error("looping endlessly");
+        }
+      }
+    };
+    const car = new DirectionCaret();
+    layout();
+    car.spawnMove('f');
+    layout();
+    car.spawnMove('f');
+    layout();
+    car.spawnMove('f');
+    layout();
+    car.push();
+    car.spawnMove('u');
+    layout();
+    const id = car.save();
+    car.pop();
+    car.node().neighbors().parentNode().neighbors().align(Direction.FORWARD, Alignment.NEGATIVE);
+    layout();
+    car.restore(id);
+    car.disconnect();
+    layout();
+  });
+
   it("works with big creased graph", () => {
     expect(data).to.be.an("object");
     const root = deserializeParsegraph(data as any);
