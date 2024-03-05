@@ -264,11 +264,13 @@ export class DirectionCaret<Value> {
     this.node().siblings().pull(readDirection(given));
   }
 
-  /*
+  /**
    * Returns the current node's root node.
+   * 
+   * @return {DirectionNode} the caret's node root.
    */
   root(): DirectionNode<Value> {
-    return this._nodeRoot;
+    return this.node().neighbors().root();
   }
 
   align(
