@@ -273,15 +273,36 @@ export class DirectionCaret<Value> {
     return this.node().neighbors().root();
   }
 
+  /**
+   * Aligns the current node in the given direction.
+   * 
+   * If only the alignment is given, the parent node is aligned in the current
+   * direction.
+   * 
+   * @param {Direction} inDirection 
+   * @param {Alignment} newAlignmentMode 
+   * @throws if the current node is root (alignment is done by the parent, not the child)
+   */
   align(
     inDirection: Direction | string,
-    newAlignmentMode: Alignment | string
+    newAlignmentMode?: Alignment | string
   ): void {
-    this.node()
-      .neighbors()
-      .align(readDirection(inDirection), readAlignment(newAlignmentMode));
+    let node = this.node();
+    let dir;
+    if (arguments.length === 1) {
+      newAlignmentMode = readAlignment(inDirection as any);
+      if (node.neighbors().isRoot()) {
+        throw new Error("Cannot align root");
+      }
+      node = node.neighbors().parentNode();
+      dir = reverseDirection(node.neighbors().parentDirection());
+    } else {
+      dir = readDirection(inDirection);
+      newAlignmentMode = readAlignment(newAlignmentMode);
+    }
+    node.neighbors().align(dir, newAlignmentMode as Alignment);
     if (newAlignmentMode != Alignment.NONE) {
-      this.node().setNodeFit(Fit.EXACT);
+      node.setNodeFit(Fit.EXACT);
     }
   }
 
