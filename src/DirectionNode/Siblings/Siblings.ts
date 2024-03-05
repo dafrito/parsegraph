@@ -88,6 +88,13 @@ export class Siblings {
       }
       ++count;
     }
+    count = 0;
+    for (let n = this.prev(); n !== this.node(); n = n.siblings().prev()) {
+      if (count > MAX_SIBLINGS) {
+        throw new Error();
+      }
+      ++count;
+    }
   }
 
   removeFromLayout(inDirection: Direction): void {
