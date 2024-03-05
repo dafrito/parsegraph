@@ -1,3 +1,10 @@
+## version 6.1.6
+
+Bug fixes:
+
+- Fixed case where setLayoutPreference would create a malformed layout (by
+  including paint groups as siblings)
+
 ## version 6.1.4
 
 Bug fixes:
