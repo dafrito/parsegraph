@@ -5,11 +5,10 @@ import {
   CommitLayout,
   DirectionNode,
   PreferredAxis,
-  forEachCardinalDirection,
   namePreferredAxis,
 } from ".";
 
-const createLayout = (node) => {
+const createLayout = (node: DirectionNode) => {
   return new CommitLayout(node, {
     size: (node, size) => {
       size[0] = 24;
@@ -22,18 +21,18 @@ const createLayout = (node) => {
 describe("alignment", () => {
   it("works with big creased graph", () => {
     expect(data).to.be.an("object");
-    const root = deserializeParsegraph(data);
+    const root = deserializeParsegraph(data as any);
     expect(root).to.be.an.instanceof(DirectionNode);
 
     const count = () => {
       let total = 0;
       const TRIGGER = 10000;
-      /*const cld = createLayout(root);
+      const cld = createLayout(root);
       while (cld.crank()) {
           if (total++ > TRIGGER) {
             throw new Error("looping endlessly");
           }
-      }*/
+      }
 
       let groups = 0;
       let nodes = 0;

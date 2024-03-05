@@ -10,8 +10,9 @@
     "sourceMap":false,
     "moduleResolution": "node",
     "declaration": true,
-    "declarationMap": true
-  },
+    "declarationMap": true,
+    "resolveJsonModule": true
+  ,
   "include": [
     "../src"
   ],

@@ -277,7 +277,7 @@ export class Siblings {
       ? null
       : this.node().neighbors().parentDirection();
 
-    const getChild = (dir) => {
+    const getChild = (dir: Direction) => {
       if (parentDir === dir) {
         return null;
       }
