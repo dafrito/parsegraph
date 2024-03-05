@@ -156,7 +156,6 @@ describe("serializeParsegraph", () => {
     }
   });
 
-
   it("preserves creasing", () => {
     const root = new DirectionNode("Hello!");
     let node = root;

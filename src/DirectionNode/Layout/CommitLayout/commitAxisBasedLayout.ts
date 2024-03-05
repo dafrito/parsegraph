@@ -56,15 +56,7 @@ export const commitAxisBasedLayout = (
     // Layout this node's second-axis child, if that child exists.
     if (node.neighbors().hasNode(oppositeFromParent)) {
       // Layout the second-axis child.
-      if (
-        layoutSingle(
-          node,
-          oppositeFromParent,
-          true,
-          bodySize,
-          painter
-        )
-      ) {
+      if (layoutSingle(node, oppositeFromParent, true, bodySize, painter)) {
         return true;
       }
     }

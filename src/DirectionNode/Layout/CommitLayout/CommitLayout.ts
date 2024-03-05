@@ -163,16 +163,12 @@ export class CommitLayout {
     }
 
     if (node.neighbors().isRootlike()) {
-      if (
-        commitRootlikeLayout(this.painter(), node, this.bodySize)
-      ) {
+      if (commitRootlikeLayout(this.painter(), node, this.bodySize)) {
         node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
         return true;
       }
     } else {
-      if (
-        commitAxisBasedLayout(this.painter(), node, this.bodySize)
-      ) {
+      if (commitAxisBasedLayout(this.painter(), node, this.bodySize)) {
         node.layout().setPhase(LayoutPhase.NEEDS_COMMIT);
         return true;
       }

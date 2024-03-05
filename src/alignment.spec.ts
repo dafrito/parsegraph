@@ -1,7 +1,13 @@
-import { expect } from 'chai';
-import data from './buggy-graph-with-crease.parsegraph.json';
-import { deserializeParsegraph } from './serializeParsegraph';
-import { CommitLayout, DirectionNode, PreferredAxis, namePreferredAxis } from '.';
+import { expect } from "chai";
+import data from "./buggy-graph-with-crease.parsegraph.json";
+import { deserializeParsegraph } from "./serializeParsegraph";
+import {
+  CommitLayout,
+  DirectionNode,
+  PreferredAxis,
+  forEachCardinalDirection,
+  namePreferredAxis,
+} from ".";
 
 const createLayout = (node) => {
   return new CommitLayout(node, {
@@ -9,13 +15,13 @@ const createLayout = (node) => {
       size[0] = 24;
       size[1] = 24;
     },
-    getSeparation: () => 10
+    getSeparation: () => 10,
   });
 };
 
 describe("alignment", () => {
   it("works with big creased graph", () => {
-    expect(data).to.be.an('object');
+    expect(data).to.be.an("object");
     const root = deserializeParsegraph(data);
     expect(root).to.be.an.instanceof(DirectionNode);
 
@@ -31,13 +37,13 @@ describe("alignment", () => {
 
       let groups = 0;
       let nodes = 0;
-      root.paintGroup().forEach(pg => {
+      root.paintGroup().forEach((pg) => {
         groups++;
-        pg.siblings().forEach(node => {
+        pg.siblings().forEach((node) => {
           if (total++ > TRIGGER) {
-            throw new Error("looping endlessly");
+            throw new Error("looping endlessly, group " + groups);
           }
-          if (total > TRIGGER-20) {
+          if (total > TRIGGER - 20) {
             console.log(node.id());
           }
           //expect(node.layout().needsCommit()).to.equal(false);
@@ -52,7 +58,11 @@ describe("alignment", () => {
     expect(nodes).to.be.greaterThan(1);
     expect(groups).to.be.greaterThan(1);
 
-    expect(root.siblings().getLayoutPreference()).to.equal(PreferredAxis.HORIZONTAL, namePreferredAxis(root.siblings().getLayoutPreference()));
+    expect(root.siblings().getLayoutPreference()).to.equal(
+      PreferredAxis.HORIZONTAL,
+      namePreferredAxis(root.siblings().getLayoutPreference())
+    );
+    expect(root.neighbors().isRoot()).to.equal(true);
     root.siblings().setLayoutPreference(PreferredAxis.VERTICAL);
 
     [groups, nodes] = count();

@@ -955,10 +955,10 @@ describe("CommitLayout", () => {
         },
         lineThickness: () => {
           return 3;
-        }
+        },
       };
       const cld = new CommitLayout(car.root(), painter);
-      while (cld.crank()) ;
+      while (cld.crank());
       expect(car.root().layout().needsCommit()).toEqual(false);
       const extentSize = [NaN, NaN];
       car.root().layout().extentSize(extentSize);
@@ -966,31 +966,31 @@ describe("CommitLayout", () => {
     };
 
     car.push();
-    car.spawnMove('d');
+    car.spawnMove("d");
     doLayout();
-    car.spawn('b');
+    car.spawn("b");
     doLayout();
-    car.spawn('f');
+    car.spawn("f");
     doLayout();
     car.pop();
 
     car.push();
-    car.spawnMove('u');
+    car.spawnMove("u");
     doLayout();
-    car.spawn('b');
+    car.spawn("b");
     doLayout();
-    car.spawn('f');
+    car.spawn("f");
     doLayout();
     car.pop();
 
     const extentSize = doLayout();
 
     car.push();
-    car.move('d');
+    car.move("d");
     doLayout();
-    car.move('f');
+    car.move("f");
     doLayout();
-    car.spawnMove('u');
+    car.spawnMove("u");
     car.pop();
 
     const newExtentSize = doLayout();
@@ -1000,11 +1000,11 @@ describe("CommitLayout", () => {
     expect(newExtentSize[1]).toBeGreaterThan(extentSize[1]);
 
     car.push();
-    car.move('u');
+    car.move("u");
     doLayout();
-    car.move('f');
+    car.move("f");
     doLayout();
-    car.spawnMove('d');
+    car.spawnMove("d");
     car.pop();
 
     const newerExtentSize = doLayout();

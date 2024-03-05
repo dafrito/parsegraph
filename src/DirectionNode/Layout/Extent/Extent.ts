@@ -440,7 +440,7 @@ export class Extent {
     given: Extent,
     positionAdjustment?: number,
     allowAxisOverlap?: boolean,
-    givenScale?: number,
+    givenScale?: number
   ): number {
     if (positionAdjustment === undefined) {
       positionAdjustment = 0;
@@ -481,7 +481,7 @@ export class Extent {
           !isNaN(boundSeparation) &&
           boundSeparation > extentSeparation
         ) {
-          extentSeparation = boundSeparation
+          extentSeparation = boundSeparation;
         }
         separator.incrementGivenBound();
       }
@@ -517,10 +517,7 @@ export class Extent {
 
         const givenSize = given.boundSizeAt(separator._givenBound);
         if (!isNaN(givenSize)) {
-          extentSeparation = Math.max(
-            extentSeparation,
-            givenScale * givenSize
-          );
+          extentSeparation = Math.max(extentSeparation, givenScale * givenSize);
         }
         ++separator._givenBound;
       }
