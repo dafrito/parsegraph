@@ -1,3 +1,9 @@
+## version 6.1.7
+
+Bug fixes:
+
+- Fixed case where nodeAt could throw on missing node even though it's not supposed to
+
 ## version 6.1.6
 
 Bug fixes:
