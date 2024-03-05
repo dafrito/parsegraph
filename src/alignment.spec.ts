@@ -29,9 +29,9 @@ describe("alignment", () => {
       const TRIGGER = 10000;
       const cld = createLayout(root);
       while (cld.crank()) {
-          if (total++ > TRIGGER) {
-            throw new Error("looping endlessly");
-          }
+        if (total++ > TRIGGER) {
+          throw new Error("looping endlessly");
+        }
       }
 
       let groups = 0;
