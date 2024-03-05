@@ -27,12 +27,30 @@ const VERTICAL_ORDER: Direction[] = [
   Direction.OUTWARD,
 ];
 
+/**
+ * Represents a DirectionNode's entry within its paint group.
+ *
+ * Every DirectionNode has its own Siblings instance.
+ *
+ * Siblings are often used to iterate all nodes in the graph, using forEach.
+ * Siblings are also used to store the preferred axis of a node, as this affects
+ * the layout and iteration order of the node's children.
+ *
+ * @see PreferredAxis
+ *
+ */
 export class Siblings {
   private _prev: DirectionNode;
   private _next: DirectionNode;
   private _node: DirectionNode;
   private _layoutPreference: PreferredAxis;
 
+  /**
+   * Creates a new, orphaned Siblings object for this node with
+   * a horizontal preferred axis.
+   *
+   * @param {DirectionNode} node the owning node
+   */
   constructor(node: DirectionNode) {
     this._node = node;
     this._prev = this._node;
@@ -40,6 +58,13 @@ export class Siblings {
     this._layoutPreference = PreferredAxis.HORIZONTAL;
   }
 
+  /**
+   * Iterates over every node in this node's paint group, beginning with this
+   * node and continuing until all nodes are iterated.
+   *
+   * @param {function} func the iterator that will be called for each node in this node's paint group.
+   * The iterator's signature is <code>(node: DirectionNode) => void</code>
+   */
   forEach(func: (node: DirectionNode) => void): void {
     let node: DirectionNode = this.node();
     do {
@@ -52,6 +77,9 @@ export class Siblings {
     return this._node;
   }
 
+  /**
+   * Test method to ensure the Siblings object can be iterated.
+   */
   verify() {
     let count = 0;
     for (let n = this.next(); n !== this.node(); n = n.siblings().next()) {
@@ -434,6 +462,14 @@ export class Siblings {
     return canonicalPref;
   }
 
+  /**
+   * Changes the layout order of this node's children.
+   *
+   * The node is invalidated if the preferred axis is actually changed.
+   *
+   * @param {PreferredAxis} given the new {@link PreferredAxis} to use
+   * @throws if root is given and {@link PreferredAxis} is not <code>VERTICAL</code> or <code>HORIZONTAL</code>
+   */
   setLayoutPreference(given: PreferredAxis): void {
     if (this.node().neighbors().isRoot()) {
       if (

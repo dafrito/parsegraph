@@ -2,6 +2,14 @@ import { Direction, nameDirection } from "./Direction";
 import { DirectionNode } from "./DirectionNode";
 import { findPaintGroup } from "./DirectionNode/PaintGroups/findPaintGroup";
 
+/**
+ * Returns the bounds of the given paint group.
+ *
+ * @param {DirectionNode} nodeRoot the paint group root
+ * @return {object} an object with fields <code>left</code>, <code>right</code>,
+ * <code>top</code>, and <code>bottom</code>, relative to the center of the given root node.
+ * @throws if node is not a paint group or root node
+ */
 export function paintGroupBounds(nodeRoot: DirectionNode) {
   if (
     !nodeRoot.neighbors().isRoot() &&
