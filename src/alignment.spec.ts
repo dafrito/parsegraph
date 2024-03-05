@@ -36,7 +36,7 @@ describe("alignment", () => {
       }
     };
 
-    const car = new DirectionCaret(deserializeParsegraph(buggyAlignment));
+    const car = new DirectionCaret(deserializeParsegraph(buggyAlignment as any));
     layout();
     car.move('f')
     car.move('f')
