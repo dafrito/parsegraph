@@ -34,11 +34,12 @@ Format: The lines from ~/.ssh/known_hosts corresponding to the PARSEGRAPH_SSH_HO
 
 ### PARSEGRAPH_GITHUB_PATH
 
-Format: home-relative path to the remote Github directory for uploads. Do not include the beginning ~/ as it may break ssh
+Format: Absolute path to the remote Github directory for uploads. Do not include a trailing slash.
 
 ### PARSEGRAPH_DOCS_PATH
 
-Format: path to parsegraph public documents directory. Include the full path as needed; no directory is assumed.
+Format: Absolute path to remote parsegraph public documents directory. Do not include a trailing slash.
+
 
 ### NPM_PUBLISH_TOKEN
 
