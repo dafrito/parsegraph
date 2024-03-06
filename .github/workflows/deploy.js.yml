@@ -40,7 +40,7 @@ jobs:
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
           PARSEGRAPH_GITHUB_PATH: ${{ secrets.PARSEGRAPH_GITHUB_PATH }}
-    - run: scp parsegraph-docs.tgz "$SSH_HOST:$PARSEGRAPH_GITHUB_PATH/$GITHUB_SHA"
+    - run: scp parsegraph-docs.tgz "$SSH_HOST:$PARSEGRAPH_GITHUB_PATH/$GITHUB_SHA/parsegraph-docs.tgz"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
           PARSEGRAPH_GITHUB_PATH: ${{ secrets.PARSEGRAPH_GITHUB_PATH }}
