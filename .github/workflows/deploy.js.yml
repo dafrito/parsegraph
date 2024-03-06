@@ -34,6 +34,8 @@ jobs:
       env:
           SSH_KNOWN_HOST: ${{ secrets.PARSEGRAPH_SSH_KNOWN_HOST }}
     - run: ssh "$SSH_HOST" 'echo "Hello, world!"'
+      env:
+          SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
     - run: scp parsegraph-docs.tgz "$SSH_HOST:"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
