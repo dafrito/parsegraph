@@ -54,7 +54,7 @@ jobs:
     - run: yarn deploy
       env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
-    - run: export VERSION=`node -e 'console.log(JSON.parse(require("fs").readFileSync("package.json")).version)'` && test -n $VERSION && echo $VERSION && ssh "$SSH_HOST" "echo $VERSION && cd $DOCS_PATH && ln -f -s $GITHUB_SHA $VERSION"
+    - run: export VERSION=`node -e 'console.log(JSON.parse(require("fs").readFileSync("package.json")).version)'` && test -n $VERSION && echo $VERSION && ssh "$SSH_HOST" "echo $VERSION && cd $DOCS_PATH && ln -f -s $GITHUB_SHA $VERSION; ln -f -s $GITHUB_SHA latest"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
           DOCS_PATH: ${{ secrets.PARSEGRAPH_DOCS_PATH }}
