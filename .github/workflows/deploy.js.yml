@@ -36,7 +36,7 @@ jobs:
     - run: echo -n "$SSH_KNOWN_HOST" | base64 -d >>$HOME/.ssh/known_hosts
       env:
           SSH_KNOWN_HOST: ${{ secrets.PARSEGRAPH_SSH_KNOWN_HOST }}
-    - run: ssh "$SSH_HOST" "mkdir -p ~/$PARSEGRAPH_GITHUB_PATH/$GITHUB_SHA"
+    - run: ssh "$SSH_HOST" "mkdir -p $PARSEGRAPH_GITHUB_PATH/$GITHUB_SHA"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
           PARSEGRAPH_GITHUB_PATH: ${{ secrets.PARSEGRAPH_GITHUB_PATH }}
@@ -44,7 +44,7 @@ jobs:
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
           PARSEGRAPH_GITHUB_PATH: ${{ secrets.PARSEGRAPH_GITHUB_PATH }}
-    - run: ssh "$SSH_HOST" "cd ~/$PARSEGRAPH_GITHUB_PATH/$GITHUB_SHA && tar xvzf parsegraph-docs.tgz && rm -f ./parsegraph-docs.tgz && cp -f -r docs $DOCS_PATH/$GITHUB_SHA && cd $DOCS_PATH && ln -f -s $GITHUB_SHA main"
+    - run: ssh "$SSH_HOST" "cd $PARSEGRAPH_GITHUB_PATH/$GITHUB_SHA && tar xvzf parsegraph-docs.tgz && rm -f ./parsegraph-docs.tgz && cp -f -r docs $DOCS_PATH/$GITHUB_SHA && cd $DOCS_PATH && ln -f -s $GITHUB_SHA main"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
           PARSEGRAPH_GITHUB_PATH: ${{ secrets.PARSEGRAPH_GITHUB_PATH }}
