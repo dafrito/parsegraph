@@ -29,16 +29,20 @@ jobs:
     - run: echo -n "$SSH_TOKEN" | base64 -d >$HOME/.ssh/id_rsa
       env:
           SSH_TOKEN: ${{ secrets.PARSEGRAPH_SSH_TOKEN }}
-    - run: file $HOME/.ssh/id_rsa
     - run: chmod 0400 $HOME/.ssh/id_rsa
-    - run: echo "3d6b11a37bb1bd4f418de3686c851a58d5673ad0 *$HOME/.ssh/id_rsa" | sha1sum -c
+    - run: echo "$SSH_TOKEN_SHA1SUM *$HOME/.ssh/id_rsa" | sha1sum -c
+      env:
+          SSH_TOKEN_SHA1SUM: ${{ secrets.PARSEGRAPH_SSH_TOKEN_SHA1SUM }}
     - run: echo -n "$SSH_KNOWN_HOST" | base64 -d >>$HOME/.ssh/known_hosts
       env:
           SSH_KNOWN_HOST: ${{ secrets.PARSEGRAPH_SSH_KNOWN_HOST }}
-    - run: ssh "$SSH_HOST" 'echo "Hello, world!"'
+    - run: ssh "$SSH_HOST" mkdir -p $HOME/github/parsegraph/GITHUB_SHA
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
-    - run: scp parsegraph-docs.tgz "$SSH_HOST:"
+    - run: scp parsegraph-docs.tgz "$SSH_HOST:github/parsegraph/GITHUB_SHA/"
+      env:
+          SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
+    - run: ssh "$SSH_HOST" "cd $HOME/github/parsegraph/$GITHUB_SHA && tar xvzf parsegraph-docs.tgz && rm -f $HOME/github/parsegraph/$GITHUB_SHA/parsegraph-docs.tgz"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
     - run: mv ./dist/coverage ./coverage
