@@ -26,7 +26,7 @@ The next token must be kept in sync with this one.
 
 Format: only the SHA1 hash string; do not include the filename or spaces
 
-This is the SHA1 hash of the token used for PARSEGRAPH_SSH_TOKEN.
+This is the SHA1 hash of the token used for PARSEGRAPH_SSH_TOKEN. This is the hash of the file itself, not the base64-encoded string.
 
 ### PARSEGRAPH_SSH_KNOWN_HOST
 
