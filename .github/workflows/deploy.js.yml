@@ -26,15 +26,16 @@ jobs:
     - run: mv ./dist/docs ./docs
     - run: tar cvzf parsegraph-docs.tgz ./docs
     - run: mkdir -p ~/.ssh
-    - run: echo -n "$SSH_TOKEN" | base64 -d >~/.ssh/id_rsa
-    - run: chmod 0400 ~/.ssh/id_rsa
+    - run: echo -n "$SSH_TOKEN" | base64 -d >$HOME/.ssh/id_rsa
+    - run: file $HOME/.ssh/id_rsa
+    - run: chmod 0400 $HOME/.ssh/id_rsa
     - run: echo "3d6b11a37bb1bd4f418de3686c851a58d5673ad0 *$HOME/.ssh/id_rsa" | sha1sum -c
       env:
           SSH_TOKEN: ${{ secrets.PARSEGRAPH_SSH_TOKEN }}
-    - run: echo -n "$SSH_KNOWN_HOST" | base64 -d >>~/.ssh/known_hosts
+    - run: echo -n "$SSH_KNOWN_HOST" | base64 -d >>$HOME/.ssh/known_hosts
       env:
           SSH_KNOWN_HOST: ${{ secrets.PARSEGRAPH_SSH_KNOWN_HOST }}
-    - run: ssh -vvv "$SSH_HOST" 'echo "Hello, world!"'
+    - run: ssh "$SSH_HOST" 'echo "Hello, world!"'
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
     - run: scp parsegraph-docs.tgz "$SSH_HOST:"
