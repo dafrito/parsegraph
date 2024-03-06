@@ -42,7 +42,7 @@ jobs:
     - run: scp parsegraph-docs.tgz "$SSH_HOST:github/parsegraph/$GITHUB_SHA/"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
-    - run: ssh "$SSH_HOST" "cd ~/github/parsegraph/$GITHUB_SHA && tar xvzf parsegraph-docs.tgz && rm -f ~/github/parsegraph/$GITHUB_SHA/parsegraph-docs.tgz"
+    - run: export VERSION=`node -e 'console.log(JSON.parse(require("fs").readFileSync("package.json")).version)'` ssh "$SSH_HOST" "cd ~/github/parsegraph/$GITHUB_SHA && tar xvzf parsegraph-docs.tgz && rm -f ./parsegraph-docs.tgz && cd .. && ln -f -s $GITHUB_SHA $VERSION"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
     - run: mv ./dist/coverage ./coverage
