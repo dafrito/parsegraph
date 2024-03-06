@@ -1,19 +1,19 @@
 {
   "name": "parsegraph",
   "version": "6.1.8",
-  "description": "DirectionNode and CommitLayout",
+  "description": "Parsegraph layout algorithm for graphs",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/dafrito/parsegraph.git"
   },
-  "author": "Aaron Faanes",
+  "author": "Rainback, Inc.",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dafrito/parsegraph/issues"
   },
-  "homepage": "https://github.com/dafrito/parsegraph#readme",
+  "homepage": "https://parsegraph.com",
   "devDependencies": {
     "@babel/cli": "^7.20.7",
     "@babel/core": "^7.20.12",
