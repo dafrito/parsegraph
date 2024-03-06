@@ -26,11 +26,11 @@ jobs:
     - run: mv ./dist/docs ./docs
     - run: tar cvzf parsegraph-docs.tgz ./docs
     - run: mkdir -p ~/.ssh
-    - run: echo "$SSH_TOKEN" | base64 -d >~/.ssh/id_rsa
+    - run: echo -n "$SSH_TOKEN" | base64 -d >~/.ssh/id_rsa
     - run: chmod 0400 ~/.ssh/id_rsa
       env:
           SSH_TOKEN: ${{ secrets.PARSEGRAPH_SSH_TOKEN }}
-    - run: echo "$SSH_KNOWN_HOST" | base64 -d >>~/.ssh/known_hosts
+    - run: echo -n "$SSH_KNOWN_HOST" | base64 -d >>~/.ssh/known_hosts
       env:
           SSH_KNOWN_HOST: ${{ secrets.PARSEGRAPH_SSH_KNOWN_HOST }}
     - run: ssh -vvv "$SSH_HOST" 'echo "Hello, world!"'
