@@ -39,7 +39,7 @@ jobs:
     - run: ssh "$SSH_HOST" "mkdir -p ~/github/parsegraph/$GITHUB_SHA"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
-    - run: scp parsegraph-docs.tgz "$SSH_HOST:github/parsegraph/GITHUB_SHA/"
+    - run: scp parsegraph-docs.tgz "$SSH_HOST:github/parsegraph/$GITHUB_SHA/"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
     - run: ssh "$SSH_HOST" "cd ~/github/parsegraph/$GITHUB_SHA && tar xvzf parsegraph-docs.tgz && rm -f ~/github/parsegraph/$GITHUB_SHA/parsegraph-docs.tgz"
