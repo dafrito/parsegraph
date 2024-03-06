@@ -36,17 +36,18 @@ jobs:
     - run: echo -n "$SSH_KNOWN_HOST" | base64 -d >>$HOME/.ssh/known_hosts
       env:
           SSH_KNOWN_HOST: ${{ secrets.PARSEGRAPH_SSH_KNOWN_HOST }}
-    - run: ssh "$SSH_HOST" "mkdir -p ~/$GITHUB_PATH/$GITHUB_SHA"
+    - run: ssh "$SSH_HOST" "mkdir -p ~/$PARSEGRAPH_GITHUB_PATH/$GITHUB_SHA"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
-          GITHUB_PATH: ${{ secrets.PARSEGRAPH_GITHUB_PATH }}
-    - run: scp parsegraph-docs.tgz "$SSH_HOST:$GITHUB_PATH/$GITHUB_SHA/"
+          PARSEGRAPH_GITHUB_PATH: ${{ secrets.PARSEGRAPH_GITHUB_PATH }}
+    - run: scp parsegraph-docs.tgz "$SSH_HOST:$PARSEGRAPH_GITHUB_PATH/$GITHUB_SHA/"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
-    - run: ssh "$SSH_HOST" "cd ~/$GITHUB_PATH/$GITHUB_SHA && tar xvzf parsegraph-docs.tgz && rm -f ./parsegraph-docs.tgz && cp -f -r docs $DOCS_PATH/$GITHUB_SHA && cd $DOCS_PATH && ln -f -s $GITHUB_SHA main"
+    - run: ssh "$SSH_HOST" "cd ~/$PARSEGRAPH_GITHUB_PATH/$GITHUB_SHA && tar xvzf parsegraph-docs.tgz && rm -f ./parsegraph-docs.tgz && cp -f -r docs $DOCS_PATH/$GITHUB_SHA && cd $DOCS_PATH && ln -f -s $GITHUB_SHA main"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
-          GITHUB_PATH: ${{ secrets.PARSEGRAPH_GITHUB_PATH }}
+          PARSEGRAPH_GITHUB_PATH: ${{ secrets.PARSEGRAPH_GITHUB_PATH }}
+          DOCS_PATH: ${{ secrets.PARSEGRAPH_DOCS_PATH }}
     - run: mv ./dist/coverage ./coverage
     - run: yarn tar
     - run: yarn deploy
@@ -55,7 +56,7 @@ jobs:
     - run: export VERSION=`node -e 'console.log(JSON.parse(require("fs").readFileSync("package.json")).version)'` && test -n $VERSION && echo $VERSION && ssh "$SSH_HOST" "echo $VERSION && cd $DOCS_PATH && ln -f -s $GITHUB_SHA $VERSION"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
-          GITHUB_PATH: ${{ secrets.PARSEGRAPH_GITHUB_PATH }}
+          DOCS_PATH: ${{ secrets.PARSEGRAPH_DOCS_PATH }}
     - run: tar cvzf parsegraph.tgz parsegraph/
     - uses: actions/upload-artifact@v2
       with:
