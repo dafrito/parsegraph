@@ -32,6 +32,14 @@ This is the SHA1 hash of the token used for PARSEGRAPH_SSH_TOKEN. This is the ha
 
 Format: The lines from ~/.ssh/known_hosts corresponding to the PARSEGRAPH_SSH_HOST
 
+### PARSEGRAPH_GITHUB_PATH
+
+Format: home-relative path to the remote Github directory for uploads. Do not include the beginning ~/ as it may break ssh
+
+### PARSEGRAPH_DOCS_PATH
+
+Format: path to parsegraph public documents directory. Include the full path as needed; no directory is assumed.
+
 ### NPM_PUBLISH_TOKEN
 
 The NPM token used for yarn deploy
