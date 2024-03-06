@@ -1,3 +1,9 @@
+## version 6.1.8
+
+Enhancements:
+
+Pipeline now automatically deploys docs to parsegraph.com
+
 ## version 6.1.7
 
 Bug fixes:
