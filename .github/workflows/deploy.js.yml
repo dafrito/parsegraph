@@ -25,10 +25,14 @@ jobs:
     - run: yarn doc
     - run: mv ./dist/docs ./docs
     - run: tar cvzf parsegraph-docs.tgz ./docs
-    - run: mkdir -p ~/.ssh && echo "$SSH_TOKEN" >~/.ssh/id_rsa
-    - run: scp parsegraph-docs.tgz "ubuntu@aaronfaanes.com:"
+    - run: mkdir -p ~/.ssh
+    - run: echo "$SSH_TOKEN" >~/.ssh/id_rsa
       env:
-          SSH_TOKEN: ${{ secrets.SSH_TOKEN }}
+          SSH_TOKEN: ${{ secrets.PARSEGRAPH_SSH_TOKEN }}
+    - run: echo "$SSH_KNOWN_HOST" >>~/.ssh/known_hosts
+      env:
+          SSH_KNOWN_HOST: ${{ secrets.PARSEGRAPH_SSH_KNOWN_HOST }}
+    - run: scp parsegraph-docs.tgz "ubuntu@aaronfaanes.com:"
     - run: mv ./dist/coverage ./coverage
     - run: yarn tar
     - run: yarn deploy
