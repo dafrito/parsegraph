@@ -20,6 +20,7 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
     - run: yarn
     - run: export VERSION=`node -e 'console.log(JSON.parse(require("fs").readFileSync("package.json")).version)'`
+    - run: test -n '$VERSION'
     - run: yarn lint:ci
     - run: yarn test:cov
     - run: yarn build
