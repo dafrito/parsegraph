@@ -36,13 +36,13 @@ jobs:
     - run: echo -n "$SSH_KNOWN_HOST" | base64 -d >>$HOME/.ssh/known_hosts
       env:
           SSH_KNOWN_HOST: ${{ secrets.PARSEGRAPH_SSH_KNOWN_HOST }}
-    - run: ssh "$SSH_HOST" mkdir -p $HOME/github/parsegraph/GITHUB_SHA
+    - run: ssh "$SSH_HOST" "mkdir -p ~/github/parsegraph/$GITHUB_SHA"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
     - run: scp parsegraph-docs.tgz "$SSH_HOST:github/parsegraph/GITHUB_SHA/"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
-    - run: ssh "$SSH_HOST" "cd $HOME/github/parsegraph/$GITHUB_SHA && tar xvzf parsegraph-docs.tgz && rm -f $HOME/github/parsegraph/$GITHUB_SHA/parsegraph-docs.tgz"
+    - run: ssh "$SSH_HOST" "cd ~/github/parsegraph/$GITHUB_SHA && tar xvzf parsegraph-docs.tgz && rm -f ~/github/parsegraph/$GITHUB_SHA/parsegraph-docs.tgz"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
     - run: mv ./dist/coverage ./coverage
