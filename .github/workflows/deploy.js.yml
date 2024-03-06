@@ -24,6 +24,11 @@ jobs:
     - run: yarn build
     - run: yarn doc
     - run: mv ./dist/docs ./docs
+    - run: tar cvzf parsegraph-docs.tgz ./docs
+    - run: mkdir -p ~/.ssh && cat "$SSH_TOKEN" >~/.ssh/id_rsa
+    - run: scp parsegraph-docs.tgz ubuntu@aaronfaanes.com:
+      env:
+          SSH_TOKEN: ${{ secrets.SSH_TOKEN }}
     - run: mv ./dist/coverage ./coverage
     - run: yarn tar
     - run: yarn deploy
@@ -34,7 +39,6 @@ jobs:
       with:
         name: parsegraph-${{ github.run_number }}
         path: parsegraph.tgz
-    - run: tar cvzf parsegraph-docs.tgz ./docs
     - uses: actions/upload-artifact@v2
       with:
         name: parsegraph-docs-${{ github.run_number }}
