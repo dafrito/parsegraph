@@ -33,6 +33,7 @@ jobs:
     - run: echo "$SSH_KNOWN_HOST" | base64 -d >>~/.ssh/known_hosts
       env:
           SSH_KNOWN_HOST: ${{ secrets.PARSEGRAPH_SSH_KNOWN_HOST }}
+    - run: ssh "$SSH_HOST" 'echo "Hello, world!"'
     - run: scp parsegraph-docs.tgz "$SSH_HOST:"
       env:
           SSH_HOST: ${{ secrets.PARSEGRAPH_SSH_HOST }}
