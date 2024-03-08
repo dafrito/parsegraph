@@ -1,3 +1,9 @@
+## version 6.2.0
+
+Bug fixes:
+
+-  Fix using setLayoutPreference on an INWARD node
+
 ## version 6.1.8
 
 Enhancements:
