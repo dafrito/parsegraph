@@ -3,6 +3,7 @@ import {
   isVerticalDirection,
   getDirectionAxis,
   Axis,
+  nameDirection,
 } from "../../Direction";
 import { PreferredAxis } from "./PreferredAxis";
 import { DirectionNode } from "../DirectionNode";
@@ -514,7 +515,7 @@ export class Siblings {
     // console.log("Changing", namePreferredAxis(curCanon), "to", namePreferredAxis(newCanon));
 
     const parentDir = this.node().neighbors().parent()?.direction();
-    if (!parentDir) {
+    if (!nameDirection(parentDir)) {
       throw new Error("unreachable");
     }
 

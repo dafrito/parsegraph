@@ -18,6 +18,13 @@ describe("Siblings", () => {
     assert.equal(n.siblings().getLayoutPreference(), PreferredAxis.VERTICAL);
   });
 
+  it("unreachable test", () => {
+    const root = new DirectionNode();
+    const inward = new DirectionNode();
+    root.connect(Direction.INWARD, inward);
+    inward.siblings().setLayoutPreference(PreferredAxis.PARENT);
+  });
+
   it("pull test", () => {
     const nodes: DirectionNode[] = [];
     for (let i = 0; i < 5; ++i) {
