@@ -14,7 +14,7 @@ import { AxisOverlap } from "./AxisOverlap";
 
 /**
  * Neighbors contains information about a node's connections to other nodes.
- * 
+ *
  * @see {@link DirectionNode}
  */
 export class Neighbors {
