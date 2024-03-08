@@ -12,6 +12,11 @@ import { DirectionNode } from "../DirectionNode";
 import { Alignment } from "./Alignment";
 import { AxisOverlap } from "./AxisOverlap";
 
+/**
+ * Neighbors contains information about a node's connections to other nodes.
+ * 
+ * @see {@link DirectionNode}
+ */
 export class Neighbors {
   private _node: DirectionNode;
   private _neighbors: Neighbor[];
