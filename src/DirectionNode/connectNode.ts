@@ -46,6 +46,7 @@ export const connectNode = (
   if (node.neighbors().hasNode(reverseDirection(inDirection))) {
     node.disconnect(reverseDirection(inDirection));
   }
+  const previousOrder = node.siblings().layoutOrder();
 
   // Connect the node.
   const neighbor = parent.neighbors().ensure(inDirection);
@@ -55,6 +56,9 @@ export const connectNode = (
   }
   neighbor.meet(node);
   node.neighbors().assignParent(parent, inDirection);
+  if (previousOrder !== node.siblings().layoutOrder()) {
+    node.siblings().reorderLayout();
+  }
 
   if (node.paintGroups().paintGroup().explicit()) {
     const pg = findPaintGroup(parent);
@@ -74,6 +78,9 @@ export const connectNode = (
     node.paintGroups().clearPaintGroup();
   }
 
+  // Parent direction participates in the child's layout and transform caches.
+  // An already committed subtree must be reconsidered after reparenting.
+  node.invalidate();
   parent.invalidate();
 
   return node;

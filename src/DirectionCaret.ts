@@ -98,7 +98,7 @@ export class DirectionCaret<Value> {
   disconnect(
     inDirection?: Direction | string
   ): DirectionNode<Value> | undefined {
-    if (inDirection) {
+    if (inDirection !== undefined) {
       // Interpret the given direction for ease-of-use.
       return this.node().disconnect(readDirection(inDirection));
     }
@@ -115,7 +115,7 @@ export class DirectionCaret<Value> {
 
   crease(inDirection?: Direction | string): void {
     let node: DirectionNode<Value> = this.node();
-    if (inDirection) {
+    if (inDirection !== undefined) {
       node = this.node().neighbors().nodeAt(readDirection(inDirection));
     }
 
@@ -125,7 +125,7 @@ export class DirectionCaret<Value> {
 
   uncrease(inDirection?: Direction | string) {
     let node: DirectionNode<Value> = this.node();
-    if (inDirection) {
+    if (inDirection !== undefined) {
       node = this.node().neighbors().nodeAt(readDirection(inDirection));
     }
 
@@ -135,7 +135,7 @@ export class DirectionCaret<Value> {
 
   isCreased(inDirection?: Direction | string): boolean {
     let node: DirectionNode<Value> = this.node();
-    if (inDirection) {
+    if (inDirection !== undefined) {
       node = this.node().neighbors().nodeAt(readDirection(inDirection));
     }
 
@@ -294,8 +294,8 @@ export class DirectionCaret<Value> {
       if (node.neighbors().isRoot()) {
         throw new Error("Cannot align root");
       }
-      node = node.neighbors().parentNode();
       dir = reverseDirection(node.neighbors().parentDirection());
+      node = node.neighbors().parentNode();
     } else {
       dir = readDirection(inDirection);
       newAlignmentMode = readAlignment(newAlignmentMode);
@@ -308,7 +308,7 @@ export class DirectionCaret<Value> {
 
   shrink(inDirection?: Direction | string): void {
     let node = this.node();
-    if (inDirection) {
+    if (inDirection !== undefined) {
       node = node.neighbors().nodeAt(readDirection(inDirection));
     }
     if (node) {
@@ -318,7 +318,7 @@ export class DirectionCaret<Value> {
 
   grow(inDirection?: Direction | string): void {
     let node = this.node();
-    if (inDirection) {
+    if (inDirection !== undefined) {
       node = node.neighbors().nodeAt(readDirection(inDirection));
     }
     if (node) {
@@ -328,7 +328,7 @@ export class DirectionCaret<Value> {
 
   fitExact(inDirection?: Direction | string): void {
     let node = this.node();
-    if (inDirection) {
+    if (inDirection !== undefined) {
       node = node.neighbors().nodeAt(readDirection(inDirection));
     }
     node.setNodeFit(Fit.EXACT);
@@ -336,7 +336,7 @@ export class DirectionCaret<Value> {
 
   fitLoose(inDirection?: Direction | string): void {
     let node = this.node();
-    if (inDirection) {
+    if (inDirection !== undefined) {
       node = node.neighbors().nodeAt(readDirection(inDirection));
     }
     node.setNodeFit(Fit.LOOSE);
@@ -344,7 +344,7 @@ export class DirectionCaret<Value> {
 
   fitNaive(inDirection?: Direction | string): void {
     let node = this.node();
-    if (inDirection) {
+    if (inDirection !== undefined) {
       node = node.neighbors().nodeAt(readDirection(inDirection));
     }
     node.setNodeFit(Fit.NAIVE);

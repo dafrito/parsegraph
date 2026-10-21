@@ -146,15 +146,11 @@ export class Neighbors {
   }
 
   nodeAt(atDirection: Direction): DirectionNode {
+    if (!this.isRoot() && this.parentDirection() === atDirection) {
+      return this.parentNode();
+    }
     const n = this.at(atDirection);
     if (!n) {
-      if (!this.isRoot() && this.parent().reverseDirection() === atDirection) {
-        const par = this.parent()?.node();
-        if (!par) {
-          throw new Error("Parent neighbor has no node");
-        }
-        return par;
-      }
       return undefined as any;
       // throw new Error("Node not found");
     }
@@ -191,6 +187,9 @@ export class Neighbors {
   }
 
   lineLengthAt(direction: Direction): number {
+    if (!this.isRoot() && this.parentDirection() === direction) {
+      return this.parent().lineLength();
+    }
     if (!this.hasNode(direction)) {
       return 0;
     }
@@ -219,6 +218,9 @@ export class Neighbors {
   }
 
   getAlignment(inDirection: Direction): Alignment {
+    if (!this.isRoot() && this.parentDirection() === inDirection) {
+      return this.parent().getAlignment();
+    }
     if (this.hasNode(inDirection)) {
       return this.at(inDirection).getAlignment();
     }
@@ -240,6 +242,15 @@ export class Neighbors {
     inDirection: Direction | Alignment,
     newAlignmentMode?: Alignment
   ): void {
+    if (
+      newAlignmentMode !== undefined &&
+      !this.isRoot() &&
+      inDirection === this.parentDirection()
+    ) {
+      return this.parentNode()
+        .neighbors()
+        .align(reverseDirection(inDirection as Direction), newAlignmentMode);
+    }
     if (newAlignmentMode === undefined) {
       if (this.isRoot()) {
         throw new Error("Alignment must have a parent if self-directed");
@@ -256,6 +267,13 @@ export class Neighbors {
   }
 
   axisOverlap(inDirection?: Direction): AxisOverlap {
+    if (
+      inDirection !== undefined &&
+      !this.isRoot() &&
+      this.parentDirection() === inDirection
+    ) {
+      return this.parent().axisOverlap();
+    }
     if (inDirection === undefined) {
       if (this.isRoot()) {
         throw new Error(
@@ -276,6 +294,18 @@ export class Neighbors {
     inDirection: Direction | AxisOverlap,
     newAxisOverlap?: AxisOverlap
   ): void {
+    if (
+      newAxisOverlap !== undefined &&
+      !this.isRoot() &&
+      inDirection === this.parentDirection()
+    ) {
+      return this.parentNode()
+        .neighbors()
+        .setAxisOverlap(
+          reverseDirection(inDirection as Direction),
+          newAxisOverlap
+        );
+    }
     if (newAxisOverlap === undefined) {
       if (this.isRoot()) {
         throw new Error(

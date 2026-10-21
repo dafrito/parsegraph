@@ -79,6 +79,19 @@ export class CommitLayout {
     return this._painter;
   }
 
+  private childPositionsKnown(node: DirectionNode): boolean {
+    for (let dir = Direction.INWARD; dir <= Direction.BACKWARD; ++dir) {
+      if (!node.neighbors().hasChildAt(dir)) {
+        continue;
+      }
+      const edge = node.neighbors().at(dir);
+      if (!Number.isFinite(edge.xPos()) || !Number.isFinite(edge.yPos())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   protected commitLayout(node: DirectionNode): boolean {
     // Do nothing if this node already has a layout committed.
     switch (node.layout().phase()) {
@@ -156,7 +169,8 @@ export class CommitLayout {
 
     if (
       node.nodeFit() === Fit.NAIVE &&
-      (node.neighbors().isRoot() || !isNaN(node.neighbors().parentX()))
+      (node.neighbors().isRoot() || !isNaN(node.neighbors().parentX())) &&
+      this.childPositionsKnown(node)
     ) {
       node.layout().setPhase(LayoutPhase.COMMITTED);
       return false;

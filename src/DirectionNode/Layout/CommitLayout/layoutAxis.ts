@@ -113,12 +113,12 @@ export const layoutAxis = (
     .extentsAt(secondDirection)
     .separation(
       secondNode.layout().extentsAt(firstDirection),
-      (node.neighbors().nodeAt(secondDirection).scale() /
-        node.neighbors().nodeAt(firstDirection).scale()) *
-        (secondNodeAlignment -
-          secondNode.layout().extentOffsetAt(firstDirection)) -
-        (firstNodeAlignment -
-          firstNode.layout().extentOffsetAt(secondDirection)),
+      // Alignments are in the parent's space; extent offsets are in each
+      // child's space. Express the displacement in the first child's space.
+      (secondNodeAlignment - firstNodeAlignment) / firstNode.scale() +
+        firstNode.layout().extentOffsetAt(secondDirection) -
+        (secondNode.scale() / firstNode.scale()) *
+          secondNode.layout().extentOffsetAt(firstDirection),
       true,
       node.neighbors().nodeAt(secondDirection).scale() /
         node.neighbors().nodeAt(firstDirection).scale()

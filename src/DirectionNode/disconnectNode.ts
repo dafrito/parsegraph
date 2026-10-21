@@ -41,6 +41,7 @@ export const disconnectNode = (
   // Disconnect the node.
   const neighbor = parent.neighbors().at(inDirection);
   const disconnected = neighbor.neighbor() as DirectionNode;
+  const previousOrder = disconnected.siblings().layoutOrder();
 
   const clearExplicit = !disconnected.paintGroups().isPaintGroup();
   if (!disconnected.paintGroups().isPaintGroup()) {
@@ -55,6 +56,12 @@ export const disconnectNode = (
   }
 
   disconnected.siblings().convertLayoutPreference(inDirection);
+  if (previousOrder !== disconnected.siblings().layoutOrder()) {
+    disconnected.siblings().reorderLayout();
+  }
+  // Explicit paint groups do not pass through crease() above. They still need
+  // a new root layout and identity transform after losing their parent.
+  disconnected.invalidate();
   parent.invalidate();
 
   return disconnected;

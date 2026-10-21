@@ -1,5 +1,4 @@
 import { DirectionNode } from "../DirectionNode";
-import { findClosestPaintGroup } from "./findClosestPaintGroup";
 import makeLimit from "./makeLimit";
 import { comesBefore } from "./comesBefore";
 import { getLastPaintGroup } from "./getLastPaintGroup";
@@ -12,25 +11,44 @@ export const findPaintGroupInsert = (
     return findPaintGroupInsert(node.paintGroup().node(), inserted);
   }
 
-  // Gather possible insertion points; exclude this node.
-  const paintGroupCandidates: DirectionNode[] = [];
+  // Walk complete sibling group subtrees. A distance-based insertion can put
+  // an ancestor after one of its deeper descendants, making layout wait forever
+  // for a group it has not yet visited. Existing subtree blocks must also stay
+  // intact if a preferred-axis change has altered sibling ordering since they
+  // were inserted.
   const lim = makeLimit();
-  let n = node.paintGroup().next();
-  while (n !== node) {
-    paintGroupCandidates.push(n);
-    lim();
-    n = n.paintGroup().next();
+  const descendantLimit = makeLimit();
+  // Existing descendants take priority over sibling ordering. Their containing
+  // node may have changed preferred axes without rearranging the group ring;
+  // placing a new ancestor before an unrelated sibling would split its block.
+  let descendant = node.paintGroup().next();
+  while (descendant !== node && descendant.neighbors().hasAncestor(node)) {
+    descendantLimit();
+    if (descendant.neighbors().hasAncestor(inserted)) {
+      return [descendant.paintGroup().prev(), descendant];
+    }
+    descendant = descendant.paintGroup().next();
   }
-  paintGroupCandidates.push(getLastPaintGroup(node));
-
-  const closestPaintGroup = findClosestPaintGroup(
-    inserted,
-    paintGroupCandidates
-  );
-
-  if (comesBefore(closestPaintGroup, inserted)) {
-    const endOfPaintGroup = getLastPaintGroup(closestPaintGroup);
-    return [endOfPaintGroup, endOfPaintGroup.paintGroup().next()];
+  for (;;) {
+    let previous = node;
+    let candidate = node.paintGroup().next();
+    let descend = false;
+    while (candidate !== node && candidate.neighbors().hasAncestor(node)) {
+      lim();
+      if (inserted.neighbors().hasAncestor(candidate)) {
+        // A caller can supply a more distant containing group.
+        node = candidate;
+        descend = true;
+        break;
+      }
+      if (!comesBefore(candidate, inserted)) {
+        return [previous, candidate];
+      }
+      previous = getLastPaintGroup(candidate);
+      candidate = previous.paintGroup().next();
+    }
+    if (!descend) {
+      return [previous, candidate];
+    }
   }
-  return [closestPaintGroup.paintGroup().prev(), closestPaintGroup];
 };

@@ -14,6 +14,49 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  native:
+    name: Native (${{ matrix.os }}, ${{ matrix.build_type }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        build_type: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - name: Install parity-test dependencies
+        run: yarn install --frozen-lockfile --non-interactive
+      - name: Configure native library
+        run: >-
+          cmake -S native -B native/build
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DPARSEGRAPH_SANITIZE=${{ matrix.build_type == 'Debug' && 'ON' || 'OFF' }}
+      - name: Build C and C++ consumers
+        run: cmake --build native/build --parallel 4
+      - name: Test native behavior and TypeScript parity
+        run: ctest --test-dir native/build --output-on-failure
+      - name: Generate native SVG example
+        run: native/build/parsegraph_svg > native/build/native-demo.svg
+      - name: Record optimized benchmark observations
+        if: matrix.build_type == 'Release'
+        run: native/build/parsegraph_benchmark --nodes 2000 > native/build/benchmark.csv
+      - name: Upload native diagnostics
+        uses: actions/upload-artifact@v6
+        with:
+          name: native-${{ matrix.os }}-${{ matrix.build_type }}
+          path: |
+            native/build/native-demo.svg
+            native/build/benchmark.csv
+          if-no-files-found: error
+          retention-days: 14
   check:
     name: Check (Node ${{ matrix.node }})
     runs-on: ubuntu-latest

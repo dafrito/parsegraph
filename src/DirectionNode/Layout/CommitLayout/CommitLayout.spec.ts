@@ -675,10 +675,14 @@ describe("CommitLayout", () => {
       newRoot.connect(Direction.BACKWARD, root);
       root = newRoot;
       const m = demo(root);
+      // The new root and the former root both need measurement: the latter's
+      // parent-dependent layout has changed. Older descendant groups are reused.
+      assert.deepEqual(m.sizes, 2);
+      assert.deepEqual(m.paints, 2);
       paints += m.paints;
       renders += m.renders;
     }
-    assert.deepEqual(paints, 10);
+    assert.deepEqual(paints, 20);
     assert.deepEqual(renders, 65);
   });
 
@@ -714,13 +718,18 @@ describe("CommitLayout", () => {
       newRoot.connect(Direction.BACKWARD, root);
       root = newRoot;
       const m = demo2(root);
+      // Reparenting recomputes these two group roots without repainting the
+      // previously committed groups farther down the chain.
+      assert.deepEqual(m.sizes, 2);
+      assert.deepEqual(m.paints, 2);
+      assert.deepEqual(m.paintedNodes, 2);
       paints += m.paints;
       renders += m.renders;
       paintedNodes += m.paintedNodes;
     }
-    assert.deepEqual(paints, 10);
+    assert.deepEqual(paints, 20);
     assert.deepEqual(renders, 65);
-    assert.deepEqual(paintedNodes, 10);
+    assert.deepEqual(paintedNodes, 20);
   });
 
   it("ten creased forward neighbors iterated each node", () => {

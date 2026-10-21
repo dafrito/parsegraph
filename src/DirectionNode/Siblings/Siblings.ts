@@ -3,7 +3,6 @@ import {
   isVerticalDirection,
   getDirectionAxis,
   Axis,
-  nameDirection,
 } from "../../Direction";
 import { PreferredAxis } from "./PreferredAxis";
 import { DirectionNode } from "../DirectionNode";
@@ -131,6 +130,27 @@ export class Siblings {
     b.siblings()._prev = a;
   }
 
+  /**
+   * Reorders child spans after a parent change alters the effective axis.
+   * The spans themselves remain intact, including all their descendants.
+   */
+  reorderLayout(): void {
+    const children = this.layoutOrder()
+      .filter((dir) => this.node().neighbors().hasChildAt(dir))
+      .map((dir) => this.node().neighbors().nodeAt(dir))
+      .filter((child) => !child.paintGroups().isPaintGroup());
+
+    for (const child of children) {
+      const head = child.siblings().head();
+      this.connect(head.siblings().prev(), child.siblings().next());
+      this.connect(child, head);
+    }
+    for (const child of children) {
+      this.connect(this.prev(), child.siblings().head());
+      this.connect(child, this.node());
+    }
+  }
+
   insertIntoLayout(inDirection: Direction): void {
     const node: DirectionNode = this.node().neighbors().nodeAt(inDirection);
     if (!node) {
@@ -184,13 +204,12 @@ export class Siblings {
       const dirs = deeplyLinked.siblings().layoutOrder();
       for (let i = 0; i < dirs.length; ++i) {
         const dir = dirs[i];
-        const candidate = deeplyLinked.neighbors().hasNode(dir)
+        const candidate = deeplyLinked.neighbors().hasChildAt(dir)
           ? deeplyLinked.neighbors().nodeAt(dir)
           : undefined;
         if (
           candidate &&
           candidate != excludeThisNode &&
-          deeplyLinked.neighbors().parent()?.reverseDirection() !== dir &&
           !candidate.paintGroups().isPaintGroup()
         ) {
           deeplyLinked = candidate;
@@ -489,56 +508,24 @@ export class Siblings {
           "Root layout preference can only be VERTICAL or HORIZONTAL"
         );
       }
-      if (this.getLayoutPreference() === given) {
-        return;
-      }
-      if (given === PreferredAxis.VERTICAL) {
-        // console.log("PREFER_HORIZONTAL_AXIS -> PREFER_VERTICAL_AXIS");
-        this.horzToVert();
-      } else {
-        // console.log("PREFER_VERTICAL_AXIS -> PREFER_HORIZONTAL_AXIS");
-        this.vertToHorz();
-      }
-      this._layoutPreference = given;
-      this.node().invalidate();
-      return;
-    }
-
-    given = this.sanitizeLayoutPreference(given);
-
-    const curCanon = this.canonicalLayoutPreference();
-    this._layoutPreference = given;
-    const newCanon = this.canonicalLayoutPreference();
-    if (curCanon === newCanon) {
-      return;
-    }
-    // console.log("Changing", namePreferredAxis(curCanon), "to", namePreferredAxis(newCanon));
-
-    const parentDir = this.node().neighbors().parent()?.direction();
-    if (!nameDirection(parentDir)) {
-      throw new Error("unreachable");
-    }
-
-    const paxis = getDirectionAxis(parentDir);
-    if (curCanon === PreferredAxis.PARENT) {
-      if (paxis === Axis.HORIZONTAL) {
-        // parent is horizontal, we're aligned horizontal, and we want vertical
-        this.horzToVert();
-      } else {
-        // parent is vertical, we're aligned vertical, and we want horizontal
-        this.vertToHorz();
-      }
     } else {
-      // curCanon is perpendicular
-      if (paxis === Axis.VERTICAL) {
-        // parent is vertical, we're aligned horizontal, and we want vertical
-        this.horzToVert();
-      } else {
-        // parent is horizontal, we're aligned vertical, and we want horizontal
-        this.vertToHorz();
-      }
+      given = this.sanitizeLayoutPreference(given);
     }
-
+    const previousOrder = this.layoutOrder();
+    const previousPreference = this._layoutPreference;
+    this._layoutPreference = given;
+    if (previousOrder === this.layoutOrder()) {
+      // Rootlike layout uses the stored preference directly. Normalizing an
+      // inward node's absolute preference can change its axis layout even when
+      // the sibling traversal order remains identical.
+      if (previousPreference !== given) {
+        this.node().invalidate();
+      }
+      return;
+    }
+    // Compare the effective order directly: the inward/outward Z axis cannot
+    // safely be treated as either horizontal or vertical during a swap.
+    this.reorderLayout();
     this.node().invalidate();
   }
 

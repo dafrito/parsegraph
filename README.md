@@ -14,9 +14,9 @@ document format and presentation rules, with migration guidance for Freeform.
 See [CI and deploying](DEPLOYING.md) for the package script inventory, local
 validation commands, GitHub Actions checks, and deployment notes.
 
-The [native Extent prototype](native/README.md) ports the extent buffer and its
-combination/separation operations to C11, with C/C++ consumers and TypeScript
-parity tests. It is the first native component, not yet a full layout library.
+The [native C11 library](native/README.md) ports the Node/Caret API, extent
+operations, paint groups, and incremental layout. It includes C/C++ consumers,
+a standalone SVG example, sanitizer and TypeScript parity tests, and benchmarks.
 
 # Code example:
 
