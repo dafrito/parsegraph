@@ -1,6 +1,7 @@
 {
   "name": "parsegraph",
   "version": "7.0.0",
+  "packageManager": "yarn@1.22.22",
   "description": "Parsegraph layout algorithm for graphs",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",

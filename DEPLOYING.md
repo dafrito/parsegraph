@@ -4,9 +4,12 @@
 
 `.github/workflows/ci.yml` checks pull requests, pushes to `main`, and manual
 runs on Ubuntu with Node 22 and 24. It installs dependencies from `yarn.lock`
-using `yarn install --frozen-lockfile --non-interactive`. Use Yarn Classic (1.x)
-for this repository; CI explicitly uses `yarn.lock`, even though the historical
-`package-lock.json` is also present.
+using `yarn install --frozen-lockfile --non-interactive`. Use Yarn Classic 1.22.22,
+as declared by `packageManager` in `package.json`. `yarn.lock` is the only
+authoritative dependency lockfile; the stale npm lockfile has been removed.
+Use `yarn add`/`yarn remove` for dependency changes and commit `package.json` and
+`yarn.lock` together. npm remains available for `pack`/`publish`; those operations
+do not require maintaining a second dependency lockfile.
 
 Each Node version runs formatting/lint checks, Jest with coverage, development
 and production builds, package staging, a smoke test of the extracted production

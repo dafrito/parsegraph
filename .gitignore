@@ -52,6 +52,9 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Yarn is the authoritative dependency lockfile.
+/package-lock.json
+
 # TypeScript v1 declaration files
 typings/
 

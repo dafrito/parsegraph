@@ -1,5 +1,15 @@
 # Development
 
+Use Yarn Classic 1.22.22 and the committed `yarn.lock` for dependency installation:
+
+```sh
+yarn install --frozen-lockfile --non-interactive
+```
+
+Use `yarn add` or `yarn remove` for dependency changes and commit the resulting
+manifest and lockfile together. npm is used for package archives and publication,
+not for maintaining this repository's dependencies.
+
 See [graph generators](examples/README.md) to create example `.parsegraph` files
 in `generated/` using the Node/Caret API.
 
