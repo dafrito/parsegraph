@@ -1,10 +1,17 @@
 #!/bin/sh
 
+set -eu
+
 BUILD=parsegraph
 
 EXTRA_FILES="LICENSE README.md package.json"
 
+# Fail before replacing an existing package if the production build is missing.
+test -f dist-prod/src/index.js
+test -f dist-prod/src/index.d.ts
+
 rm -rf ./$BUILD
 mkdir ./$BUILD
 cp -r $EXTRA_FILES ./$BUILD
-cp dist-prod ./$BUILD/dist
+cp -R dist-prod ./$BUILD/dist
+tar -czf parsegraph.tgz ./$BUILD

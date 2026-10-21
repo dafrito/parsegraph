@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Check (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node }}
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --non-interactive
+      - name: Check formatting and lint
+        run: yarn lint:ci
+      - name: Test with coverage
+        run: yarn test:cov --ci --runInBand
+      - name: Build development bundle
+        run: yarn build
+      - name: Stage development package
+        run: yarn tar
+      - name: Build production bundle
+        run: yarn build:prod
+      - name: Package production bundle
+        run: yarn tar:prod
+      - name: Verify production archive
+        run: |
+          mkdir package-smoke
+          tar -xzf parsegraph.tgz -C package-smoke
+          node <<'NODE'
+          const assert = require('node:assert/strict');
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const root = './package-smoke/parsegraph';
+          const metadata = require(root + '/package.json');
+          assert.ok(fs.existsSync(path.join(root, metadata.types)));
+          const { DirectionNode, CommitLayout } = require(root);
+          const node = new DirectionNode('CI smoke test');
+          const layout = new CommitLayout(node, {
+            size: (_, size) => { size[0] = 24; size[1] = 80; }
+          });
+          while (layout.crank());
+          NODE
+      - name: Generate API documentation
+        run: yarn doc
+      - name: Upload production package
+        uses: actions/upload-artifact@v6
+        with:
+          name: parsegraph-node-${{ matrix.node }}
+          path: parsegraph.tgz
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload API documentation
+        uses: actions/upload-artifact@v6
+        with:
+          name: docs-node-${{ matrix.node }}
+          path: dist/docs/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-node-${{ matrix.node }}
+          path: dist/coverage/
+          if-no-files-found: warn
+          retention-days: 14

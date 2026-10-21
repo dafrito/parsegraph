@@ -1,3 +1,8 @@
+# Development
+
+See [CI and deploying](DEPLOYING.md) for the package script inventory, local
+validation commands, GitHub Actions checks, and deployment notes.
+
 # Code example:
 
 ```
