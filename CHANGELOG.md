@@ -1,3 +1,28 @@
+## version 7.0.0 (unreleased)
+
+Enhancements:
+
+- Add v1 document APIs with presentation, appearance, and seeded-generation
+  capabilities, while retaining the legacy v0 serialization APIs.
+- Add standalone proportion, Ulam, primes, Memory Piers, and rainbow generators,
+  a reference SVG exporter, and verified local preview packages.
+- Add a headless C layout port with TypeScript parity tests and benchmarks, plus
+  an optional Qt Quick viewer with presentation/appearance support and an
+  incremental primes demo. Native builds are separate from the npm package.
+- Add JavaScript and native CI workflows; hosted validation remains pending.
+
+Bug fixes:
+
+- Correct Extent buffer growth, ownership transfer, separation, and equality.
+- Correct Caret direction/alignment handling, inward reparenting, naive layout,
+  scaled-subtree separation, and paint-group ordering. These fixes can change
+  geometry for graphs affected by the previous layout bugs.
+- Repair dependency-graph SVG generation and production archive staging.
+
+The npm major version does not change the `.parsegraph` v1 format or capability
+versions. Release publishing is still being prepared; this version is not yet
+published by this checkout.
+
 ## version 6.2.0
 
 Bug fixes:

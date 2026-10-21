@@ -1,8 +1,12 @@
 # Freeform v1 migration: local package handoff
 
-Freeform's installed registry `parsegraph@6.2.0` does not contain these document
-APIs. This checkout still has that source package version; do not use it alone
-to determine API availability.
+The registry package `parsegraph@6.2.0` predates these document APIs. This checkout
+now targets `7.0.0`; local previews identify the exact build before publication.
+Freeform already supports v1 documents using a local preview. Use the receipt
+below when updating its dependency to a newer build.
+
+The npm package version is independent of the `.parsegraph` document version,
+which remains v1, and of capability versions such as `appearance/1`.
 
 ## Build and install the preview
 
@@ -14,16 +18,16 @@ cat generated/preview-package.json
 ```
 
 This builds production code and creates
-`generated/parsegraph-6.2.0-v1.local.<content-hash>.tgz`. The receipt records the
+`generated/parsegraph-7.0.0-v1.local.<content-hash>.tgz`. The receipt records the
 exact filename, version, and npm integrity value. The preview is marked private,
-has no install scripts, and is not published. Its version is a local identity,
-not a decision about the eventual public release number. The source manifest
-and lockfile are not changed by packaging.
+has no install scripts, and is not published. Its version is a local identity
+derived from the source package version and packaged contents. The source
+manifest and lockfile are not changed by packaging.
 
 In Freeform, install the **exact filename from that receipt**:
 
 ```sh
-yarn add file:../parsegraph/generated/parsegraph-6.2.0-v1.local.<content-hash>.tgz
+yarn add file:../parsegraph/generated/parsegraph-7.0.0-v1.local.<content-hash>.tgz
 ```
 
 Replace `<content-hash>` before running that command; it is not a literal path.

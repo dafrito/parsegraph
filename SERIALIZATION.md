@@ -1,13 +1,14 @@
 # The `.parsegraph` serialization format (v0)
 
 The existing unversioned format described here is now called **v0**. See the
-[v1 draft and capability specification](docs/parsegraph-v1.md) for the new
+[v1 document and capability specification](docs/parsegraph-v1.md) for the new
 document envelope, presentation rules, and Freeform migration contract.
 
 This page documents the format implemented by `serializeParsegraph` and
-`deserializeParsegraph` in this repository, whose package version is currently
-6.2.0. The file format itself has **no version field**. This is a description of
-current behavior, including its limitations, rather than a new format proposal.
+`deserializeParsegraph` in this repository. Those legacy APIs remain available
+in package version 7. The v0 file format itself has **no version field**; package
+versions and document format versions are independent. This is a description of
+existing behavior, including its limitations, rather than a new format proposal.
 
 A `.parsegraph` file is a JSON document describing nodes, their content, their
 parent-child connections, and layout instructions. It does **not** contain a
