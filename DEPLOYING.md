@@ -52,7 +52,7 @@ changing this checkout's version or publishing to the registry.
 | `build:watch` | Development build in watch mode; local use. |
 | `build:prod` | Minified production UMD bundle and declarations in `dist-prod/src`. Checked in CI. |
 | `build:prod:watch` | Production build in watch mode; local use. |
-| `dependencygraph` | Generates `dependencygraph.svg`. Requires external `ts_dependency_graph` and Graphviz `dot`, neither installed by this package; excluded from CI. |
+| `dependencygraph` | Generates `dependencygraph.svg` with folder grouping and box-shaped file nodes, avoiding Graphviz's record-shape flat-edge limitation. Checks both tools before replacing the image. Requires external `ts_dependency_graph` and Graphviz `dot`, neither installed by this package; excluded from CI. |
 | `examples:check` | Type-checks the standalone TypeScript generators. |
 | `pack:preview` | Builds production code, packs a uniquely versioned local preview, and verifies its extracted public APIs and all three geometry fixtures. Writes the artifact receipt to `generated/preview-package.json`. |
 | `generate:proportion` | Generates `generated/proportion.parsegraph` in legacy v0 format for current Freeform builds. |
