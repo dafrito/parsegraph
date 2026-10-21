@@ -14,6 +14,10 @@ document format and presentation rules, with migration guidance for Freeform.
 See [CI and deploying](DEPLOYING.md) for the package script inventory, local
 validation commands, GitHub Actions checks, and deployment notes.
 
+The [native Extent prototype](native/README.md) ports the extent buffer and its
+combination/separation operations to C11, with C/C++ consumers and TypeScript
+parity tests. It is the first native component, not yet a full layout library.
+
 # Code example:
 
 ```

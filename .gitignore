@@ -1,10 +1,11 @@
 # Build directory
+native/build*/
 generated/*.parsegraph
 generated/*.svg
 generated/*.png
 generated/preview-package.json
 dist-tools/
-parsegraph/
+/parsegraph/
 .DS_Store
 dependencygraph.svg
 
