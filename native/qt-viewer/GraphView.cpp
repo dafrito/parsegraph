@@ -2,6 +2,7 @@
 #include "GraphDocument.h"
 
 #include <QCursor>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QGuiApplication>
 #include <QKeyEvent>
@@ -233,6 +234,8 @@ GraphView::GraphView(QQuickItem *parent) : QQuickItem(parent)
     setActiveFocusOnTab(true);
 }
 
+GraphView::~GraphView() = default;
+
 void GraphView::setError(const QString &error)
 {
     if (error_ == error) return;
@@ -243,6 +246,16 @@ void GraphView::setError(const QString &error)
 void GraphView::setSource(const QString &source)
 {
     if (source_ == source) return;
+    if (source.startsWith(QStringLiteral("primes:"))) {
+        bool valid = false;
+        const int count = source.mid(7).toInt(&valid);
+        if (!valid) {
+            setError(QStringLiteral("A primes source must have the form primes:<count>."));
+            return;
+        }
+        loadPrimes(count);
+        return;
+    }
     source_ = source;
     emit sourceChanged();
     try {
@@ -258,6 +271,9 @@ void GraphView::setSource(const QString &source)
             validateDrawingRange(*document);
         }
         document_ = std::move(document);
+        primes_.reset();
+        primeCount_ = primeLimit_ = 0;
+        demoBuildStats_.clear();
         ++documentRevision_;
         clearSelection();
         updateOverlays();
@@ -269,6 +285,89 @@ void GraphView::setSource(const QString &source)
         // Retain the last good scene; the UI shows the requested source and error.
         setError(QString::fromUtf8(error.what()));
     }
+}
+
+bool GraphView::loadPrimes(int count, int sizingLimit)
+{
+    try {
+        QElapsedTimer timer;
+        timer.start();
+        auto session = std::make_unique<PrimesSession>(sizingLimit);
+        auto document = session->growTo(count);
+        validateDrawingRange(*document);
+        primes_ = std::move(session);
+        acceptPrimesDocument(std::move(document), true, timer.nsecsElapsed() / 1e6);
+        return true;
+    } catch (const std::exception &error) {
+        setError(QString::fromUtf8(error.what()));
+        return false;
+    }
+}
+
+bool GraphView::growPrimes(int targetCount)
+{
+    if (!primes_) {
+        setError(QStringLiteral("Load the primes demo before adding columns."));
+        return false;
+    }
+    if (targetCount < primeCount_ || targetCount > primeLimit_) {
+        setError(QStringLiteral("Growth must stay between the current count (%1) and sizing limit (%2).")
+                     .arg(primeCount_).arg(primeLimit_));
+        return false;
+    }
+    if (targetCount == primeCount_) {
+        setError({});
+        return true;
+    }
+    try {
+        QElapsedTimer timer;
+        timer.start();
+        auto document = primes_->growTo(targetCount);
+        validateDrawingRange(*document);
+        acceptPrimesDocument(std::move(document), false, timer.nsecsElapsed() / 1e6);
+        return true;
+    } catch (const std::exception &error) {
+        // The old immutable snapshot remains visible. Do not attempt further
+        // mutations after a native allocation or layout failure.
+        primes_.reset();
+        setError(QString::fromUtf8(error.what()));
+        return false;
+    }
+}
+
+void GraphView::acceptPrimesDocument(std::shared_ptr<GraphDocument> document,
+                                   bool coldStart, qreal totalMs)
+{
+    document_ = std::move(document);
+    primeCount_ = primes_->count();
+    primeLimit_ = primes_->limit();
+    const auto &metrics = primes_->metrics();
+    demoBuildStats_ = {
+        {QStringLiteral("count"), primeCount_},
+        {QStringLiteral("sizingLimit"), primeLimit_},
+        {QStringLiteral("coldStart"), coldStart},
+        {QStringLiteral("generationMs"), metrics.generationMs},
+        {QStringLiteral("layoutMs"), metrics.layoutMs},
+        {QStringLiteral("snapshotMs"), metrics.snapshotMs},
+        {QStringLiteral("totalMs"), totalMs},
+        {QStringLiteral("nodesCommitted"), qulonglong(metrics.nodesCommitted)},
+        {QStringLiteral("nodesMeasured"), qulonglong(metrics.nodesMeasured)},
+        {QStringLiteral("cleanSubtreesSkipped"), qulonglong(metrics.cleanSubtreesSkipped)},
+        {QStringLiteral("workUnits"), qulonglong(metrics.workUnits)},
+        {QStringLiteral("restarts"), qulonglong(metrics.restarts)}
+    };
+    const QString source = QStringLiteral("primes:%1").arg(primeCount_);
+    if (source_ != source) {
+        source_ = source;
+        emit sourceChanged();
+    }
+    ++documentRevision_;
+    clearSelection();
+    updateOverlays();
+    setError({});
+    emit documentChanged();
+    if (coldStart || autoFit_) fitGraph();
+    update();
 }
 
 int GraphView::nodeCount() const { return document_ ? int(document_->nodes().size()) : 0; }
@@ -371,9 +470,12 @@ QSGNode *GraphView::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     auto *scene = static_cast<GraphSceneNode *>(oldNode);
     if (!scene) scene = new GraphSceneNode;
     if (scene->documentRevision != documentRevision_) {
+        QElapsedTimer timer;
+        timer.start();
         clearChildren(scene->groups);
         if (document_) {
             buildGroups(scene->groups, window(), *document_);
+            lastSceneBuildMs_.store(timer.nsecsElapsed() / 1e6);
             geometryBuildCount_.fetch_add(1);
             QMetaObject::invokeMethod(this, [this] { emit geometryBuildCountChanged(); },
                                       Qt::QueuedConnection);

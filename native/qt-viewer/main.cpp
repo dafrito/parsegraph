@@ -1,4 +1,5 @@
 #include "GraphView.h"
+#include "ViewerBenchmark.h"
 
 #include <QCommandLineParser>
 #include <QFileInfo>
@@ -23,11 +24,36 @@ int main(int argc, char **argv) {
     parser.addPositionalArgument("document", "A v1 .parsegraph document; defaults to the bundled proportion demo.", "[document]");
     parser.addOption({"snapshot", "Save the complete viewer window as PNG, then exit.", "file"});
     parser.addOption({"quit-after", "Exit after this many milliseconds (for smoke checks).", "milliseconds"});
+    parser.addOption({"primes", "Generate the native primes demo through this number (1..1000).", "count"});
+    parser.addOption({"prime-limit", "Fixed sizing/growth limit (defaults to --primes count).", "count"});
+    parser.addOption({"benchmark", "Write a JSON viewer benchmark and exit; requires --primes.", "file"});
+    parser.addOption({"frames", "Camera frames sampled by --benchmark (1..10000).", "count", "120"});
+    parser.addOption({"growth-steps", "Append this many columns after the camera benchmark; requires room under --prime-limit.", "count", "0"});
     parser.process(app);
     if (parser.positionalArguments().size() > 1) parser.showHelp(1);
+    const auto integer = [&](const char *option, int minimum, int maximum) {
+        bool valid = false;
+        const int value = parser.value(option).toInt(&valid);
+        if (!valid || value < minimum || value > maximum) {
+            qCritical() << "Invalid --" << option << "; expected" << minimum << "through" << maximum;
+            parser.showHelp(1);
+        }
+        return value;
+    };
+    const bool primes = parser.isSet("primes"), benchmark = parser.isSet("benchmark");
+    if ((primes && !parser.positionalArguments().isEmpty()) ||
+        (!primes && (benchmark || parser.isSet("prime-limit"))) ||
+        (!benchmark && (parser.isSet("frames") || parser.isSet("growth-steps"))) ||
+        (benchmark && (parser.isSet("snapshot") || parser.isSet("quit-after"))))
+        parser.showHelp(1);
+    const int primeCount = primes ? integer("primes", 1, 1000) : 0;
+    const int primeLimit = parser.isSet("prime-limit") ? integer("prime-limit", primeCount, 1000) : primeCount;
+    const int frames = benchmark ? integer("frames", 1, 10000) : 0;
+    const int growthSteps = benchmark ? integer("growth-steps", 0, primeLimit - primeCount) : 0;
     QString source = ":/viewer/assets/proportion.parsegraph";
     if (!parser.positionalArguments().isEmpty())
         source = QFileInfo(parser.positionalArguments().first()).absoluteFilePath();
+    if (primes) source.clear();
 
     qmlRegisterType<pgqt::GraphView>("Parsegraph.Native", 1, 0, "GraphView");
     QQmlApplicationEngine engine;
@@ -36,6 +62,18 @@ int main(int argc, char **argv) {
     if (engine.rootObjects().isEmpty()) return 1;
     auto *window = qobject_cast<QQuickWindow *>(engine.rootObjects().first());
     if (!window) return 1;
+    auto *view = window->findChild<pgqt::GraphView *>("graphView");
+    if (!view) return 1;
+    if (benchmark) {
+        auto *runner = new pgqt::ViewerBenchmark(window, view,
+            QFileInfo(parser.value("benchmark")).absoluteFilePath(), frames, growthSteps);
+        QTimer::singleShot(0, runner, [runner, primeCount, primeLimit] {
+            runner->start(primeCount, primeLimit);
+        });
+    } else if (primes && !view->loadPrimes(primeCount, primeLimit)) {
+        qCritical() << "Could not generate primes:" << view->error();
+        return 1;
+    }
 
     QObject::connect(window, &QQuickWindow::sceneGraphInitialized, window, [window] {
         qInfo() << "Parsegraph Qt renderer:" << window->rendererInterface()->graphicsApi();

@@ -77,3 +77,21 @@ The 2,004-node group scenario retained all 2,001 large-group local caches after 
 The first benchmark run exposed unnecessary cache invalidation when changing the large group's own scale. This is now fixed: scale changes invalidate the affected outer coordinate space, while a layout commit advances a group's local generation only when its local geometry changes. The group root is still remeasured, so a host's scale-dependent measurement callback can intentionally change the geometry and invalidate those caches. Separate layout tests cover that case. This benchmark's fixed dimensions require all local caches to survive each of the four group scenarios.
 
 There is no TypeScript timing comparison in this benchmark. Native-versus-TypeScript speed claims require a separate harness with identical graph generation, callback work, cold/warm state, and build configuration.
+
+## Primes demo
+
+`parsegraph_primes_benchmark` uses the same native C generator as the Qt viewer.
+It defaults to counts 30, 100, 300, and 1,000, measuring cold construction/layout
+and retained-graph growth in batches of one and ten columns. Use `--count N`
+for one size and `--repeats N` for repeated trials. The CSV separates topology
+construction from layout, with per-update layout percentiles and cumulative
+layout work counters. It uses a monotonic clock. Growth excludes the initial
+root-only setup and fixes cell dimensions from the final target count.
+
+```sh
+native/build-qt/parsegraph_primes_benchmark --repeats 3 \
+  > native/build-qt/primes-native.csv
+```
+
+See [primes results](../qt-viewer/PRIMES_PERFORMANCE.md) for the native growth
+measurements alongside real Qt snapshot, scene-building, and camera timings.

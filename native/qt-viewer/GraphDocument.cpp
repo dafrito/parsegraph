@@ -2,6 +2,7 @@
 
 #include "parsegraph/layout.h"
 #include "parsegraph/paint.h"
+#include "primes.h"
 #include <QGuiApplication>
 #include <QFontDatabase>
 #include <QHash>
@@ -14,6 +15,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <chrono>
 #include <limits>
 #include <stdexcept>
 
@@ -239,6 +241,114 @@ void collectRect(double x, double y, double width, double height, void *opaque) 
     sink.rects->push_back({rect(x, y, width, height), sink.color});
 }
 
+struct DrawingRecord {
+    QString id, text;
+    bool hasLabel = false, slot = false;
+    double textWidth = 0, textHeight = 0;
+    Style style;
+};
+
+// Both document loading and direct generators finish at this boundary. The
+// resulting snapshots contain no pointers into mutable native graph storage.
+template<typename Snapshot, typename Metadata>
+void collectSnapshot(Snapshot &data, pg_node *root, size_t nodeCount, Metadata metadata) {
+    const QColor bodyColor("#183646"), slotColor("#dbe6e8"),
+                 lineColor("#789694"), labelColor("#f4f6ee");
+    const double lineThickness = 1;
+    QHash<pg_node *, size_t> groupIndexes;
+    bool haveBounds = false;
+    for (auto *groupNode = root; groupNode; groupNode = pg_node_next_paint_group(groupNode, root)) {
+        const auto record = metadata(groupNode);
+        pg_transform absolute;
+        checked(pg_node_absolute_transform(groupNode, &absolute), "paint-group transform");
+        pg_rect groupBounds;
+        checked(pg_paint_group_bounds(groupNode, lineThickness, &groupBounds), "paint-group bounds");
+        PaintGroup group;
+        group.id = record.id;
+        group.position = QPointF(absolute.x, absolute.y);
+        group.scale = absolute.scale;
+        group.bounds = rect(groupBounds.x, groupBounds.y, groupBounds.width, groupBounds.height);
+        const auto worldBounds = worldRect(group.bounds, absolute);
+        data.bounds = haveBounds ? data.bounds.united(worldBounds) : worldBounds;
+        haveBounds = true;
+        groupIndexes.insert(groupNode, data.groups.size());
+        data.groups.push_back(std::move(group));
+    }
+    data.nodes.reserve(nodeCount);
+    for (auto *node = root; node; node = pg_node_next_preorder(node, root)) {
+        const auto record = metadata(node);
+        auto &group = data.groups[groupIndexes.value(pg_node_paint_group(node))];
+        RectSink lineSink{&group.lines, lineColor}, bodySink{&group.bodies, record.slot ? slotColor : bodyColor};
+        checked(pg_paint_node_lines(node, lineThickness, collectRect, &lineSink), "connector geometry");
+        checked(pg_paint_node_bounds(node, collectRect, &bodySink), "body geometry");
+        pg_transform absolute, local;
+        checked(pg_node_absolute_transform(node, &absolute), "node transform");
+        checked(pg_node_group_transform(node, &local), "node group transform");
+        double size[2], extent[2];
+        checked(pg_node_size(node, size), "node size");
+        checked(pg_node_extent_size(node, extent), "extent size");
+        const QRectF bounds = rect(absolute.x, absolute.y, size[0] * absolute.scale, size[1] * absolute.scale);
+        const double offsetX = pg_extent_offset(pg_node_extent(node, PG_DOWNWARD));
+        const double offsetY = pg_extent_offset(pg_node_extent(node, PG_FORWARD));
+        const QRectF extents = rect(absolute.x + (extent[0] / 2 - offsetX) * absolute.scale,
+                                   absolute.y + (extent[1] / 2 - offsetY) * absolute.scale,
+                                   extent[0] * absolute.scale, extent[1] * absolute.scale);
+        data.nodes.push_back({record.id, record.text, group.id, bounds, extents});
+        if (record.hasLabel && !record.text.isEmpty()) {
+            double left = -record.textWidth / 2, top = -record.textHeight / 2;
+            if (pg_node_child(node, PG_INWARD)) {
+                if (pg_node_alignment(node, PG_INWARD) == PG_ALIGN_INWARD_VERTICAL)
+                    top = -size[1] / 2 + record.style.paddingY;
+                else left = -size[0] / 2 + record.style.paddingX;
+            }
+            group.labels.push_back({record.text,
+                QPointF(local.x + left * local.scale, local.y + top * local.scale),
+                local.scale, labelColor});
+        }
+    }
+}
+
+QFont presentationFont(const Presentation &presentation) {
+    require(presentation.fontSize <= 16384,
+            "this viewer supports fontSize up to 16384 logical units");
+    QFont font;
+    font.setFamily(presentation.family == "sans-serif"
+        ? QFontDatabase::systemFont(QFontDatabase::GeneralFont).family()
+        : presentation.family);
+    font.setWeight(QFont::Normal);
+    font.setStyle(QFont::StyleNormal);
+    // Point sizing preserves fractional logical sizes on the default screen.
+    const auto *screen = QGuiApplication::primaryScreen();
+    const double dpi = screen ? screen->logicalDotsPerInchY() : 96;
+    font.setPointSizeF(presentation.fontSize * 72 / dpi);
+    return font;
+}
+
+double shapedWidth(const QString &line, const QFont &font) {
+    if (line.isEmpty()) return 0;
+    QTextLayout layout(line, font);
+    QTextOption option;
+    option.setWrapMode(QTextOption::NoWrap);
+    option.setFlags(QTextOption::IncludeTrailingSpaces);
+    layout.setTextOption(option);
+    layout.beginLayout();
+    auto shapedLine = layout.createLine();
+    double width = 0;
+    if (shapedLine.isValid()) {
+        // createLine alone leaves text unlaid-out. NoWrap keeps a complete line.
+        shapedLine.setLineWidth(1e9);
+        width = shapedLine.naturalTextWidth();
+    }
+    layout.endLayout();
+    require(std::isfinite(width) && width >= 0, "invalid shaped text width");
+    return width;
+}
+
+using Clock = std::chrono::steady_clock;
+double milliseconds(Clock::time_point start, Clock::time_point end) {
+    return std::chrono::duration<double, std::milli>(end - start).count();
+}
+
 } // namespace
 
 struct GraphDocument::Data {
@@ -370,18 +480,7 @@ std::shared_ptr<GraphDocument> GraphDocument::fromJson(const QByteArray &json,
         else data->ignored.append(it.key());
     }
     data->lineHeight = presentation.lineHeight;
-    require(presentation.fontSize <= 16384,
-            "this viewer supports fontSize up to 16384 logical units");
-    data->font.setFamily(presentation.family == "sans-serif"
-        ? QFontDatabase::systemFont(QFontDatabase::GeneralFont).family()
-        : presentation.family);
-    data->font.setWeight(QFont::Normal);
-    data->font.setStyle(QFont::StyleNormal);
-    // Point sizing preserves fractional logical font sizes. Qt resolves this
-    // against the same default screen for QTextLayout during measurement/draw.
-    const auto *screen = QGuiApplication::primaryScreen();
-    const double dpi = screen ? screen->logicalDotsPerInchY() : 96;
-    data->font.setPointSizeF(presentation.fontSize * 72 / dpi);
+    data->font = presentationFont(presentation);
     for (auto &record : records) {
         const auto style = presentation.nodeStyles.value(record.id, presentation.defaultStyle);
         record.style = presentation.styles.value(style);
@@ -391,22 +490,7 @@ std::shared_ptr<GraphDocument> GraphDocument::fromJson(const QByteArray &json,
         for (const auto &line : lines) {
             double width = 0;
             if (deterministicMetrics) width = static_cast<double>(line.toUcs4().size()) * 6;
-            else if (!line.isEmpty()) {
-                QTextLayout layout(line, data->font);
-                QTextOption option;
-                option.setWrapMode(QTextOption::NoWrap);
-                option.setFlags(QTextOption::IncludeTrailingSpaces);
-                layout.setTextOption(option);
-                layout.beginLayout();
-                auto shapedLine = layout.createLine();
-                if (shapedLine.isValid()) {
-                    // createLine() alone leaves its text unlaid-out. NoWrap
-                    // keeps this one complete line even beyond this width.
-                    shapedLine.setLineWidth(1e9);
-                    width = shapedLine.naturalTextWidth();
-                }
-                layout.endLayout();
-            }
+            else width = shapedWidth(line, data->font);
             require(std::isfinite(width) && width >= 0, "invalid shaped text width");
             record.textWidth = std::max(record.textWidth, width);
         }
@@ -443,60 +527,92 @@ std::shared_ptr<GraphDocument> GraphDocument::fromJson(const QByteArray &json,
     if (!layout) throw std::bad_alloc();
     checked(pg_layout_run(layout.get()), "layout");
 
-    const QColor bodyColor("#183646"), lineColor("#789694"), labelColor("#f4f6ee");
-    const double lineThickness = 1;
-    QHash<pg_node *, size_t> groupIndexes;
-    bool haveBounds = false;
-    for (auto *groupNode = root; groupNode; groupNode = pg_node_next_paint_group(groupNode, root)) {
-        const auto &record = *static_cast<Record *>(pg_node_value(groupNode));
-        pg_transform absolute;
-        checked(pg_node_absolute_transform(groupNode, &absolute), "paint-group transform");
-        pg_rect groupBounds;
-        checked(pg_paint_group_bounds(groupNode, lineThickness, &groupBounds), "paint-group bounds");
-        PaintGroup group;
-        group.id = record.id;
-        group.position = QPointF(absolute.x, absolute.y);
-        group.scale = absolute.scale;
-        group.bounds = rect(groupBounds.x, groupBounds.y, groupBounds.width, groupBounds.height);
-        const auto worldBounds = worldRect(group.bounds, absolute);
-        data->bounds = haveBounds ? data->bounds.united(worldBounds) : worldBounds;
-        haveBounds = true;
-        groupIndexes.insert(groupNode, data->groups.size());
-        data->groups.push_back(std::move(group));
-    }
-    data->nodes.reserve(records.size());
-    for (auto *node = root; node; node = pg_node_next_preorder(node, root)) {
+    collectSnapshot(*data, root, records.size(), [](pg_node *node) {
         const auto &record = *static_cast<Record *>(pg_node_value(node));
-        auto &group = data->groups[groupIndexes.value(pg_node_paint_group(node))];
-        RectSink lineSink{&group.lines, lineColor}, bodySink{&group.bodies, bodyColor};
-        checked(pg_paint_node_lines(node, lineThickness, collectRect, &lineSink), "connector geometry");
-        checked(pg_paint_node_bounds(node, collectRect, &bodySink), "body geometry");
-        pg_transform absolute, local;
-        checked(pg_node_absolute_transform(node, &absolute), "node transform");
-        checked(pg_node_group_transform(node, &local), "node group transform");
-        double size[2], extent[2];
-        checked(pg_node_size(node, size), "node size");
-        checked(pg_node_extent_size(node, extent), "extent size");
-        const QRectF bounds = rect(absolute.x, absolute.y, size[0] * absolute.scale, size[1] * absolute.scale);
-        const double offsetX = pg_extent_offset(pg_node_extent(node, PG_DOWNWARD));
-        const double offsetY = pg_extent_offset(pg_node_extent(node, PG_FORWARD));
-        const QRectF extents = rect(absolute.x + (extent[0] / 2 - offsetX) * absolute.scale,
-                                   absolute.y + (extent[1] / 2 - offsetY) * absolute.scale,
-                                   extent[0] * absolute.scale, extent[1] * absolute.scale);
-        data->nodes.push_back({record.id, record.text, group.id, bounds, extents});
-        if (record.hasLabel && !record.text.isEmpty()) {
-            double left = -record.textWidth / 2, top = -record.textHeight / 2;
-            if (pg_node_child(node, PG_INWARD)) {
-                if (pg_node_alignment(node, PG_INWARD) == PG_ALIGN_INWARD_VERTICAL)
-                    top = -size[1] / 2 + record.style.paddingY;
-                else left = -size[0] / 2 + record.style.paddingX;
-            }
-            group.labels.push_back({record.text,
-                QPointF(local.x + left * local.scale, local.y + top * local.scale),
-                local.scale, labelColor});
-        }
-    }
+        return DrawingRecord{record.id, record.text, record.hasLabel, false,
+                             record.textWidth, record.textHeight, record.style};
+    });
     return std::shared_ptr<GraphDocument>(new GraphDocument(std::move(data)));
+}
+
+struct PrimesSession::Data {
+    // Destruction order is deliberate: a layout borrows its root and painter.
+    std::unique_ptr<pg_primes, decltype(&pg_primes_free)> graph{nullptr, pg_primes_free};
+    std::unique_ptr<pg_layout, decltype(&pg_layout_free)> layout{nullptr, pg_layout_free};
+    int limit = 0;
+    double side = 0;
+    QFont font;
+    QHash<QString, double> textWidths;
+    PrimesMetrics metrics;
+
+    static pg_status measure(pg_node *, double out[2], void *opaque) {
+        const auto &data = *static_cast<Data *>(opaque);
+        out[0] = out[1] = data.side;
+        return PG_OK;
+    }
+    static double separation(pg_node *, pg_axis, pg_direction, bool, void *) {
+        return 0;
+    }
+};
+
+PrimesSession::PrimesSession(int sizingLimit) {
+    if (sizingLimit < 1 || sizingLimit > 1000)
+        throw std::invalid_argument("Primes limit must be between 1 and 1000");
+    require(qobject_cast<QGuiApplication *>(QCoreApplication::instance()) != nullptr,
+            "QGuiApplication must exist before creating a primes session");
+    data_ = std::make_unique<Data>();
+    data_->limit = sizingLimit;
+    data_->graph.reset(pg_primes_new(sizingLimit));
+    if (!data_->graph) throw std::bad_alloc();
+    data_->side = pg_primes_cell_side(data_->graph.get());
+    data_->font = presentationFont(Presentation{});
+    const pg_layout_painter painter{Data::measure, Data::separation, data_.get()};
+    data_->layout.reset(pg_layout_new(pg_primes_root(data_->graph.get()), &painter));
+    if (!data_->layout) throw std::bad_alloc();
+}
+PrimesSession::~PrimesSession() = default;
+int PrimesSession::count() const { return pg_primes_count(data_->graph.get()); }
+int PrimesSession::limit() const { return data_->limit; }
+const PrimesMetrics &PrimesSession::metrics() const { return data_->metrics; }
+
+std::shared_ptr<GraphDocument> PrimesSession::growTo(int target) {
+    if (target < count() || target > limit())
+        throw std::invalid_argument("Primes count must be between the current count and session limit");
+    const auto start = Clock::now();
+    checked(pg_primes_append(data_->graph.get(), target), "primes generation");
+    const auto generated = Clock::now();
+    pg_layout_clear_metrics(data_->layout.get());
+    checked(pg_layout_run(data_->layout.get()), "primes layout");
+    const auto laidOut = Clock::now();
+    pg_layout_metrics nativeMetrics;
+    pg_layout_get_metrics(data_->layout.get(), &nativeMetrics);
+    auto snapshot = std::make_unique<GraphDocument::Data>();
+    snapshot->font = data_->font;
+    snapshot->lineHeight = 10;
+    collectSnapshot(*snapshot, pg_primes_root(data_->graph.get()),
+                    pg_primes_node_count(data_->graph.get()), [this](pg_node *node) {
+        const auto &record = *static_cast<const pg_primes_record *>(pg_node_value(node));
+        const QString text = QString::fromLatin1(record.text);
+        double width = 0;
+        if (!text.isEmpty()) {
+            auto it = data_->textWidths.constFind(text);
+            if (it == data_->textWidths.cend()) {
+                width = shapedWidth(text, data_->font);
+                data_->textWidths.insert(text, width);
+            } else width = *it;
+        }
+        return DrawingRecord{QString::fromLatin1(record.id), text, true, text.isEmpty(),
+                             width, 10, {data_->side, data_->side, 3, 2.5, true}};
+    });
+    const auto captured = Clock::now();
+    data_->metrics = {milliseconds(start, generated), milliseconds(generated, laidOut),
+                      milliseconds(laidOut, captured),
+                      static_cast<size_t>(nativeMetrics.nodes_committed),
+                      static_cast<size_t>(nativeMetrics.nodes_measured),
+                      static_cast<size_t>(nativeMetrics.clean_subtrees_skipped),
+                      static_cast<size_t>(nativeMetrics.work_units),
+                      static_cast<size_t>(nativeMetrics.restarts)};
+    return std::shared_ptr<GraphDocument>(new GraphDocument(std::move(snapshot)));
 }
 
 } // namespace pgqt

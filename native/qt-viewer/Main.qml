@@ -15,6 +15,7 @@ ApplicationWindow {
     color: "#f3f5f7"
 
     component ActionButton: Button {
+        opacity: enabled ? 1 : 0.4
         font.pixelSize: 13
         font.weight: Font.Medium
         leftPadding: 13
@@ -36,7 +37,7 @@ ApplicationWindow {
     }
 
     header: Rectangle {
-        height: 112
+        height: 158
         color: "#ffffff"
         Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: "#dce3e9" }
         Row {
@@ -49,7 +50,7 @@ ApplicationWindow {
             }
         }
         Text {
-            x: 24; y: 53; text: graph.source.indexOf(":/viewer/") === 0 ? "Proportion study" : graph.source.split("/").pop()
+            x: 24; y: 53; text: graph.primeCount > 0 ? "Primes · 1 through " + graph.primeCount : graph.source.indexOf(":/viewer/") === 0 ? "Proportion study" : graph.source.split("/").pop()
             font.pixelSize: 14; color: "#64748b"
         }
         Row {
@@ -59,7 +60,7 @@ ApplicationWindow {
             Text { text: graph.groupCount + " paint groups"; font.pixelSize: 11; color: "#64748b" }
         }
         Row {
-            anchors.right: parent.right; anchors.rightMargin: 24; anchors.verticalCenter: parent.verticalCenter; spacing: 8
+            anchors.right: parent.right; anchors.rightMargin: 24; y: 38; spacing: 8
             ActionButton { text: "Open…"; onClicked: fileDialog.open() }
             ActionButton { text: "Fit"; onClicked: { graph.fitGraph(); graph.forceActiveFocus() } }
             ActionButton { text: "−"; onClicked: graph.zoomOut() }
@@ -67,6 +68,26 @@ ApplicationWindow {
             ActionButton { text: "+"; onClicked: graph.zoomIn() }
             ActionButton { text: "Groups"; checkable: true; checked: graph.showGroups; onClicked: graph.showGroups = checked }
             ActionButton { text: "Extent bounds"; checkable: true; checked: graph.showExtents; onClicked: graph.showExtents = checked }
+        }
+        Row {
+            x: 24; y: 111; spacing: 8
+            ActionButton { text: "Proportion"; onClicked: graph.source = ":/viewer/assets/proportion.parsegraph" }
+            Text { anchors.verticalCenter: parent.verticalCenter; text: "Primes through"; font.pixelSize: 12; color: "#475569" }
+            SpinBox {
+                id: primeTarget; from: 1; to: 1000; value: graph.primeLimit > 0 ? graph.primeLimit : 100
+                editable: true; width: 116; height: 34
+                palette.base: "#ffffff"; palette.text: "#334155"
+                palette.button: "#edf2f5"; palette.buttonText: "#334155"
+            }
+            ActionButton { text: "Build"; onClicked: graph.loadPrimes(primeTarget.value, primeTarget.value) }
+            ActionButton { text: "Start at 1"; onClicked: graph.loadPrimes(1, primeTarget.value) }
+            ActionButton { text: "+1"; enabled: graph.primeCount > 0 && graph.primeCount < graph.primeLimit; onClicked: graph.growPrimes(graph.primeCount + 1) }
+            ActionButton { text: "+10"; enabled: graph.primeCount > 0 && graph.primeCount < graph.primeLimit; onClicked: graph.growPrimes(Math.min(graph.primeCount + 10, graph.primeLimit)) }
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: graph.primeCount > 0 ? "Fixed cells · limit " + graph.primeLimit : ""
+                font.pixelSize: 11; color: "#64748b"
+            }
         }
     }
 
@@ -98,7 +119,7 @@ ApplicationWindow {
         }
     }
     footer: Rectangle {
-        height: graph.ignoredCapabilities.length ? 58 : 36
+        height: graph.ignoredCapabilities.length || graph.primeCount > 0 ? 58 : 36
         color: "#ffffff"
         Rectangle { width: parent.width; height: 1; color: "#dce3e9" }
         Text {
@@ -113,6 +134,17 @@ ApplicationWindow {
             x: 24; y: 33; visible: graph.ignoredCapabilities.length > 0
             text: "Unsupported capabilities: " + graph.ignoredCapabilities.join(", ")
             font.pixelSize: 11; color: "#976c23"
+        }
+        Text {
+            x: 24; y: 33; visible: graph.primeCount > 0
+            text: {
+                const stats = graph.demoBuildStats
+                if (!stats || stats.layoutMs === undefined) return ""
+                return "Last update: build " + stats.generationMs.toFixed(1) + " ms · layout " + stats.layoutMs.toFixed(1)
+                    + " ms · snapshot " + stats.snapshotMs.toFixed(1) + " ms · scene CPU " + graph.lastSceneBuildMs.toFixed(1)
+                    + " ms · " + stats.nodesCommitted + " nodes laid out"
+            }
+            font.pixelSize: 11; color: "#64748b"
         }
     }
     FileDialog {

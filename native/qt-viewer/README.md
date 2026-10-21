@@ -2,7 +2,9 @@
 
 A read-only proof of concept using the C library for layout and Qt Quick for
 the window, input, text, and GPU drawing. The bundled proportion study has
-196 nodes and comes from the existing TypeScript generator. The executable
+196 nodes and comes from the existing TypeScript generator. The primes demo
+is generated directly through the C node/caret API, with append-only growth.
+The executable
 does not need Node.js, a browser, or a server at runtime.
 
 ## Build and run
@@ -40,6 +42,22 @@ the viewer itself does not depend on them. `-DBUILD_TESTING=OFF` omits all tests
 - Groups outlines each paint group's drawing bounds. Extent bounds displays
   the rectangular envelopes of nodes' extents, not their stepped profiles.
 - Open or drop a v1 `.parsegraph` file to load another graph.
+- Set **Primes through** (1–1,000), then **Build** for a complete graph, or
+  **Start at 1** followed by **+1** / **+10** to grow it. The target sets a fixed
+  math-cell size for that session; changing digit counts does not resize old
+  nodes. Blank cells use a lighter fill so the divisibility pattern is visible.
+- The footer reports the last native generation, layout, snapshot, and CPU
+  scene-building times. These are separate phases, not a frame-rate estimate.
+
+Generate primes directly, without an intermediate file:
+
+```sh
+native/build-qt/qt-viewer/parsegraph_viewer.app/Contents/MacOS/parsegraph_viewer \
+  --primes 1000
+```
+
+`--prime-limit 1000 --primes 30` starts smaller while allowing growth to 1,000.
+Without `--prime-limit`, the initial count is also the sizing/growth limit.
 
 Open the full 30-level, 1,024-node proportion example:
 
@@ -75,7 +93,7 @@ from malformed documents. String IDs remain opaque app-owned IDs.
 The proof of concept supports string/numeric text and missing values. Legacy v0
 and other content types are not supported. Unsupported capabilities are reported
 in the footer and ignored, including `appearance/1` for now; the viewer uses its
-own palette. There is no saving, editing, or regeneration of generator recipes.
+own palette. There is no saving, general editing, or regeneration of imported recipes.
 
 The GUI thread creates an immutable drawing snapshot. The render thread only
 uses that snapshot: it does not touch the C graph. Each paint group gets a Qt
@@ -83,7 +101,10 @@ transform node, batched body/connector vertices, and Qt-managed text nodes.
 Camera changes update the outer transform; they do not run layout, rebuild
 vertices, or recreate labels. Selection/diagnostic overlays update separately.
 This initial renderer loads the whole graph; it has no application-level
-visibility index, label level of detail, or incremental document editing yet.
+visibility index or label level of detail yet. Native primes growth retains
+the C graph and incremental layout job, but extracts a full new drawing
+snapshot and rebuilds the Qt scene. Paint-group geometry reuse across edits
+is a separate next step; camera motion already reuses the scene.
 
 The renderer uses Qt's hardware scene graph (Metal on macOS), not the Qt software
 scene-graph adaptation. Extremely large coordinates outside the renderer's
@@ -106,3 +127,46 @@ The viewport test creates a real Qt Quick window, checks rendered pixels,
 exercises wheel/drag/select/overlay behavior, and asserts navigation does not
 rebuild retained graph geometry. It needs a graphical session; the document test
 uses the offscreen platform. Full native tests remain available through CTest.
+
+The native primes tests check topology/divisibility, independent grid geometry,
+and incremental versus cold layouts. A TypeScript differential check compares
+the native generator with the existing TS generator. Qt tests compare generated
+snapshots with the document path, check lifetime/invalid input, and verify that
+growth uploads new geometry while panning does not.
+
+## Performance measurements
+
+Use a Release build and a quiet machine. The headless benchmark separates
+native construction from layout and compares cold layout with repeated growth:
+
+```sh
+native/build-qt/parsegraph_primes_benchmark --repeats 3 \
+  > native/build-qt/primes-native.csv
+```
+
+The real viewer can write a JSON report and exit:
+
+```sh
+native/build-qt/qt-viewer/parsegraph_viewer.app/Contents/MacOS/parsegraph_viewer \
+  --primes 1000 --benchmark native/build-qt/primes-1000.json
+native/build-qt/qt-viewer/parsegraph_viewer.app/Contents/MacOS/parsegraph_viewer \
+  --primes 990 --prime-limit 1000 --growth-steps 10 \
+  --benchmark native/build-qt/primes-growth.json
+```
+
+`--frames` defaults to 120 measured camera frames after 10 warmup frames.
+The report includes native phase metrics, full snapshot extraction, CPU scene
+creation/disposal, elapsed time through frame submission, camera frame interval
+percentiles, and each requested growth update. Growth refits the camera to
+include the new column. Construction, layout, and snapshot timings exclude
+session setup; `totalMs` also includes session setup and drawing-range validation,
+but excludes installing the snapshot and rendering. The elapsed submission time
+covers those additional steps and frame scheduling; the cold sample also includes
+initial graphics initialization.
+
+Scene CPU timing includes vertex/glyph construction and disposal of the previous
+scene, but not GPU execution. Frame intervals use render-thread `frameSwapped`
+timestamps: a frame has been queued for presentation, not necessarily displayed.
+They include display pacing and must not be interpreted as isolated GPU time.
+Camera measurements reuse the completed graph; the growth measurements are the
+ones that exercise layout and scene updates. See [recorded results](PRIMES_PERFORMANCE.md).
