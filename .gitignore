@@ -1,4 +1,9 @@
 # Build directory
+generated/*.parsegraph
+generated/*.svg
+generated/*.png
+generated/preview-package.json
+dist-tools/
 parsegraph/
 .DS_Store
 dependencygraph.svg

@@ -40,6 +40,11 @@ is currently no coverage threshold.
 
 ## Package script inventory
 
+For the Freeform v1 migration, use the verified local preview described in
+[the handoff guide](docs/freeform-handoff.md). `yarn pack:preview` produces an
+installable npm tarball with its own content-derived prerelease version, without
+changing this checkout's version or publishing to the registry.
+
 | Command (`yarn ...`) | Purpose and CI use |
 | --- | --- |
 | `all` | Runs the fixing lint command, coverage, development build, and docs. Omits production build/packaging; CI uses explicit steps instead. |
@@ -48,6 +53,21 @@ is currently no coverage threshold.
 | `build:prod` | Minified production UMD bundle and declarations in `dist-prod/src`. Checked in CI. |
 | `build:prod:watch` | Production build in watch mode; local use. |
 | `dependencygraph` | Generates `dependencygraph.svg`. Requires external `ts_dependency_graph` and Graphviz `dot`, neither installed by this package; excluded from CI. |
+| `examples:check` | Type-checks the standalone TypeScript generators. |
+| `pack:preview` | Builds production code, packs a uniquely versioned local preview, and verifies its extracted public APIs and all three geometry fixtures. Writes the artifact receipt to `generated/preview-package.json`. |
+| `generate:proportion` | Generates `generated/proportion.parsegraph` in legacy v0 format for current Freeform builds. |
+| `generate:proportion:v1` | Generates `generated/proportion-v1.parsegraph` using the draft v1 envelope and proportional presentation capability. |
+| `generate:ulam` | Generates `generated/ulam.parsegraph` with v1 math presentation and prime/composite style assignments. |
+| `generate:ulam:v0` | Generates legacy `generated/ulam-v0.parsegraph`, without presentation or prime style assignments. |
+| `generate:primes` | Generates `generated/primes.parsegraph`, a static prime-divisor chart with v1 math presentation. |
+| `generate:primes:v0` | Generates legacy `generated/primes-v0.parsegraph`, without block/slot presentation. |
+| `generate:memory-piers` | Generates v1 `generated/memory-piers.parsegraph` with seeded random branches, presentation, and a `generation/1` recipe. |
+| `generate:memory-piers:v0` | Generates legacy `generated/memory-piers-v0.parsegraph`, losing presentation and the embedded recipe. |
+| `generate:rainbow` | Generates `generated/rainbow.parsegraph`, porting Freeform's color grid with optional appearance/1. |
+| `generate:rainbow:vertical` | Generates the vertical variant in `generated/rainbow-vertical.parsegraph`. |
+| `svg:check` | Type-checks the SVG exporter. |
+| `svg:build` | Bundles the browser renderer into `dist-tools/svg/`. |
+| `render:svg` | Builds the renderer and exports an input graph to SVG using locally installed Chrome/Chromium. Local tool; browser exports are not currently run in CI. |
 | `test` | Jest in jsdom, with caching disabled. Covered by `test:cov` in CI. |
 | `test:watch` | Interactive Jest watch mode; local use. |
 | `test:cov` | Runs the same tests and writes coverage to `dist/coverage`. CI adds `--ci --runInBand`. |

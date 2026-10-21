@@ -3927,6 +3927,11 @@ parse5@^7.0.0, parse5@^7.1.1:
   dependencies:
     entities "^4.4.0"
 
+parsegraph-color@1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/parsegraph-color/-/parsegraph-color-1.5.1.tgz#6fc5ba4908f8861c55b988aa8d84d45caa0216f4"
+  integrity sha512-TzJnb1rx7pzz8SokYiBGDSdDFZ9CjQfWdsBUC/LLII0SzOQlziN/X6V0zxeOcSj68VFKLx82dQHwZW8DIkaoDA==
+
 path-exists@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/path-exists/-/path-exists-3.0.0.tgz"

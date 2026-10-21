@@ -1,5 +1,16 @@
 # Development
 
+See [graph generators](examples/README.md) to create example `.parsegraph` files
+in `generated/` using the Node/Caret API.
+
+Use the [SVG exporter](tools/svg/README.md) to turn those files into standalone
+images or thumbnails, with browser-measured text and the core layout algorithm.
+
+See [the `.parsegraph` serialization format](SERIALIZATION.md) for node data,
+file structure, generator examples, and Freeform interoperability.
+The [v1 draft specification](docs/parsegraph-v1.md) defines the new capability-based
+document format and presentation rules, with migration guidance for Freeform.
+
 See [CI and deploying](DEPLOYING.md) for the package script inventory, local
 validation commands, GitHub Actions checks, and deployment notes.
 
