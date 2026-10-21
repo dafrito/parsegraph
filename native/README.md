@@ -154,6 +154,11 @@ It constructs a graph through Caret, lays it out, and writes SVG using only the
 public API and libc. This demonstrates the boundary between library and renderer;
 it is not a `.parsegraph` file importer.
 
+An optional [Qt Quick viewer](qt-viewer/README.md) opens v1 documents through
+the native library, with a bundled proportion demo, pan/zoom, node selection,
+and paint-group/extent-bound overlays. Enable `PARSEGRAPH_BUILD_QT_VIEWER` to
+build it with Qt 6.7 or newer; Qt is not required by the core library.
+
 ## Validation and performance
 
 CTest covers enums, ownership and randomized topology, Caret stacks/marks,
