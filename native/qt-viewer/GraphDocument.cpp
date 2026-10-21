@@ -17,6 +17,7 @@
 #include <cmath>
 #include <chrono>
 #include <limits>
+#include <optional>
 #include <stdexcept>
 
 namespace pgqt {
@@ -162,6 +163,60 @@ Presentation presentationFromJson(const QJsonValue &value, const QHash<QString, 
     return result;
 }
 
+struct NodeAppearance {
+    QColor background, border, text, line;
+};
+struct Appearance {
+    NodeAppearance defaults;
+    QHash<QString, NodeAppearance> nodeStyles;
+    QColor pageBackground;
+};
+QColor appearanceColor(const QJsonValue &value) {
+    require(value.isString(), "appearance color must be #RRGGBB");
+    const auto text = value.toString();
+    require(text.size() == 7 && text[0] == '#', "appearance color must be #RRGGBB");
+    for (qsizetype i = 1; i < text.size(); ++i) {
+        const auto c = text[i].unicode();
+        require((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') ||
+                    (c >= 'A' && c <= 'F'), "appearance color must be #RRGGBB");
+    }
+    return QColor(text);
+}
+double appearanceAlpha(const QJsonValue &value) {
+    const auto alpha = number(value, "appearance alpha");
+    require(alpha <= 1, "appearance alpha exceeds 1");
+    return alpha;
+}
+NodeAppearance appearanceStyle(const QJsonValue &value, const NodeAppearance &base,
+                               bool partial) {
+    const auto style = object(value, "appearance style");
+    const QStringList keys{"backgroundColor", "backgroundAlpha", "borderColor", "borderAlpha",
+                           "textColor", "textAlpha", "lineColor", "lineAlpha"};
+    fields(style, partial ? QStringList{} : keys, partial ? keys : QStringList{});
+    const auto resolve = [&style](const QString &name, const QColor &fallback) {
+        const auto colorKey = name + "Color", alphaKey = name + "Alpha";
+        auto result = style.contains(colorKey) ? appearanceColor(style[colorKey]) : fallback;
+        result.setAlphaF(style.contains(alphaKey) ? appearanceAlpha(style[alphaKey]) : fallback.alphaF());
+        return result;
+    };
+    return {resolve("background", base.background), resolve("border", base.border),
+            resolve("text", base.text), resolve("line", base.line)};
+}
+Appearance appearanceFromJson(const QJsonValue &value, const QHash<QString, size_t> &ids) {
+    const auto obj = object(value, "appearance/1");
+    fields(obj, {"defaults", "nodeStyles", "pageBackgroundColor", "pageBackgroundAlpha"});
+    Appearance result;
+    result.defaults = appearanceStyle(obj["defaults"], {}, false);
+    const auto overrides = object(obj["nodeStyles"], "appearance nodeStyles");
+    for (auto it = overrides.begin(); it != overrides.end(); ++it) {
+        require(ids.contains(it.key()), "appearance references missing node " + it.key());
+        result.nodeStyles.insert(it.key(), appearanceStyle(it.value(), result.defaults, true));
+    }
+    result.pageBackground = appearanceColor(obj["pageBackgroundColor"]);
+    result.pageBackground.setAlphaF(appearanceAlpha(obj["pageBackgroundAlpha"]));
+    return result;
+}
+
 struct Record {
     QString id, parentId, text;
     bool root = false, hasLabel = false, crease = false, rtl = false;
@@ -246,7 +301,23 @@ struct DrawingRecord {
     bool hasLabel = false, slot = false;
     double textWidth = 0, textHeight = 0;
     Style style;
+    std::optional<NodeAppearance> appearance;
 };
+
+// Four non-overlapping strips keep border alpha independent at the corners.
+// The decoration stays inside the measured body and never affects C layout.
+void collectBorder(std::vector<PaintRect> &out, const QRectF &body, double scale,
+                   const QColor &color) {
+    const double width = std::min({scale, body.width() / 2, body.height() / 2});
+    if (width <= 0) return;
+    out.push_back({QRectF(body.left(), body.top(), body.width(), width), color});
+    out.push_back({QRectF(body.left(), body.bottom() - width, body.width(), width), color});
+    const double middleHeight = body.height() - 2 * width;
+    if (middleHeight > 0) {
+        out.push_back({QRectF(body.left(), body.top() + width, width, middleHeight), color});
+        out.push_back({QRectF(body.right() - width, body.top() + width, width, middleHeight), color});
+    }
+}
 
 // Both document loading and direct generators finish at this boundary. The
 // resulting snapshots contain no pointers into mutable native graph storage.
@@ -278,12 +349,17 @@ void collectSnapshot(Snapshot &data, pg_node *root, size_t nodeCount, Metadata m
     for (auto *node = root; node; node = pg_node_next_preorder(node, root)) {
         const auto record = metadata(node);
         auto &group = data.groups[groupIndexes.value(pg_node_paint_group(node))];
-        RectSink lineSink{&group.lines, lineColor}, bodySink{&group.bodies, record.slot ? slotColor : bodyColor};
+        RectSink lineSink{&group.lines, record.appearance ? record.appearance->line : lineColor};
+        RectSink bodySink{&group.bodies, record.appearance ? record.appearance->background :
+                                                       record.slot ? slotColor : bodyColor};
         checked(pg_paint_node_lines(node, lineThickness, collectRect, &lineSink), "connector geometry");
         checked(pg_paint_node_bounds(node, collectRect, &bodySink), "body geometry");
         pg_transform absolute, local;
         checked(pg_node_absolute_transform(node, &absolute), "node transform");
         checked(pg_node_group_transform(node, &local), "node group transform");
+        if (record.appearance)
+            collectBorder(group.borders, group.bodies.back().rect, local.scale,
+                          record.appearance->border);
         double size[2], extent[2];
         checked(pg_node_size(node, size), "node size");
         checked(pg_node_extent_size(node, extent), "extent size");
@@ -303,7 +379,7 @@ void collectSnapshot(Snapshot &data, pg_node *root, size_t nodeCount, Metadata m
             }
             group.labels.push_back({record.text,
                 QPointF(local.x + left * local.scale, local.y + top * local.scale),
-                local.scale, labelColor});
+                local.scale, record.appearance ? record.appearance->text : labelColor});
         }
     }
 }
@@ -357,6 +433,7 @@ struct GraphDocument::Data {
     QRectF bounds;
     QFont font;
     qreal lineHeight = 10;
+    QColor pageBackground = QColor("#f3f5f7");
     QStringList ignored;
 };
 
@@ -367,6 +444,7 @@ const std::vector<NodeVisual> &GraphDocument::nodes() const { return data_->node
 QRectF GraphDocument::bounds() const { return data_->bounds; }
 QFont GraphDocument::font() const { return data_->font; }
 qreal GraphDocument::lineHeight() const { return data_->lineHeight; }
+QColor GraphDocument::pageBackgroundColor() const { return data_->pageBackground; }
 QStringList GraphDocument::ignoredCapabilities() const { return data_->ignored; }
 const NodeVisual *GraphDocument::hitTest(QPointF world) const {
     if (!std::isfinite(world.x()) || !std::isfinite(world.y())) return nullptr;
@@ -474,11 +552,14 @@ std::shared_ptr<GraphDocument> GraphDocument::fromJson(const QByteArray &json,
 
     auto data = std::make_unique<Data>();
     Presentation presentation;
+    std::optional<Appearance> appearance;
     for (auto it = capabilities.begin(); it != capabilities.end(); ++it) {
         require(!it.key().isEmpty(), "capability names cannot be empty");
         if (it.key() == "presentation/1") presentation = presentationFromJson(it.value(), ids);
+        else if (it.key() == "appearance/1") appearance = appearanceFromJson(it.value(), ids);
         else data->ignored.append(it.key());
     }
+    if (appearance) data->pageBackground = appearance->pageBackground;
     data->lineHeight = presentation.lineHeight;
     data->font = presentationFont(presentation);
     for (auto &record : records) {
@@ -527,10 +608,12 @@ std::shared_ptr<GraphDocument> GraphDocument::fromJson(const QByteArray &json,
     if (!layout) throw std::bad_alloc();
     checked(pg_layout_run(layout.get()), "layout");
 
-    collectSnapshot(*data, root, records.size(), [](pg_node *node) {
+    collectSnapshot(*data, root, records.size(), [&appearance](pg_node *node) {
         const auto &record = *static_cast<Record *>(pg_node_value(node));
         return DrawingRecord{record.id, record.text, record.hasLabel, false,
-                             record.textWidth, record.textHeight, record.style};
+                             record.textWidth, record.textHeight, record.style,
+                             appearance ? std::optional<NodeAppearance>(
+                                 appearance->nodeStyles.value(record.id, appearance->defaults)) : std::nullopt};
     });
     return std::shared_ptr<GraphDocument>(new GraphDocument(std::move(data)));
 }
@@ -556,8 +639,9 @@ struct PrimesSession::Data {
 };
 
 PrimesSession::PrimesSession(int sizingLimit) {
-    if (sizingLimit < 1 || sizingLimit > 1000)
-        throw std::invalid_argument("Primes limit must be between 1 and 1000");
+    if (sizingLimit < 1 || sizingLimit > PG_PRIMES_MAX_COUNT)
+        throw std::invalid_argument("Primes limit must be between 1 and " +
+                                    std::to_string(PG_PRIMES_MAX_COUNT));
     require(qobject_cast<QGuiApplication *>(QCoreApplication::instance()) != nullptr,
             "QGuiApplication must exist before creating a primes session");
     data_ = std::make_unique<Data>();
@@ -602,7 +686,7 @@ std::shared_ptr<GraphDocument> PrimesSession::growTo(int target) {
             } else width = *it;
         }
         return DrawingRecord{QString::fromLatin1(record.id), text, true, text.isEmpty(),
-                             width, 10, {data_->side, data_->side, 3, 2.5, true}};
+                             width, 10, {data_->side, data_->side, 3, 2.5, true}, std::nullopt};
     });
     const auto captured = Clock::now();
     data_->metrics = {milliseconds(start, generated), milliseconds(generated, laidOut),

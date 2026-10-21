@@ -42,7 +42,7 @@ the viewer itself does not depend on them. `-DBUILD_TESTING=OFF` omits all tests
 - Groups outlines each paint group's drawing bounds. Extent bounds displays
   the rectangular envelopes of nodes' extents, not their stepped profiles.
 - Open or drop a v1 `.parsegraph` file to load another graph.
-- Set **Primes through** (1–1,000), then **Build** for a complete graph, or
+- Set **Primes through** (1–10,000), then **Build** for a complete graph, or
   **Start at 1** followed by **+1** / **+10** to grow it. The target sets a fixed
   math-cell size for that session; changing digit counts does not resize old
   nodes. Blank cells use a lighter fill so the divisibility pattern is visible.
@@ -58,6 +58,12 @@ native/build-qt/qt-viewer/parsegraph_viewer.app/Contents/MacOS/parsegraph_viewer
 
 `--prime-limit 1000 --primes 30` starts smaller while allowing growth to 1,000.
 Without `--prime-limit`, the initial count is also the sizing/growth limit.
+Both options accept counts up to 10,000. This produces 6,564,833 nodes and
+31,193 paint groups; the native node/label records alone require about 5.28 GiB
+on this ARM64 build, before layout buffers, snapshots, Qt geometry, and allocator
+overhead. The full viewer needs substantially more memory. A count of 2,000
+already exercises 331,253 nodes and 2,402 groups, including additional creases
+within factor columns.
 
 Open the full 30-level, 1,024-node proportion example:
 
@@ -85,15 +91,37 @@ Regenerate the bundled document with the canonical generator:
 
 ## Scope and rendering
 
-`GraphDocument` reads the v1 core and `presentation/1`, measures text using Qt,
+`GraphDocument` reads the v1 core, `presentation/1`, and `appearance/1`, measures text using Qt,
 and runs the C layout algorithm. It validates connections before constructing
 them: the C API's tolerant replacement behavior must not silently discard nodes
 from malformed documents. String IDs remain opaque app-owned IDs.
 
 The proof of concept supports string/numeric text and missing values. Legacy v0
-and other content types are not supported. Unsupported capabilities are reported
-in the footer and ignored, including `appearance/1` for now; the viewer uses its
-own palette. There is no saving, general editing, or regeneration of imported recipes.
+and other content types are not supported. Unsupported capabilities, including
+`generation/1`, are reported in the footer and ignored. There is no saving,
+general editing, or regeneration of imported recipes.
+
+`appearance/1` supplies node fills, borders, labels, outgoing connectors, and
+the page background, each with independent alpha. Sparse node overrides resolve
+against the capability's complete defaults, without inheritance from parents or
+presentation style names. A transparent fill does not hide its border or text.
+The page background stays fixed to the viewport when the camera moves; its alpha
+composites over the host surface (the standalone app uses a light gray surface).
+Borders are one node-local unit wide, inset and clamped to the body dimensions,
+so decoration does not change layout bounds. These decorations can differ from
+the SVG viewer's stroke widths and corner shapes while honoring the same colors.
+Malformed supported appearance is rejected. Documents without the capability
+retain the native palette.
+
+Open the shared color fixture or generate a colored Rainbow document:
+
+```sh
+native/build-qt/qt-viewer/parsegraph_viewer.app/Contents/MacOS/parsegraph_viewer \
+  examples/fixtures/appearance-colors.parsegraph
+yarn generate:rainbow --count 12 --output generated/native-rainbow.parsegraph
+native/build-qt/qt-viewer/parsegraph_viewer.app/Contents/MacOS/parsegraph_viewer \
+  generated/native-rainbow.parsegraph
+```
 
 The GUI thread creates an immutable drawing snapshot. The render thread only
 uses that snapshot: it does not touch the C graph. Each paint group gets a Qt
@@ -122,11 +150,14 @@ ctest --test-dir native/build-qt -R '^qt_' --output-on-failure
 ```
 
 The document test covers the three committed proportion geometry fixtures,
-proportional endpoint alignment with actual text metrics, and invalid documents.
+proportional endpoint alignment with actual text metrics, appearance resolution
+and validation, and invalid documents.
 The viewport test creates a real Qt Quick window, checks rendered pixels,
 exercises wheel/drag/select/overlay behavior, and asserts navigation does not
 rebuild retained graph geometry. It needs a graphical session; the document test
 uses the offscreen platform. Full native tests remain available through CTest.
+Appearance checks also inspect rendered pixels for independent fill/border/text
+alpha, parent-owned connector color, and page compositing over the host surface.
 
 The native primes tests check topology/divisibility, independent grid geometry,
 and incremental versus cold layouts. A TypeScript differential check compares
@@ -142,6 +173,13 @@ native construction from layout and compares cold layout with repeated growth:
 ```sh
 native/build-qt/parsegraph_primes_benchmark --repeats 3 \
   > native/build-qt/primes-native.csv
+```
+
+For larger counts, use `--cold-only` to measure construction and one layout
+without also running thousands of incremental updates:
+
+```sh
+native/build-qt/parsegraph_primes_benchmark --count 2000 --cold-only
 ```
 
 The real viewer can write a JSON report and exit:

@@ -37,7 +37,7 @@ static pg_layout *new_layout(pg_primes *p) {
  * the text, not factor multiplicity. This does not duplicate the builder's
  * incremental known-prime table or its caret traversal. */
 static void verify(pg_primes *p) {
-    size_t index = 0, groups = 0;
+    size_t index = 0, groups = 0, expected_groups = 1;
     pg_node *previous_base = NULL;
     double side = pg_primes_cell_side(p);
     for (int number = 1; number <= pg_primes_count(p); ++number) {
@@ -76,6 +76,10 @@ static void verify(pg_primes *p) {
             near(local.scale * group.scale, world.scale);
             previous_cell = cell->node;
         }
+        /* Each column creases every 250 existing primes. A newly discovered
+         * prime belongs to the preceding group until the following column. */
+        const size_t existing_primes = (size_t)row - (prime(number) ? 1 : 0);
+        expected_groups += (existing_primes + 249) / 250;
         assert(!pg_node_child(previous_cell, PG_UPWARD));
         pg_transform base_world;
         OK(pg_node_absolute_transform(base->node, &base_world));
@@ -89,7 +93,7 @@ static void verify(pg_primes *p) {
         assert(pg_node_fit(node) == PG_FIT_LOOSE);
         groups += pg_node_is_paint_group(node);
     }
-    assert(groups == (pg_primes_count(p) < 3 ? 1 : (size_t)pg_primes_count(p)-1));
+    assert(groups == expected_groups);
     assert(!pg_node_child(previous_base, PG_FORWARD));
     double extent_size[2];
     OK(pg_node_extent_size(pg_primes_root(p), extent_size));
@@ -156,7 +160,7 @@ static void growth_matches_cold(void) {
 }
 
 static void boundaries(void) {
-    assert(!pg_primes_new(0)); assert(!pg_primes_new(1001));
+    assert(!pg_primes_new(0)); assert(!pg_primes_new(PG_PRIMES_MAX_COUNT + 1));
     pg_primes_free(NULL);
     assert(pg_primes_append(NULL, 2) == PG_INVALID);
     pg_primes *p = pg_primes_new(1000); assert(p);
@@ -170,10 +174,41 @@ static void boundaries(void) {
     size_t nodes = pg_primes_node_count(p);
     OK(pg_primes_append(p, 30)); assert(nodes == pg_primes_node_count(p));
     pg_primes_free(p);
+
+    p = pg_primes_new(PG_PRIMES_MAX_COUNT); assert(p);
+    near(pg_primes_cell_side(p), 70);
+    assert(pg_primes_append(p, PG_PRIMES_MAX_COUNT + 1) == PG_RANGE);
+    assert(pg_primes_count(p) == 1 && pg_primes_node_count(p) == 1);
+    pg_primes_free(p);
+}
+
+static void growth_crosses_crease_boundary(void) {
+    /* 1597 is the 251st prime; column 1598 is the first to require a second
+     * factor paint group. Keep CI bounded instead of building all 6.56 million
+     * nodes at the maximum, while exercising growth beyond the old limit. */
+    pg_primes *p = pg_primes_new(PG_PRIMES_MAX_COUNT); assert(p);
+    OK(pg_primes_append(p, 1597));
+    pg_layout *layout = new_layout(p); OK(pg_layout_run(layout));
+    const size_t before = pg_primes_node_count(p);
+    const pg_primes_record *previous_last = pg_primes_record_at(p, before - 1);
+    assert(!strcmp(previous_last->id, "primes-1597-factor-1597"));
+    assert(!pg_node_is_creased(previous_last->node));
+
+    OK(pg_primes_append(p, 1598));
+    pg_layout_clear_metrics(layout); OK(pg_layout_run(layout));
+    pg_layout_metrics metrics; pg_layout_get_metrics(layout, &metrics);
+    assert(metrics.nodes_committed == pg_primes_node_count(p) - before + 1597);
+    assert(metrics.clean_subtrees_skipped == 1596);
+    const pg_primes_record *last = pg_primes_record_at(p, pg_primes_node_count(p) - 1);
+    assert(!strcmp(last->id, "primes-1598-factor-1597"));
+    assert(pg_node_is_creased(last->node));
+    assert(pg_node_paint_group(last->node) == last->node);
+    verify(p);
+    pg_layout_free(layout); pg_primes_free(p);
 }
 
 int main(void) {
-    boundaries(); topology_and_geometry(); growth_matches_cold();
+    boundaries(); topology_and_geometry(); growth_matches_cold(); growth_crosses_crease_boundary();
     puts("primes: topology, divisibility, creases, square geometry, incremental reuse and cold parity passed");
     return 0;
 }

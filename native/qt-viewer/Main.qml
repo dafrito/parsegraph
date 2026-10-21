@@ -74,8 +74,8 @@ ApplicationWindow {
             ActionButton { text: "Proportion"; onClicked: graph.source = ":/viewer/assets/proportion.parsegraph" }
             Text { anchors.verticalCenter: parent.verticalCenter; text: "Primes through"; font.pixelSize: 12; color: "#475569" }
             SpinBox {
-                id: primeTarget; from: 1; to: 1000; value: graph.primeLimit > 0 ? graph.primeLimit : 100
-                editable: true; width: 116; height: 34
+                id: primeTarget; from: 1; to: graph.maximumPrimeCount; value: graph.primeLimit > 0 ? graph.primeLimit : 100
+                editable: true; width: 132; height: 34
                 palette.base: "#ffffff"; palette.text: "#334155"
                 palette.button: "#edf2f5"; palette.buttonText: "#334155"
             }

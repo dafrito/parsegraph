@@ -1,5 +1,6 @@
 #include "GraphView.h"
 #include "ViewerBenchmark.h"
+#include "primes.h"
 
 #include <QCommandLineParser>
 #include <QFileInfo>
@@ -24,7 +25,8 @@ int main(int argc, char **argv) {
     parser.addPositionalArgument("document", "A v1 .parsegraph document; defaults to the bundled proportion demo.", "[document]");
     parser.addOption({"snapshot", "Save the complete viewer window as PNG, then exit.", "file"});
     parser.addOption({"quit-after", "Exit after this many milliseconds (for smoke checks).", "milliseconds"});
-    parser.addOption({"primes", "Generate the native primes demo through this number (1..1000).", "count"});
+    parser.addOption({"primes", QString("Generate the native primes demo through this number (1..%1).")
+        .arg(PG_PRIMES_MAX_COUNT), "count"});
     parser.addOption({"prime-limit", "Fixed sizing/growth limit (defaults to --primes count).", "count"});
     parser.addOption({"benchmark", "Write a JSON viewer benchmark and exit; requires --primes.", "file"});
     parser.addOption({"frames", "Camera frames sampled by --benchmark (1..10000).", "count", "120"});
@@ -46,8 +48,8 @@ int main(int argc, char **argv) {
         (!benchmark && (parser.isSet("frames") || parser.isSet("growth-steps"))) ||
         (benchmark && (parser.isSet("snapshot") || parser.isSet("quit-after"))))
         parser.showHelp(1);
-    const int primeCount = primes ? integer("primes", 1, 1000) : 0;
-    const int primeLimit = parser.isSet("prime-limit") ? integer("prime-limit", primeCount, 1000) : primeCount;
+    const int primeCount = primes ? integer("primes", 1, PG_PRIMES_MAX_COUNT) : 0;
+    const int primeLimit = parser.isSet("prime-limit") ? integer("prime-limit", primeCount, PG_PRIMES_MAX_COUNT) : primeCount;
     const int frames = benchmark ? integer("frames", 1, 10000) : 0;
     const int growthSteps = benchmark ? integer("growth-steps", 0, primeLimit - primeCount) : 0;
     QString source = ":/viewer/assets/proportion.parsegraph";

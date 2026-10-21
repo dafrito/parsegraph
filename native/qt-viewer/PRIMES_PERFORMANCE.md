@@ -95,3 +95,33 @@ passed with AddressSanitizer and UndefinedBehaviorSanitizer. TypeScript
 generator parity covers 1,823 nodes across six sizes; Qt document parity
 additionally covers labels and group-local drawing geometry. No C layout
 bug was found in this work.
+
+## Extended native limit: 10,000
+
+The native generator, viewer, and benchmark now accept up to 10,000, using a
+shared maximum and sized prime-table, pending-column, and benchmark-sample
+allocations. Routine regression checks cross 1597→1598, where a factor column
+first needs a second paint group. The 10,000 sizing limit is checked with a
+small graph; the full maximum graph is not part of CI.
+
+This development Mac is an Apple M1 with 8 GiB RAM. A complete count of 10,000
+contains 6,564,833 nodes and 31,193 paint groups. Multiplying the node count by
+the current 792-byte node and 72-byte label record gives **5.28 GiB** before
+extent allocations, pointer arrays, snapshots, GPU geometry, or allocator
+overhead. This is a calculated lower bound, not a measured peak. The full-size
+viewer was therefore not run on this machine.
+
+Three real viewer runs at 2,000 did complete: **331,253 nodes / 2,402 groups**.
+Median cold timings were construction **80.7 ms**, layout **148.6 ms**,
+snapshot **260.8 ms**, scene CPU **78.1 ms**, and start through first frame
+submission **891.0 ms**. Median camera frame intervals were **26.6–27.0 ms**
+across the three runs, with p95 **27.6–37.1 ms** and zero geometry rebuilds.
+Unlike the 1,000 case, this larger scene no longer followed the 75 Hz display
+rate. Layout and snapshot timing also varied considerably across these runs
+on the memory-constrained development machine.
+
+Raw runs are `native/build-qt/primes-2000-{1,2,3}.json`. All 18 Release checks
+passed after raising the limit. The native test and a 1,002-column benchmark
+also passed ASan/UBSan, exercising more than 1,000 timing samples and the
+additional paint-group boundary. `--cold-only` is available for large headless
+runs to avoid additionally performing thousands of incremental updates.

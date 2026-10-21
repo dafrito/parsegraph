@@ -157,7 +157,7 @@ void incremental() {
 
 void lifetime() {
     rejects([] { pgqt::PrimesSession invalid(0); });
-    rejects([] { pgqt::PrimesSession invalid(1001); });
+    rejects([] { pgqt::PrimesSession invalid(10001); });
     std::shared_ptr<pgqt::GraphDocument> retained;
     {
         pgqt::PrimesSession session(6);
@@ -167,6 +167,21 @@ void lifetime() {
     check(retained->hitTest(retained->nodes()[0].bounds.center()) != nullptr,
           "snapshot hit testing survives native graph destruction");
 }
+
+void maximumSizingLimit() {
+    // Exercise the maximum sizing/growth limit without allocating millions of
+    // nodes: the fixed target determines cell dimensions before later appends.
+    pgqt::PrimesSession session(10000);
+    check(session.limit() == 10000, "maximum sizing limit accepted");
+    const auto document = session.growTo(2);
+    check(document->nodes().size() == 3, "small initial graph at maximum limit");
+    for (const auto &node : document->nodes()) {
+        near(node.bounds.width(), 70, "five-digit sizing limit sets fixed cell width");
+        near(node.bounds.height(), 70, "five-digit sizing limit sets fixed cell height");
+    }
+    rejects([&] { session.growTo(10001); });
+    check(session.count() == 2, "exceeding maximum leaves graph unchanged");
+}
 } // namespace
 
 int main(int argc, char **argv) {
@@ -175,6 +190,7 @@ int main(int argc, char **argv) {
         canonical();
         incremental();
         lifetime();
+        maximumSizingLimit();
         // Optional externally generated canonical fixture for larger parity
         // runs: qt_primes_document_test document.parsegraph count.
         if (argc == 3) {

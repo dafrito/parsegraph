@@ -86,7 +86,9 @@ static void cold(int count, int repeat) {
 static void grow(int count, int batch, int repeat) {
     pg_primes *p = pg_primes_new(count); if (!p) fail("cannot allocate graph");
     pg_layout *layout = new_layout(p); check(pg_layout_run(layout));
-    double samples[1000], construction = 0, layout_ms = 0;
+    double *samples = malloc((size_t)count * sizeof(*samples));
+    if (!samples) fail("cannot allocate timing samples");
+    double construction = 0, layout_ms = 0;
     size_t sample_count = 0;
     pg_layout_metrics total = {0};
     while (pg_primes_count(p) < count) {
@@ -103,6 +105,7 @@ static void grow(int count, int batch, int repeat) {
         add_metrics(&total, &metrics);
     }
     row("growth", repeat, p, batch, sample_count, construction, layout_ms, samples, &total);
+    free(samples);
     pg_layout_free(layout); pg_primes_free(p);
 }
 static int integer(const char *text, int maximum) {
@@ -114,17 +117,22 @@ static int integer(const char *text, int maximum) {
 }
 int main(int argc, char **argv) {
     int requested_count = 0, repeats = 1;
+    bool cold_only = false;
     for (int i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--help")) {
-            puts("Usage: parsegraph_primes_benchmark [--count 1..1000] [--repeats 1..100]\n"
+            printf("Usage: parsegraph_primes_benchmark [--count 1..%d] [--repeats 1..100] [--cold-only]\n",
+                   PG_PRIMES_MAX_COUNT);
+            puts(
                  "Default counts: 30,100,300,1000; cold build and incremental batches 1/10.\n"
+                 "--cold-only skips incremental growth for large graph measurements.\n"
                  "Growth keeps the original layout and final-target cell size. Its timings\n"
                  "exclude initial root layout and report per-update layout percentiles.\n"
                  "CSV stdout; native topology construction and layout measured separately.");
             return 0;
         }
+        if (!strcmp(argv[i], "--cold-only")) { cold_only = true; continue; }
         if (i+1 >= argc) fail("missing argument value");
-        if (!strcmp(argv[i], "--count")) requested_count = integer(argv[++i], 1000);
+        if (!strcmp(argv[i], "--count")) requested_count = integer(argv[++i], PG_PRIMES_MAX_COUNT);
         else if (!strcmp(argv[i], "--repeats")) repeats = integer(argv[++i], 100);
         else fail("unknown argument");
     }
@@ -134,7 +142,8 @@ int main(int argc, char **argv) {
         size_t limit = requested_count ? 1 : sizeof(counts)/sizeof(*counts);
         for (size_t i = 0; i < limit; ++i) {
             int count = requested_count ? requested_count : counts[i];
-            cold(count, repeat); grow(count, 1, repeat); grow(count, 10, repeat);
+            cold(count, repeat);
+            if (!cold_only) { grow(count, 1, repeat); grow(count, 10, repeat); }
         }
     }
     return 0;

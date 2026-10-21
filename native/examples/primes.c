@@ -9,7 +9,7 @@ struct pg_primes {
     pg_primes_record **records;
     size_t size, capacity;
     int count, limit;
-    int known[1000];
+    int *known;
     size_t known_count;
     double side;
 };
@@ -42,10 +42,12 @@ static pg_primes_record *new_record(int number, int factor) {
 }
 
 pg_primes *pg_primes_new(int sizing_limit) {
-    if (sizing_limit < 1 || sizing_limit > 1000) return NULL;
+    if (sizing_limit < 1 || sizing_limit > PG_PRIMES_MAX_COUNT) return NULL;
     pg_primes *p = calloc(1, sizeof(*p));
     if (!p) return NULL;
     p->limit = sizing_limit;
+    p->known = malloc((size_t)sizing_limit * sizeof(*p->known));
+    if (!p->known) { pg_primes_free(p); return NULL; }
     int digits = 1;
     for (int n = sizing_limit; n >= 10; n /= 10) ++digits;
     p->side = (digits + 2) * 10.0;
@@ -65,6 +67,7 @@ void pg_primes_free(pg_primes *p) {
     if (p->size) pg_node_free_tree(p->records[0]->node);
     for (size_t i = 0; i < p->size; ++i) free(p->records[i]);
     free(p->records);
+    free(p->known);
     free(p);
 }
 
@@ -78,7 +81,8 @@ static pg_status append_column(pg_primes *p, int number) {
 
     /* Acquire the whole column before changing the graph. These are leaves,
      * so attaching through the public API avoids ancestry scans of subtrees. */
-    pg_primes_record *pending[1002] = {0};
+    pg_primes_record **pending = calloc(count, sizeof(*pending));
+    if (!pending) return PG_NOMEM;
     for (size_t i = 0; i < count; ++i) {
         int factor = !i ? 0 : i <= p->known_count ? p->known[i-1] : number;
         pending[i] = new_record(number, factor);
@@ -87,6 +91,7 @@ static pg_status append_column(pg_primes *p, int number) {
                 pg_node_free(pending[j]->node);
                 free(pending[j]);
             }
+            free(pending);
             return PG_NOMEM;
         }
     }
@@ -102,6 +107,7 @@ static pg_status append_column(pg_primes *p, int number) {
                 pg_node_free(pending[j]->node);
                 free(pending[j]);
             }
+            free(pending);
             return status;
         }
         /* Match spawnMove: inherited loose fit and perpendicular preference. */
@@ -112,6 +118,7 @@ static pg_status append_column(pg_primes *p, int number) {
     }
     (void)pg_caret_move_to(p->caret, pending[0]->node);
     for (size_t i = 0; i < count; ++i) p->records[p->size++] = pending[i];
+    free(pending);
     if (prime) p->known[p->known_count++] = number;
     p->count = number;
     return PG_OK;

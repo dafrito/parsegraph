@@ -2,6 +2,7 @@
 #define PARSEGRAPH_QT_GRAPH_VIEW_H
 
 #include <QQuickItem>
+#include <QColor>
 #include <QStringList>
 #include <QVariantMap>
 #include <atomic>
@@ -21,6 +22,7 @@ class GraphView : public QQuickItem {
     Q_PROPERTY(int nodeCount READ nodeCount NOTIFY documentChanged)
     Q_PROPERTY(int groupCount READ groupCount NOTIFY documentChanged)
     Q_PROPERTY(QStringList ignoredCapabilities READ ignoredCapabilities NOTIFY documentChanged)
+    Q_PROPERTY(QColor pageBackgroundColor READ pageBackgroundColor NOTIFY documentChanged)
     Q_PROPERTY(QString selectedId READ selectedId NOTIFY selectionChanged)
     Q_PROPERTY(QString selectedText READ selectedText NOTIFY selectionChanged)
     Q_PROPERTY(qreal zoom READ zoom NOTIFY zoomChanged)
@@ -30,6 +32,7 @@ class GraphView : public QQuickItem {
     Q_PROPERTY(qreal lastSceneBuildMs READ lastSceneBuildMs NOTIFY geometryBuildCountChanged)
     Q_PROPERTY(int primeCount READ primeCount NOTIFY documentChanged)
     Q_PROPERTY(int primeLimit READ primeLimit NOTIFY documentChanged)
+    Q_PROPERTY(int maximumPrimeCount READ maximumPrimeCount CONSTANT)
     Q_PROPERTY(QVariantMap demoBuildStats READ demoBuildStats NOTIFY documentChanged)
 
 public:
@@ -41,6 +44,7 @@ public:
     int nodeCount() const;
     int groupCount() const;
     QStringList ignoredCapabilities() const;
+    QColor pageBackgroundColor() const;
     QString selectedId() const { return selectedId_; }
     QString selectedText() const { return selectedText_; }
     qreal zoom() const { return zoom_; }
@@ -52,9 +56,11 @@ public:
     qreal lastSceneBuildMs() const { return lastSceneBuildMs_.load(); }
     int primeCount() const { return primeCount_; }
     int primeLimit() const { return primeLimit_; }
+    int maximumPrimeCount() const;
     QVariantMap demoBuildStats() const { return demoBuildStats_; }
 
-    Q_INVOKABLE bool loadPrimes(int count, int sizingLimit = 1000);
+    Q_INVOKABLE bool loadPrimes(int count);
+    Q_INVOKABLE bool loadPrimes(int count, int sizingLimit);
     Q_INVOKABLE bool growPrimes(int targetCount);
     Q_INVOKABLE void fitGraph();
     Q_INVOKABLE void zoomIn();

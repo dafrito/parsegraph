@@ -25,7 +25,7 @@ struct PaintGroup {
     QPointF position;
     qreal scale = 1;
     QRectF bounds;
-    std::vector<PaintRect> lines, bodies;
+    std::vector<PaintRect> lines, bodies, borders;
     std::vector<Label> labels;
 };
 struct NodeVisual {
@@ -50,6 +50,8 @@ public:
     QRectF bounds() const;
     QFont font() const;
     qreal lineHeight() const;
+    // Carries the page alpha through to the host surface; never precomposited.
+    QColor pageBackgroundColor() const;
     QStringList ignoredCapabilities() const;
     const NodeVisual *hitTest(QPointF world) const;
 

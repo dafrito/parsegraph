@@ -1,5 +1,6 @@
 #include "GraphView.h"
 #include "GraphDocument.h"
+#include "primes.h"
 
 #include <QCursor>
 #include <QElapsedTimer>
@@ -59,6 +60,7 @@ void validateDrawingRange(const GraphDocument &document)
                 && renderable(group.bounds));
         for (const auto &line : group.lines) require(renderable(line.rect));
         for (const auto &body : group.bodies) require(renderable(body.rect));
+        for (const auto &border : group.borders) require(renderable(border.rect));
         for (const auto &label : group.labels) {
             require(renderable(label.origin) && renderable(label.scale));
             require(renderable(group.scale * label.scale));
@@ -68,17 +70,24 @@ void validateDrawingRange(const GraphDocument &document)
         require(renderable(node.bounds) && renderable(node.extents));
 }
 
-// Camera changes alter this node's matrix only. Overlay nodes have their own
-// revision, so selecting a node does not rebuild graph vertices or glyphs.
-class GraphSceneNode final : public QSGTransformNode {
+// The page is viewport-sized, outside the camera transform. Camera changes
+// alter one matrix only. Overlays have a separate revision, so selection does
+// not rebuild graph vertices or glyphs.
+class GraphSceneNode final : public QSGNode {
 public:
     GraphSceneNode()
     {
-        appendChildNode(groups);
-        appendChildNode(overlays);
+        appendChildNode(background);
+        appendChildNode(camera);
+        camera->appendChildNode(groups);
+        camera->appendChildNode(overlays);
     }
+    QSGNode *background = new QSGNode;
+    QSGTransformNode *camera = new QSGTransformNode;
     QSGNode *groups = new QSGNode;
     QSGNode *overlays = new QSGNode;
+    QSizeF viewportSize;
+    QColor backgroundColor;
     quint64 documentRevision = 0;
     quint64 overlayRevision = 0;
 };
@@ -113,12 +122,14 @@ void appendRectangles(QSGNode *parent, const std::vector<PaintRect> &rectangles)
         geometry->setDrawingMode(QSGGeometry::DrawTriangles);
         geometry->setVertexDataPattern(QSGGeometry::StaticPattern);
         auto *vertex = geometry->vertexDataAsColoredPoint2D();
+        bool translucent = false;
         for (size_t i = start; i < start + count; ++i) {
             const auto &entry = rectangles[i];
             const auto &rect = entry.rect;
             const auto &color = entry.color;
             // QSGVertexColorMaterial expects premultiplied color components.
             const auto alpha = uchar(color.alpha());
+            translucent = translucent || alpha < 255;
             const auto red = uchar((color.red() * alpha + 127) / 255);
             const auto green = uchar((color.green() * alpha + 127) / 255);
             const auto blue = uchar((color.blue() * alpha + 127) / 255);
@@ -133,7 +144,9 @@ void appendRectangles(QSGNode *parent, const std::vector<PaintRect> &rectangles)
         }
         node->setGeometry(geometry);
         node->setFlag(QSGNode::OwnsGeometry);
-        node->setMaterial(new QSGVertexColorMaterial);
+        auto *material = new QSGVertexColorMaterial;
+        material->setFlag(QSGMaterial::Blending, translucent);
+        node->setMaterial(material);
         node->setFlag(QSGNode::OwnsMaterial);
         parent->appendChildNode(node);
     }
@@ -194,6 +207,7 @@ void buildGroups(QSGNode *parent, QQuickWindow *window, const GraphDocument &doc
         parent->appendChildNode(position);
         appendRectangles(position, group.lines);
         appendRectangles(position, group.bodies);
+        appendRectangles(position, group.borders);
         appendLabels(position, window, group, document);
     }
 }
@@ -287,6 +301,13 @@ void GraphView::setSource(const QString &source)
     }
 }
 
+int GraphView::maximumPrimeCount() const { return PG_PRIMES_MAX_COUNT; }
+
+bool GraphView::loadPrimes(int count)
+{
+    return loadPrimes(count, maximumPrimeCount());
+}
+
 bool GraphView::loadPrimes(int count, int sizingLimit)
 {
     try {
@@ -375,6 +396,11 @@ int GraphView::groupCount() const { return document_ ? int(document_->groups().s
 QStringList GraphView::ignoredCapabilities() const
 {
     return document_ ? document_->ignoredCapabilities() : QStringList {};
+}
+
+QColor GraphView::pageBackgroundColor() const
+{
+    return document_ ? document_->pageBackgroundColor() : QColor("#f3f5f7");
 }
 
 void GraphView::setShowGroups(bool visible)
@@ -469,6 +495,14 @@ QSGNode *GraphView::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
     auto *scene = static_cast<GraphSceneNode *>(oldNode);
     if (!scene) scene = new GraphSceneNode;
+    const QColor background = pageBackgroundColor();
+    if (scene->viewportSize != size() || scene->backgroundColor != background) {
+        clearChildren(scene->background);
+        if (width() > 0 && height() > 0 && background.alpha() > 0)
+            appendRectangles(scene->background, {{QRectF(QPointF(0, 0), size()), background}});
+        scene->viewportSize = size();
+        scene->backgroundColor = background;
+    }
     if (scene->documentRevision != documentRevision_) {
         QElapsedTimer timer;
         timer.start();
@@ -488,7 +522,7 @@ QSGNode *GraphView::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
             buildOverlays(scene->overlays, *document_, showGroups_, showExtents_, selectedId_);
         scene->overlayRevision = overlayRevision_;
     }
-    scene->setMatrix(sceneTransform(pan_, zoom_));
+    scene->camera->setMatrix(sceneTransform(pan_, zoom_));
     return scene;
 }
 
@@ -500,8 +534,8 @@ void GraphView::geometryChange(const QRectF &newGeometry, const QRectF &oldGeome
     else {
         pan_ += QPointF((newGeometry.width() - oldGeometry.width()) / 2,
                         (newGeometry.height() - oldGeometry.height()) / 2);
-        update();
     }
+    update(); // The page background also changes size without a document.
 }
 
 void GraphView::mousePressEvent(QMouseEvent *event)

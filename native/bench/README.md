@@ -83,7 +83,8 @@ There is no TypeScript timing comparison in this benchmark. Native-versus-TypeSc
 `parsegraph_primes_benchmark` uses the same native C generator as the Qt viewer.
 It defaults to counts 30, 100, 300, and 1,000, measuring cold construction/layout
 and retained-graph growth in batches of one and ten columns. Use `--count N`
-for one size and `--repeats N` for repeated trials. The CSV separates topology
+for one size (up to 10,000) and `--repeats N` for repeated trials. `--cold-only`
+skips the incremental runs when testing large graphs. The CSV separates topology
 construction from layout, with per-update layout percentiles and cumulative
 layout work counters. It uses a monotonic clock. Growth excludes the initial
 root-only setup and fixes cell dimensions from the final target count.

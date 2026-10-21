@@ -73,8 +73,9 @@ Passing the loaded state back to the writer preserves appearance and unknown
 capabilities. Deleting/renaming nodes requires updating appearance node IDs,
 just as it does for presentation assignments.
 
-The core library validates and preserves this capability; the SVG exporter also
-renders it. Freeform still needs its own read/write/render integration.
+The core library validates and preserves this capability. The SVG exporter and
+[native Qt viewer](../native/qt-viewer/README.md) render it; the native viewer is
+read-only and does not save documents.
 
 ## Freeform migration mapping
 

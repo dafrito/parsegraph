@@ -164,16 +164,229 @@ void validation() {
     auto future = fixture;
     capabilities = future["capabilities"].toObject();
     capabilities["future/42"] = QJsonArray{1, "opaque"};
-    capabilities["appearance/1"] = QJsonObject{{"arbitrary", true}};
     future["capabilities"] = capabilities;
     const auto ignored = load(future)->ignoredCapabilities();
-    check(ignored.contains("future/42") && ignored.contains("appearance/1"), "unsupported capabilities reported");
+    check(ignored == QStringList{"future/42"}, "unsupported capabilities reported");
+    capabilities["appearance/1"] = QJsonObject{{"arbitrary", true}};
+    future["capabilities"] = capabilities;
+    rejects(future, "malformed supported appearance must not be silently ignored");
     auto opaque = simple();
     auto root = record("__proto__");
     root["value"] = "opaque";
     opaque["root"] = "__proto__";
     opaque["nodes"] = QJsonArray{root};
     check(load(opaque)->nodes()[0].id == "__proto__", "opaque IDs preserved");
+}
+
+const pgqt::NodeVisual &nodeById(const pgqt::GraphDocument &doc, const QString &id) {
+    for (const auto &node : doc.nodes()) if (node.id == id) return node;
+    throw std::runtime_error("Missing snapshot node");
+}
+QRectF flatten(const pgqt::PaintGroup &group, const QRectF &rect) {
+    return {group.position.x() + rect.x() * group.scale,
+            group.position.y() + rect.y() * group.scale,
+            rect.width() * group.scale, rect.height() * group.scale};
+}
+const pgqt::PaintRect &bodyById(const pgqt::GraphDocument &doc, const QString &id) {
+    const auto &node = nodeById(doc, id);
+    for (const auto &group : doc.groups()) if (group.id == node.groupId)
+        for (const auto &body : group.bodies)
+            if (flatten(group, body.rect) == node.bounds) return body;
+    throw std::runtime_error("Missing snapshot body");
+}
+QColor labelColor(const pgqt::GraphDocument &doc, const QString &text) {
+    for (const auto &group : doc.groups())
+        for (const auto &label : group.labels) if (label.text == text) return label.color;
+    throw std::runtime_error("Missing snapshot label");
+}
+void color(const QColor &actual, const char *rgb, double alpha, const char *message) {
+    check(actual.name() == QColor(rgb).name(), message);
+    // QColor stores alpha at 16-bit precision; separate RGB stays unpremultiplied.
+    near(actual.alphaF(), alpha, message);
+}
+void appearances() {
+    const auto source = QJsonDocument::fromJson(read("examples/fixtures/appearance-colors.parsegraph")).object();
+    const auto doc = load(source);
+    check(doc->ignoredCapabilities().isEmpty(), "appearance is supported");
+    color(doc->pageBackgroundColor(), "#f1f5f9", 0.5, "page color and independent alpha");
+    color(bodyById(*doc, "root").color, "#d9f99d", 1, "default fill");
+    color(bodyById(*doc, "child").color, "#3366ff", 0.5, "overridden fill");
+    color(bodyById(*doc, "transparent").color, "#d9f99d", 0, "zero fill alpha retains default RGB");
+    color(labelColor(*doc, "Default"), "#0f172a", 1, "default text");
+    color(labelColor(*doc, "Override"), "#ffffff", 1, "color-only text override retains alpha");
+    color(labelColor(*doc, "Transparent"), "#0f172a", 0.5, "text independent of transparent fill");
+    size_t lineCount = 0, zeroBorderCount = 0;
+    for (const auto &group : doc->groups()) {
+        for (const auto &line : group.lines) {
+            color(line.color, "#ff0000", 0.6, "parent owns outgoing connectors; color-only override retains alpha");
+            ++lineCount;
+        }
+        for (const auto &border : group.borders) {
+            if (border.color.alphaF() == 0) ++zeroBorderCount;
+            else color(border.color, "#334155", 0.8, "independent default border alpha");
+            bool contained = false;
+            for (const auto &body : group.bodies) if (body.rect.contains(border.rect)) contained = true;
+            check(contained, "border fits within a body without changing geometry");
+        }
+    }
+    check(lineCount == 2 && zeroBorderCount == 4, "fixture connections and zero-alpha border strips");
+
+    auto invisible = source;
+    auto invisibleCaps = invisible["capabilities"].toObject();
+    auto invisibleAppearance = invisibleCaps["appearance/1"].toObject();
+    auto invisibleDefaults = invisibleAppearance["defaults"].toObject();
+    for (const auto *key : {"backgroundAlpha", "borderAlpha", "textAlpha", "lineAlpha"})
+        invisibleDefaults[key] = 0;
+    invisibleAppearance["defaults"] = invisibleDefaults;
+    invisibleAppearance["nodeStyles"] = QJsonObject{};
+    invisibleCaps["appearance/1"] = invisibleAppearance;
+    invisible["capabilities"] = invisibleCaps;
+    const auto invisibleDoc = load(invisible);
+    for (const auto &group : invisibleDoc->groups()) {
+        for (const auto &body : group.bodies) near(body.color.alphaF(), 0, "zero default body alpha");
+        for (const auto &border : group.borders) near(border.color.alphaF(), 0, "zero default border alpha");
+        for (const auto &line : group.lines) near(line.color.alphaF(), 0, "zero default connector alpha");
+        for (const auto &label : group.labels) near(label.color.alphaF(), 0, "zero default text alpha");
+    }
+
+    auto plain = source;
+    auto caps = plain["capabilities"].toObject();
+    caps.remove("appearance/1");
+    plain["capabilities"] = caps;
+    const auto unstyled = load(plain);
+    color(unstyled->pageBackgroundColor(), "#f3f5f7", 1, "absent appearance keeps page palette");
+    color(bodyById(*unstyled, "root").color, "#183646", 1, "absent appearance keeps node palette");
+    check(doc->bounds() == unstyled->bounds(), "appearance cannot change global bounds");
+    for (const auto &node : doc->nodes()) {
+        const auto &before = nodeById(*unstyled, node.id);
+        check(node.bounds == before.bounds && node.extents == before.extents && node.groupId == before.groupId,
+              "appearance cannot change node geometry or grouping");
+    }
+    for (size_t i = 0; i < doc->groups().size(); ++i) {
+        const auto &a = doc->groups()[i], &b = unstyled->groups()[i];
+        check(a.bounds == b.bounds && a.position == b.position && a.scale == b.scale,
+              "appearance cannot change paint-group geometry");
+        check(b.borders.empty(), "absent appearance keeps border-free viewer palette");
+    }
+
+    // A scaled child owns a distinct connector to its grandchild. The grandchild
+    // receives defaults, never an ancestor's sparse appearance override.
+    auto chain = source;
+    auto root = record("root"); root["value"] = "Root";
+    auto child = record("child", "root", "backward"); child["value"] = "Child"; child["scale"] = 0.5;
+    auto grandchild = record("grandchild", "child", "backward"); grandchild["value"] = "Grandchild";
+    grandchild["paintGroup"] = true;
+    chain["nodes"] = QJsonArray{root, child, grandchild};
+    caps = source["capabilities"].toObject();
+    auto appearance = caps["appearance/1"].toObject();
+    appearance["nodeStyles"] = QJsonObject{
+        {"root", QJsonObject{{"backgroundColor", "#FF0000"}, {"lineColor", "#fF0000"}}},
+        {"child", QJsonObject{{"backgroundAlpha", 0}, {"lineColor", "#0000ff"}, {"lineAlpha", 0.25}}}};
+    caps["appearance/1"] = appearance;
+    chain["capabilities"] = caps;
+    auto chainDoc = load(chain);
+    color(bodyById(*chainDoc, "child").color, "#d9f99d", 0, "alpha-only override does not inherit parent RGB");
+    color(bodyById(*chainDoc, "grandchild").color, "#d9f99d", 1, "grandchild uses defaults across paint groups");
+    size_t red = 0, blue = 0;
+    for (const auto &group : chainDoc->groups()) for (const auto &line : group.lines) {
+        if (line.color.name() == "#ff0000") { ++red; near(line.color.alphaF(), 0.6, "root connector alpha"); }
+        if (line.color.name() == "#0000ff") { ++blue; near(line.color.alphaF(), 0.25, "child connector alpha"); }
+    }
+    check(red == 1 && blue == 1, "child style affects its outgoing connector only");
+    const auto &scaledBody = bodyById(*chainDoc, "child");
+    bool scaledBorder = false;
+    for (const auto &border : chainDoc->groups()[0].borders)
+        if (border.rect.topLeft() == scaledBody.rect.topLeft() && border.rect.width() == scaledBody.rect.width()) {
+            near(border.rect.height(), 0.5, "border thickness follows node-local scale");
+            scaledBorder = true;
+        }
+    check(scaledBorder, "scaled node has inset border");
+
+    // An opaque ID must also work as an appearance key; no JS prototype behavior
+    // or presentation style lookup is part of the format's cascade.
+    auto opaque = simple();
+    root = record("__proto__"); root["value"] = "opaque";
+    opaque["root"] = "__proto__";
+    opaque["nodes"] = QJsonArray{root};
+    appearance["nodeStyles"] = QJsonObject{{"__proto__", QJsonObject{{"backgroundColor", "#aBcDeF"},
+                                                                 {"backgroundAlpha", 0}}}};
+    appearance["pageBackgroundAlpha"] = 0;
+    opaque["capabilities"] = QJsonObject{{"appearance/1", appearance}};
+    const auto opaqueDoc = load(opaque);
+    color(bodyById(*opaqueDoc, "__proto__").color, "#abcdef", 0, "opaque appearance ID and mixed-case hex");
+    color(opaqueDoc->pageBackgroundColor(), "#f1f5f9", 0, "fully transparent page preserves RGB");
+
+    // Missing content and zero-sized styles are legal. Decoration cannot produce
+    // negative geometry when the presentation has nothing to enclose.
+    auto tiny = plain;
+    tiny["nodes"] = QJsonArray{record("root")};
+    caps = tiny["capabilities"].toObject();
+    auto presentation = caps["presentation/1"].toObject();
+    presentation["styles"] = QJsonObject{{"block", QJsonObject{{"minWidth", 0}, {"minHeight", 0},
+                                                             {"paddingX", 0}, {"paddingY", 0}, {"square", false}}}};
+    caps["presentation/1"] = presentation;
+    appearance["nodeStyles"] = QJsonObject{{"root", QJsonObject{}}};
+    caps["appearance/1"] = appearance;
+    tiny["capabilities"] = caps;
+    check(load(tiny)->groups()[0].borders.empty(), "zero-sized node has no border geometry");
+
+    auto invalidAppearance = [&](const QJsonObject &payload, const char *message) {
+        auto malformed = source;
+        auto malformedCaps = malformed["capabilities"].toObject();
+        malformedCaps["appearance/1"] = payload;
+        malformed["capabilities"] = malformedCaps;
+        rejects(malformed, message);
+    };
+    const auto valid = source["capabilities"].toObject()["appearance/1"].toObject();
+    for (const auto *key : {"defaults", "nodeStyles", "pageBackgroundColor", "pageBackgroundAlpha"}) {
+        auto bad = valid; bad.remove(key);
+        invalidAppearance(bad, "all appearance top-level fields required");
+    }
+    auto bad = valid; bad["extra"] = 1;
+    invalidAppearance(bad, "unknown appearance field rejected");
+    bad = valid; bad["nodeStyles"] = QJsonArray{};
+    invalidAppearance(bad, "nodeStyles must be object");
+    bad = valid; bad["nodeStyles"] = QJsonObject{{"absent", QJsonObject{}}};
+    invalidAppearance(bad, "dangling appearance ID rejected");
+    bad = valid; bad["nodeStyles"] = QJsonObject{{"__proto__", QJsonObject{}}};
+    invalidAppearance(bad, "opaque dangling appearance ID rejected");
+    bad = valid; bad["nodeStyles"] = QJsonObject{{"root", QJsonObject{{"fontSize", 12}}}};
+    invalidAppearance(bad, "unknown sparse style field rejected");
+    bad = valid; bad["nodeStyles"] = QJsonObject{{"root", QJsonArray{}}};
+    invalidAppearance(bad, "node override must be object");
+    for (const auto *name : {"background", "border", "text", "line"}) {
+        for (const auto &suffix : {QString("Color"), QString("Alpha")}) {
+            bad = valid;
+            auto defaults = bad["defaults"].toObject(); defaults.remove(QString(name) + suffix);
+            bad["defaults"] = defaults;
+            invalidAppearance(bad, "all eight default color and alpha fields required");
+        }
+        for (const auto &entry : QJsonArray{"red", "#abc", "#11223344", "#12gg00", "rgb(1,2,3)", "#１２３４５６", 12, false, QJsonValue()}) {
+            bad = valid;
+            auto defaults = bad["defaults"].toObject(); defaults[QString(name) + "Color"] = entry;
+            bad["defaults"] = defaults;
+            invalidAppearance(bad, "default colors require exact ASCII hex6");
+            bad = valid; bad["nodeStyles"] = QJsonObject{{"root", QJsonObject{{QString(name) + "Color", entry}}}};
+            invalidAppearance(bad, "override colors require exact ASCII hex6");
+            bad = valid; bad["pageBackgroundColor"] = entry;
+            invalidAppearance(bad, "page color requires exact ASCII hex6");
+        }
+        for (const auto &entry : QJsonArray{-0.1, 1.1, "0.5", false, QJsonValue(),
+                                            std::numeric_limits<double>::infinity(),
+                                            std::numeric_limits<double>::quiet_NaN()}) {
+            bad = valid;
+            auto defaults = bad["defaults"].toObject(); defaults[QString(name) + "Alpha"] = entry;
+            bad["defaults"] = defaults;
+            invalidAppearance(bad, "default alpha requires finite number in range");
+            bad = valid; bad["nodeStyles"] = QJsonObject{{"root", QJsonObject{{QString(name) + "Alpha", entry}}}};
+            invalidAppearance(bad, "override alpha requires finite number in range");
+            bad = valid; bad["pageBackgroundAlpha"] = entry;
+            invalidAppearance(bad, "page alpha requires finite number in range");
+        }
+    }
+    bad = valid; auto defaults = bad["defaults"].toObject(); defaults["unknown"] = 0;
+    bad["defaults"] = defaults;
+    invalidAppearance(bad, "unknown default style field rejected");
 }
 void textAndContainment() {
     auto source = simple();
@@ -240,8 +453,9 @@ int main(int argc, char **argv) {
     try {
         fixtures();
         validation();
+        appearances();
         textAndContainment();
-        std::cout << "Qt document: three geometry fixtures, paint-group flattening, text, containment, and validation passed\n";
+        std::cout << "Qt document: geometry fixtures, paint-group flattening, appearance, text, containment, and validation passed\n";
         return 0;
     } catch (const std::exception &error) {
         std::cerr << "Qt document test: " << error.what() << '\n';
