@@ -27,6 +27,14 @@ describe("fuzzyEquals", function () {
     assert.ok(!fuzzyEquals(-1, -0.5, 0.1));
   });
 
+  it("uses signed distance, including across zero and at the tolerance boundary", () => {
+    assert.equal(fuzzyEquals(-10, 10, 0.1), false);
+    assert.equal(fuzzyEquals(-0.125, 0.125, 0.25), false);
+    assert.equal(fuzzyEquals(-0.125, 0.125, 0.5), true);
+    assert.equal(fuzzyEquals(-1, -1.125, 0.25), true);
+    assert.equal(fuzzyEquals(-1, -1, 0), true);
+  });
+
   it("can be changed globally", () => {
     setFuzziness(1);
     assert.equal(getFuzziness(), 1);

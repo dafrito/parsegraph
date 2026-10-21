@@ -4,7 +4,6 @@ import ExtentCombiner from "./ExtentCombiner";
 
 const DEFAULT_EXTENT_BOUNDS = 1;
 const NUM_EXTENT_BOUND_COMPONENTS = 2;
-const SEPARATION_TIMEOUT = 100000;
 
 export class Extent {
   private _offset: number;
@@ -121,36 +120,21 @@ export class Extent {
     // Change the capacity.
     this._bounds = new Float32Array(NUM_EXTENT_BOUND_COMPONENTS * capacity);
 
-    if (oldBounds) {
-      if (this._start + this._numBounds > oldCap) {
-        const frontBounds = this._start + this._numBounds - oldCap;
-        // TODO See if this can be copied more efficiently, and if that matters.
-        for (
-          let i = 0;
-          i < NUM_EXTENT_BOUND_COMPONENTS * (this._numBounds - frontBounds);
-          ++i
-        ) {
-          this._bounds[i] = oldBounds[this._start + i];
-        }
-        for (
-          let i = 0;
-          i < NUM_EXTENT_BOUND_COMPONENTS * (this._numBounds - frontBounds);
-          ++i
-        ) {
-          this._bounds[this._numBounds - frontBounds + i] = oldBounds[i];
-        }
-      } else {
-        // Can do it in a single copy.
-        for (
-          let i = 0;
-          i < NUM_EXTENT_BOUND_COMPONENTS * this._numBounds;
-          ++i
-        ) {
-          this._bounds[i] = oldBounds[this._start + i];
-        }
-      }
-      // console.log(oldBounds, "to", this._bounds);
-    }
+    // Copy the logical circular sequence in at most two contiguous spans.
+    // _start and _numBounds count bounds; Float32Array indices count components.
+    const tailBounds = Math.min(this._numBounds, oldCap - this._start);
+    const tailComponents = NUM_EXTENT_BOUND_COMPONENTS * tailBounds;
+    const startComponent = NUM_EXTENT_BOUND_COMPONENTS * this._start;
+    this._bounds.set(
+      oldBounds.subarray(startComponent, startComponent + tailComponents)
+    );
+    this._bounds.set(
+      oldBounds.subarray(
+        0,
+        NUM_EXTENT_BOUND_COMPONENTS * (this._numBounds - tailBounds)
+      ),
+      tailComponents
+    );
 
     this._start = 0;
 
@@ -329,9 +313,22 @@ export class Extent {
     this.copyFrom(this.combinedExtent(added, newBoundStart));
   }
 
+  /**
+   * Destructively transfers bounds, preserving each extent's layout offset.
+   * The source becomes empty and can reuse the old destination allocation.
+   * Use clone() when the source must retain its bounds.
+   * @param {Extent} from Source whose bounds are transferred.
+   */
   copyFrom(from: Extent): void {
+    if (from === this) {
+      return;
+    }
+    const oldBounds = this._bounds;
     this._numBounds = from._numBounds;
     this._bounds = from._bounds;
+    this._start = from._start;
+    from._bounds = oldBounds;
+    from._start = 0;
     from.clear();
     this.invalidateBoundingValues();
   }
@@ -504,23 +501,12 @@ export class Extent {
       }
     }
 
-    extentSeparation = separator.consume(extentSeparation);
-
     if (!allowAxisOverlap) {
-      // Calculate the separation between the remaining bounds of given and
-      // the separation boundary.
-      let count = 0;
-      while (!separator.givenAtEnd()) {
-        if (count++ > SEPARATION_TIMEOUT) {
-          throw new Error("Extent separation timed out");
-        }
-
-        const givenSize = given.boundSizeAt(separator._givenBound);
-        if (!isNaN(givenSize)) {
-          extentSeparation = Math.max(extentSeparation, givenScale * givenSize);
-        }
-        ++separator._givenBound;
-      }
+      extentSeparation = separator.includeExposedPrefix(extentSeparation);
+    }
+    extentSeparation = separator.consume(extentSeparation);
+    if (!allowAxisOverlap) {
+      extentSeparation = separator.consumeExposedTails(extentSeparation);
     }
 
     return extentSeparation;
@@ -594,7 +580,7 @@ export class Extent {
       if (isNaN(thisSize) || isNaN(otherSize)) {
         return false;
       }
-      if (!fuzzyEquals(this.boundSizeAt(i), other.boundSizeAt(i))) {
+      if (!fuzzyEquals(this.boundSizeAt(i), other.boundSizeAt(i), fuzziness)) {
         return false;
       }
     }

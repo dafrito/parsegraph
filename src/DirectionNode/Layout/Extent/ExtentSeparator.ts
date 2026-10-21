@@ -1,5 +1,7 @@
 import { Extent } from "./Extent";
 
+const SEPARATION_TIMEOUT = 100000;
+
 export default class ExtentSeparator {
   _thisExtent: Extent;
   _givenExtent: Extent;
@@ -77,6 +79,51 @@ export default class ExtentSeparator {
 
   thisAtEnd(): boolean {
     return this._thisBound == this._thisExtent.numBounds();
+  }
+
+  /**
+   * Includes partially skipped bounds facing the bare axis. Negative sizes
+   * can make their overlapping sum smaller than this exposed prefix.
+   * @param {number} separation Separation accumulated so far.
+   * @return {number} Separation including the exposed prefix.
+   */
+  includeExposedPrefix(separation: number): number {
+    if (!this.thisAtEnd() && this._positionAdjustment > this._thisPosition) {
+      const size = this.thisBoundSize();
+      if (!isNaN(size)) separation = Math.max(separation, size);
+    }
+    if (!this.givenAtEnd() && -this._positionAdjustment > this._givenPosition) {
+      const size = this.givenBoundSize();
+      if (!isNaN(size)) separation = Math.max(separation, size);
+    }
+    return separation;
+  }
+
+  /**
+   * Includes both unconsumed tails facing the bare separation axis.
+   * @param {number} separation Separation accumulated so far.
+   * @return {number} Separation including the exposed tails.
+   */
+  consumeExposedTails(separation: number): number {
+    let count = 0;
+    while (!this.thisAtEnd()) {
+      if (count++ > SEPARATION_TIMEOUT) {
+        throw new Error("Extent separation timed out");
+      }
+      const size = this.thisBoundSize();
+      if (!isNaN(size)) separation = Math.max(separation, size);
+      this.incrementThisBound();
+    }
+    count = 0;
+    while (!this.givenAtEnd()) {
+      if (count++ > SEPARATION_TIMEOUT) {
+        throw new Error("Extent separation timed out");
+      }
+      const size = this.givenBoundSize();
+      if (!isNaN(size)) separation = Math.max(separation, size);
+      this.incrementGivenBound();
+    }
+    return separation;
   }
 
   consume(extentSeparation: number): number {

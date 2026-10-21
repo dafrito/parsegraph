@@ -2,7 +2,8 @@
 
 A C11 port of `src/DirectionNode/Layout/Extent`, including combination and
 separation. This is the first native component, not a port of graph layout or
-a native viewer. The TypeScript implementation remains unchanged.
+a native viewer. The TypeScript implementation remains supported; defects
+discovered during this port now have fixes and regression coverage there as well.
 
 ## Build and test on macOS
 
@@ -105,8 +106,11 @@ float32 length underflow rather than reproducing permissive TypeScript inputs.
 Reserve is grow-only and a no-op when already sufficient; unlike TS `realloc`,
 requesting the same or smaller capacity does not throw. Equality uses signed
 differences, explicit tolerance for both components, and equal NaN gap sizes.
+TypeScript `copyFrom` remains a destructive transfer of bounds that preserves
+each object's offset; it now swaps independent buffers for safe source reuse.
+C `move` transfers the entire owner, including offset, and zeroes the source.
 
-## Validation and TypeScript discrepancies
+## Validation and resolved TypeScript defects
 
 Validated on Apple Silicon with Apple Clang 21. Four CTest checks cover:
 
@@ -133,19 +137,23 @@ native tests (all functions below are in `tests/extent_test.c`):
 | `Extent.combinedExtent with NaN` | `inherited_combinations`: explicit NaN setter, separation of 30, and all three expected result bounds. |
 | `Extent.combinedExtent` | `algorithms`: exact shifted three-bound result, additionally checking in-place aliasing. |
 
-The TypeScript reference is not treated as infallible. Confirmed differences:
+The port exposed the following TypeScript defects. All four are now fixed in
+TypeScript, with regressions in `Extent.regression.spec.ts` and
+`fuzzyequals.spec.ts`. These are historical reproductions, not remaining parity
+exceptions:
 
-| Existing TypeScript defect | Native behavior / tracking |
+| Defect discovered during port | Corrected behavior / tracking |
 | --- | --- |
 | Growing a wrapped/prepended extent copies incorrect component indices. Three prepends `(1,10), (2,20), (3,30)` yield `[(3,30),(10,1),(10,0)]`. | Correct logical-order copy; [board issue](https://fritolaptop.fritonet.home.arpa/board/#board=59f354c3-a216-4792-9cf4-a2f5696fdea0&item=f267da84-a3ac-4123-aab3-bdbc109c5779). |
-| `copyFrom` shares the buffer with the cleared source and fails to transfer the ring start. | Separate deep copy and move; [board issue](https://fritolaptop.fritonet.home.arpa/board/#board=59f354c3-a216-4792-9cf4-a2f5696fdea0&item=c3814569-b540-4531-830e-96d355e0ac40). |
+| `copyFrom` shares the buffer with the cleared source and fails to transfer the ring start. | Independent ownership after transfer; C also provides a deep copy operation; [board issue](https://fritolaptop.fritonet.home.arpa/board/#board=59f354c3-a216-4792-9cf4-a2f5696fdea0&item=c3814569-b540-4531-830e-96d355e0ac40). |
 | Separation without axis overlap omits the base tail and partial leading spans. | Both tails and exposed prefixes count; [board issue](https://fritolaptop.fritonet.home.arpa/board/#board=59f354c3-a216-4792-9cf4-a2f5696fdea0&item=e1aeea0c-3aaf-41eb-95f2-acae39298f2a). |
 | Equality compares magnitudes and ignores the explicit tolerance for sizes. | Signed difference and consistent tolerance; [board issue](https://fritolaptop.fritonet.home.arpa/board/#board=59f354c3-a216-4792-9cf4-a2f5696fdea0&item=6504f989-e4c0-449e-98a5-4520e0ffd2fa). |
 
-The current deterministic corpus contains 49 separation differences; these
-are checked against the independent oracle rather than skipped. Minimal TS
-reproductions are pinned in `tests/parity.cjs`. When those TS bugs are fixed,
-update the explicit defect assertions and this ledger; do not weaken general
-parity checks. No performance advantage is claimed yet. Native CI integration,
-installation/distribution, other-platform verification, and the rest of graph
-layout remain follow-up work.
+The original deterministic corpus exposed 49 separation differences. It now
+requires both C and TypeScript to agree with the independent oracle, with no
+exceptions for those cases. The other minimal reproductions in
+`tests/parity.cjs` now assert corrected behavior. TypeScript also checks 600
+mixed buffer operations against a flat model and 600 separation scenarios
+against interval geometry and scaled symmetry. No performance advantage is
+claimed yet. Native CI integration, installation/distribution, other-platform
+verification, and the rest of graph layout remain follow-up work.

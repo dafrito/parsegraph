@@ -368,7 +368,7 @@ pg_status pg_extent_separation(const pg_extent *a, const pg_extent *b,
         if (delta >= 0) { bp += scale * y.length; ++j; }
     }
     if (!overlap) {
-        /* Include BOTH tails. TS currently omits the base tail. */
+        /* Both tails face the bare separation axis. */
         while (i < a->count) {
             double size = bound(a, i++).size;
             if (!isnan(size)) separation = fmax(separation, size);

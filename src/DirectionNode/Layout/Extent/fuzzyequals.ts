@@ -24,7 +24,7 @@ export class Fuzziness {
     if (!fuzziness) {
       return a === b;
     }
-    return Math.abs(Math.abs(a) - Math.abs(b)) < fuzziness;
+    return Math.abs(a - b) < fuzziness;
   }
 }
 

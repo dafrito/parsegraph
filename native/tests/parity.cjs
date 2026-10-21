@@ -73,18 +73,12 @@ function separationOracle(a, b, displacement, overlap, scale) {
   }
   return result;
 }
-let correctedSeparations = 0;
 for (let index = 0; index < cases.length; ++index) {
   const {a,b,displacement,adjustment,scale,overlap} = cases[index];
   const values = lines[index].split(/\s+/).map(Number);
   const rawSeparation = a.separation(b, displacement, overlap, scale);
-  // Known TS defect: the non-overlap path omits the remaining base tail.
   const separation = separationOracle(a,b,displacement,overlap,scale);
-  if (Math.abs(separation - rawSeparation) > 1e-6) {
-    assert.equal(overlap, false, "unexpected TS separation divergence");
-    assert.ok(rawSeparation < separation, "unexpected TS separation divergence");
-    ++correctedSeparations;
-  }
+  near(rawSeparation, separation, `case ${index} TS separation vs interval oracle`);
   near(values.shift(), separation, `case ${index} separation`);
   const combined = a.combinedExtent(b, displacement, adjustment, scale);
   assert.equal(values.shift(), combined.numBounds(), `case ${index} combined count`);
@@ -103,17 +97,15 @@ for (let index = 0; index < cases.length; ++index) {
   assert.equal(values.length, 0);
 }
 
-// Minimal reproductions pin the TS defects rather than silently claiming full
-// parity. If TS is repaired, update these assertions and the documented ledger.
+// Regressions found during the port now require the corrected TS behavior.
 const prepended = new Extent();
 prepended.prependLS(1, 10); prepended.prependLS(2, 20); prepended.prependLS(3, 30);
-assert.notDeepEqual(pairs(prepended), [[3,30],[2,20],[1,10]], "TS prepend defect was repaired: update ledger");
+assert.deepEqual(pairs(prepended), [[3,30],[2,20],[1,10]]);
 const source = make([[1,10]]), dest = new Extent();
 dest.copyFrom(source);
 source.appendLS(1,99);
-assert.equal(dest.boundSizeAt(0), 99, "TS copyFrom alias defect was repaired: update ledger");
-assert.equal(make([[1,-10]]).equals(make([[1,10]])), true, "TS signed equality defect was repaired: update ledger");
-assert.equal(make([[1,1]]).equals(make([[1,1.01]]), 0.1), false,
-  "TS size tolerance defect was repaired: update ledger");
-console.log(`${cases.length} TS comparisons passed; ${correctedSeparations} known separation-tail differences asserted.`);
-console.log("Confirmed TS regressions: prepend/growth, copyFrom aliasing, signed equality/size tolerance.");
+assert.equal(dest.boundSizeAt(0), 10);
+assert.equal(make([[1,-10]]).equals(make([[1,10]])), false);
+assert.equal(make([[1,1]]).equals(make([[1,1.01]]), 0.1), true);
+console.log(`${cases.length} C/TS comparisons passed with no discrepancy allowances; separation matches an independent interval oracle.`);
+console.log("TS regression checks passed: prepend/growth, transfer ownership, signed equality/size tolerance.");
