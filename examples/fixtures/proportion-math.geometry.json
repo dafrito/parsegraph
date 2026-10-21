@@ -1,0 +1,152 @@
+{
+  "proportion-0": {
+    "x": 0,
+    "y": 0,
+    "width": 15,
+    "height": 15
+  },
+  "proportion-5": {
+    "x": 45,
+    "y": 0,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-1": {
+    "x": -45,
+    "y": 0,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-22": {
+    "x": 0,
+    "y": -11.25,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-24": {
+    "x": 7.5,
+    "y": -11.25,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-23": {
+    "x": -7.5,
+    "y": -11.25,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-9": {
+    "x": 0,
+    "y": 15,
+    "width": 15,
+    "height": 15
+  },
+  "proportion-13": {
+    "x": 30,
+    "y": 15,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-10": {
+    "x": -30,
+    "y": 15,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-16": {
+    "x": 0,
+    "y": 30,
+    "width": 15,
+    "height": 15
+  },
+  "proportion-19": {
+    "x": 15,
+    "y": 30,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-20": {
+    "x": 15,
+    "y": 41.25,
+    "width": 15,
+    "height": 15
+  },
+  "proportion-17": {
+    "x": -15,
+    "y": 30,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-18": {
+    "x": -15,
+    "y": 41.25,
+    "width": 15,
+    "height": 15
+  },
+  "proportion-21": {
+    "x": 0,
+    "y": 45,
+    "width": 15,
+    "height": 15
+  },
+  "proportion-6": {
+    "x": 45,
+    "y": 7.5,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-7": {
+    "x": 45,
+    "y": 15,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-8": {
+    "x": 45,
+    "y": 26.25,
+    "width": 15,
+    "height": 15
+  },
+  "proportion-14": {
+    "x": 30,
+    "y": 22.5,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-15": {
+    "x": 30,
+    "y": 33.75,
+    "width": 15,
+    "height": 15
+  },
+  "proportion-11": {
+    "x": -30,
+    "y": 22.5,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-12": {
+    "x": -30,
+    "y": 33.75,
+    "width": 15,
+    "height": 15
+  },
+  "proportion-2": {
+    "x": -45,
+    "y": 7.5,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-3": {
+    "x": -45,
+    "y": 15,
+    "width": 7.5,
+    "height": 7.5
+  },
+  "proportion-4": {
+    "x": -45,
+    "y": 26.25,
+    "width": 15,
+    "height": 15
+  }
+}

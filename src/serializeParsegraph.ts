@@ -1,5 +1,7 @@
 import { Fit, Alignment, Direction, PreferredAxis, reverseDirection } from ".";
 import { DirectionNode } from "./DirectionNode/DirectionNode";
+import { hasVersionMarker } from "./document/validate";
+import { forEachSerializedNode } from "./serializationTraversal";
 
 interface DirectionNodeData {
   value: any;
@@ -18,31 +20,27 @@ const serializeParsegraph = (
   [key: string]: DirectionNodeData;
 } => {
   const nodes: { [key: string]: DirectionNodeData } = {};
-  root.paintGroup().forEach((pg) => {
-    pg.siblings().forEach((node) => {
-      nodes[node.id()] = {
-        value: node.value(),
-        scale: node.scale(),
-        fit: node.nodeFit(),
-        layoutPreference: node.siblings().getLayoutPreference(),
-        parentId: node.neighbors().isRoot()
-          ? null
-          : node.neighbors().parentNode().id(),
-        parentDir: node.neighbors().isRoot()
-          ? null
-          : node.neighbors().parentDirection(),
-        alignment: node.neighbors().isRoot()
-          ? Alignment.NONE
-          : node
-              .neighbors()
-              .parentNode()
-              .neighbors()
-              .getAlignment(
-                reverseDirection(node.neighbors().parentDirection())
-              ),
-        paintGroup: node.paintGroups().isPaintGroup(),
-      };
-    });
+  forEachSerializedNode(root, (node) => {
+    nodes[node.id()] = {
+      value: node.value(),
+      scale: node.scale(),
+      fit: node.nodeFit(),
+      layoutPreference: node.siblings().getLayoutPreference(),
+      parentId: node.neighbors().isRoot()
+        ? null
+        : node.neighbors().parentNode().id(),
+      parentDir: node.neighbors().isRoot()
+        ? null
+        : node.neighbors().parentDirection(),
+      alignment: node.neighbors().isRoot()
+        ? Alignment.NONE
+        : node
+            .neighbors()
+            .parentNode()
+            .neighbors()
+            .getAlignment(reverseDirection(node.neighbors().parentDirection())),
+      paintGroup: node.paintGroups().isPaintGroup(),
+    };
   });
   return { __parsegraph: nodes } as any;
 };
@@ -50,6 +48,11 @@ const serializeParsegraph = (
 const deserializeParsegraph = (json: {
   [key: string]: DirectionNodeData;
 }): DirectionNode => {
+  if (hasVersionMarker(json)) {
+    throw new Error(
+      "Versioned documents require deserializeParsegraphDocument to retain presentation rules"
+    );
+  }
   if (json.__parsegraph) {
     json = json.__parsegraph as any;
   }

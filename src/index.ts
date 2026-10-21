@@ -5,3 +5,4 @@ export * from "./paintGroupBounds";
 export * from "./paintNodeLines";
 export * from "./paintNodeBounds";
 export * from "./serializeParsegraph";
+export * from "./document";

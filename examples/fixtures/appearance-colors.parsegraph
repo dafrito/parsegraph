@@ -1,0 +1,114 @@
+{
+  "format": "parsegraph",
+  "version": 1,
+  "root": "root",
+  "nodes": [
+    {
+      "id": "root",
+      "value": "Default",
+      "scale": 1,
+      "fit": "loose",
+      "layoutPreference": "horizontal",
+      "parentId": null,
+      "parentDir": null,
+      "alignment": "none",
+      "axisOverlap": "default",
+      "rightToLeft": false,
+      "paintGroup": false
+    },
+    {
+      "id": "transparent",
+      "value": "Transparent",
+      "scale": 1,
+      "fit": "loose",
+      "layoutPreference": "perpendicular",
+      "parentId": "root",
+      "parentDir": "upward",
+      "alignment": "none",
+      "axisOverlap": "default",
+      "rightToLeft": false,
+      "paintGroup": false
+    },
+    {
+      "id": "child",
+      "value": "Override",
+      "scale": 1,
+      "fit": "loose",
+      "layoutPreference": "perpendicular",
+      "parentId": "root",
+      "parentDir": "backward",
+      "alignment": "none",
+      "axisOverlap": "default",
+      "rightToLeft": false,
+      "paintGroup": false
+    }
+  ],
+  "capabilities": {
+    "presentation/1": {
+      "text": {
+        "fontFamily": "sans-serif",
+        "fontSize": 10,
+        "lineHeight": 10
+      },
+      "styles": {
+        "block": {
+          "minWidth": 10,
+          "minHeight": 15,
+          "paddingX": 3,
+          "paddingY": 2.5,
+          "square": false
+        },
+        "bud": {
+          "minWidth": 7.5,
+          "minHeight": 7.5,
+          "paddingX": 0,
+          "paddingY": 0,
+          "square": false
+        },
+        "slot": {
+          "minWidth": 10,
+          "minHeight": 15,
+          "paddingX": 3,
+          "paddingY": 2.5,
+          "square": false
+        }
+      },
+      "defaultStyle": "block",
+      "nodeStyles": {},
+      "spacing": {
+        "horizontal": 5,
+        "vertical": 5,
+        "inward": 5
+      }
+    },
+    "appearance/1": {
+      "defaults": {
+        "backgroundColor": "#d9f99d",
+        "backgroundAlpha": 1,
+        "borderColor": "#334155",
+        "borderAlpha": 0.8,
+        "textColor": "#0f172a",
+        "textAlpha": 1,
+        "lineColor": "#64748b",
+        "lineAlpha": 0.6
+      },
+      "nodeStyles": {
+        "root": {
+          "lineColor": "#ff0000"
+        },
+        "child": {
+          "backgroundColor": "#3366ff",
+          "backgroundAlpha": 0.5,
+          "textColor": "#ffffff",
+          "borderAlpha": 0
+        },
+        "transparent": {
+          "backgroundAlpha": 0,
+          "textAlpha": 0.5
+        }
+      },
+      "pageBackgroundColor": "#f1f5f9",
+      "pageBackgroundAlpha": 0.5
+    }
+  }
+}
