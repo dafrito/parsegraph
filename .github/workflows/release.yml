@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    name: Check release identity
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - run: node tools/release.cjs guard
+
+  validate:
+    name: Validate released source and build candidate
+    needs: guard
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    name: Publish the verified npm archive
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Install an npm CLI with trusted publishing support
+        run: npm install --global npm@11.16.0 --ignore-scripts --no-audit --no-fund
+      - uses: actions/download-artifact@v6
+        with:
+          name: parsegraph-node-24
+          path: generated
+      - name: Publish once, or verify an identical existing version
+        run: node tools/release.cjs publish
+
+  attach:
+    name: Attach archives and checksums to the GitHub release
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: actions/download-artifact@v6
+        with:
+          name: parsegraph-node-24
+          path: generated
+      - name: Upload missing assets and verify existing assets
+        run: node tools/release.cjs attach
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -1,9 +1,22 @@
-# Freeform v1 migration: local package handoff
+# Freeform v1 package handoff
 
-The registry package `parsegraph@6.2.0` predates these document APIs. This checkout
-now targets `7.0.0`; local previews identify the exact build before publication.
-Freeform already supports v1 documents using a local preview. Use the receipt
-below when updating its dependency to a newer build.
+Parsegraph 7 contains the document APIs used by Freeform. The old registry
+package `parsegraph@6.2.0` predates them. Freeform's initial integration used a
+local preview; after publication, use the registry release so clean checkouts
+and CI do not depend on a sibling repository.
+
+## Use the published release
+
+After `parsegraph@7.0.0` is available on npm, run in Freeform:
+
+```sh
+yarn add --exact parsegraph@7.0.0
+```
+
+Commit the dependency and lockfile together. Verify a clean dependency install,
+the Freeform test suite, and its production build. Preserve any unrelated work
+in progress. The package can be verified before publication by installing the
+exact archive from `yarn pack:release` into an isolated Freeform checkout.
 
 The npm package version is independent of the `.parsegraph` document version,
 which remains v1, and of capability versions such as `appearance/1`.
@@ -41,10 +54,14 @@ the v1 and generation specs, and the three geometry fixtures. Import public APIs
 from `parsegraph` normally; there is no need to import TypeScript source paths.
 The included example sources are references, not installed package commands.
 
-The pack command extracts its own tarball and checks v1 exports, v0 loading,
+Both release and preview pack commands use the same file contract. The pack
+command extracts its own tarball and checks v1 exports, v0 loading,
 unknown-capability and metadata preservation, and all three fixtures with the
 six-units-per-code-point text metric and `1e-5` tolerance. This validates the
-package boundary, not Freeform's rendering or persistence implementation.
+package boundary, not Freeform's rendering or persistence implementation. It
+also compiles a strict isolated TypeScript consumer without ambient repository
+types and checks the browser UMD entry point. Consumers receive no build or
+install scripts; declaration maps are omitted and runtime maps embed sources.
 
 ## Migration order
 

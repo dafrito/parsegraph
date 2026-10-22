@@ -1,9 +1,26 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const directory = path.resolve(process.argv[2]);
-const api = require(directory);
+const vm = require("node:vm");
+// The archive verifier copies this into a temporary consumer with an installed
+// node_modules/parsegraph. The optional directory preserves the preview tool's
+// existing standalone interface.
+const directory = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.dirname(require.resolve("parsegraph/package.json"));
+const api = process.argv[2] ? require(directory) : require("parsegraph");
 const metadata = require(path.join(directory, "package.json"));
+const browser = {};
+vm.runInNewContext(
+  fs.readFileSync(path.join(directory, metadata.main), "utf8"),
+  browser
+);
+assert.equal(
+  typeof browser.parsegraph.DirectionNode,
+  "function",
+  "UMD browser global"
+);
+assert.equal(typeof browser.parsegraph.serializeParsegraphDocument, "function");
 for (const name of [
   "DirectionNode",
   "CommitLayout",
@@ -57,9 +74,25 @@ for (const preset of ["standard", "proportional", "math"]) {
         `${preset} ${node.id()} ${key}`
       );
   }
+  if (preset === "proportional") {
+    const endpoints = nodes.filter((node) => /^\d+$/.test(String(node.value())));
+    assert.ok(
+      endpoints.length > 1,
+      "Proportional fixture must have numbered endpoints"
+    );
+    for (const node of endpoints)
+      assert.ok(
+        Math.abs(
+          node.layout().absoluteY() - endpoints[0].layout().absoluteY()
+        ) <= 1e-5,
+        "Proportional endpoints must share a baseline"
+      );
+  }
 }
 const legacy = api.serializeParsegraph(new api.DirectionNode("legacy"));
-assert.equal(api.deserializeParsegraphDocument(legacy).version, 0);
+const legacyState = api.deserializeParsegraphDocument(legacy);
+assert.equal(legacyState.version, 0);
+assert.equal(legacyState.root.value(), "legacy");
 const colored = JSON.parse(
   fs.readFileSync(
     path.join(directory, "examples/fixtures/appearance-colors.parsegraph"),
@@ -82,5 +115,5 @@ assert.deepEqual(
   colored.capabilities
 );
 console.log(
-  `Package ${metadata.version}: v1 APIs, v0 import, capability/metadata round trips, appearance, and all three geometry fixtures pass.`
+  `Package ${metadata.version}: CommonJS/UMD, v1 APIs, v0 import, capability/metadata round trips, appearance, and all three geometry fixtures pass.`
 );

@@ -1,3 +1,15 @@
+# Installation
+
+Install the published JavaScript layout library with `yarn add parsegraph@7.0.0`
+or `npm install parsegraph@7.0.0`. Import the public API from `parsegraph` as shown
+below. The package includes TypeScript declarations and a UMD/CommonJS runtime;
+it supports browser bundlers and Node CommonJS consumers. It does not provide a
+native ESM entry point. The C library and Qt viewer have separate native builds.
+
+See [the version 7 release notes](CHANGELOG.md) for document APIs and layout
+fixes that can change graph geometry. See [CI and releasing](DEPLOYING.md) to
+build and verify the same archive used for publication.
+
 # Development
 
 Use Yarn Classic 1.22.22 and the committed `yarn.lock` for dependency installation:

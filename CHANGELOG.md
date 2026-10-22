@@ -1,4 +1,4 @@
-## version 7.0.0 (unreleased)
+## version 7.0.0
 
 Enhancements:
 
@@ -9,7 +9,8 @@ Enhancements:
 - Add a headless C layout port with TypeScript parity tests and benchmarks, plus
   an optional Qt Quick viewer with presentation/appearance support and an
   incremental primes demo. Native builds are separate from the npm package.
-- Add JavaScript and native CI workflows; hosted validation remains pending.
+- Add JavaScript and native CI workflows, verified npm archives, and publication
+  from manually published GitHub Releases.
 
 Bug fixes:
 
@@ -19,9 +20,16 @@ Bug fixes:
   geometry for graphs affected by the previous layout bugs.
 - Repair dependency-graph SVG generation and production archive staging.
 
-The npm major version does not change the `.parsegraph` v1 format or capability
-versions. Release publishing is still being prepared; this version is not yet
-published by this checkout.
+Compatibility:
+
+- The npm major version does not change the `.parsegraph` v1 format or capability
+  versions. Existing v0 serialization APIs remain available.
+- Geometry can change for graphs affected by the corrected layout bugs above.
+- The npm package contains the JavaScript layout library and TypeScript
+  declarations, with reference sources, specifications, and examples. Native C
+  and Qt artifacts are distributed separately.
+- The existing UMD/CommonJS entry point is retained. Browser bundlers can use
+  named imports from `parsegraph`; Node CommonJS consumers can use `require`.
 
 ## version 6.2.0
 

@@ -1,3 +1,0 @@
-#!/bin/bash
-
-npm pub parsegraph-dev.tgz --tag=dev

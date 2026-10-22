@@ -4,6 +4,8 @@ generated/*.parsegraph
 generated/*.svg
 generated/*.png
 generated/preview-package.json
+generated/release-package.json
+generated/SHA256SUMS
 dist-tools/
 /parsegraph/
 .DS_Store

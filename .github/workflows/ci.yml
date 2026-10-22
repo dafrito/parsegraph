@@ -5,12 +5,14 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # A release calls this workflow; use a different group from its caller.
+  group: ${{ github.workflow }}-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -56,6 +58,7 @@ jobs:
             native/build/native-demo.svg
             native/build/benchmark.csv
           if-no-files-found: error
+          overwrite: true
           retention-days: 14
   check:
     name: Check (Node ${{ matrix.node }})
@@ -72,48 +75,47 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
-          cache: yarn
+          cache: ${{ github.event_name != 'release' && 'yarn' || '' }}
           cache-dependency-path: yarn.lock
+          package-manager-cache: false
+      - name: Use the release packaging npm version
+        run: npm install --global npm@11.16.0 --ignore-scripts --no-audit --no-fund
       - name: Install dependencies
         run: yarn install --frozen-lockfile --non-interactive
       - name: Check formatting and lint
         run: yarn lint:ci
+      - name: Check generator and SVG tooling types
+        run: |
+          yarn examples:check
+          yarn svg:check
+      - name: Test packaging and release safeguards
+        run: |
+          yarn test:package
+          yarn test:release
       - name: Test with coverage
         run: yarn test:cov --ci --runInBand
       - name: Build development bundle
         run: yarn build
-      - name: Stage development package
-        run: yarn tar
-      - name: Build production bundle
-        run: yarn build:prod
-      - name: Package production bundle
-        run: yarn tar:prod
-      - name: Verify production archive
-        run: |
-          mkdir package-smoke
-          tar -xzf parsegraph.tgz -C package-smoke
-          node <<'NODE'
-          const assert = require('node:assert/strict');
-          const fs = require('node:fs');
-          const path = require('node:path');
-          const root = './package-smoke/parsegraph';
-          const metadata = require(root + '/package.json');
-          assert.ok(fs.existsSync(path.join(root, metadata.types)));
-          const { DirectionNode, CommitLayout } = require(root);
-          const node = new DirectionNode('CI smoke test');
-          const layout = new CommitLayout(node, {
-            size: (_, size) => { size[0] = 24; size[1] = 80; }
-          });
-          while (layout.crank());
-          NODE
+      - name: Build, package, and verify the production archive
+        run: yarn pack:release
       - name: Generate API documentation
         run: yarn doc
-      - name: Upload production package
+      - name: Package versioned API documentation and checksums
+        run: |
+          VERSION=$(node -p 'require("./package.json").version')
+          tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner \
+            -czf "generated/parsegraph-docs-${VERSION}.tgz" -C dist docs
+          node tools/release.cjs seal
+      - name: Upload verified release candidate
         uses: actions/upload-artifact@v6
         with:
           name: parsegraph-node-${{ matrix.node }}
-          path: parsegraph.tgz
+          path: |
+            generated/parsegraph-*.tgz
+            generated/release-package.json
+            generated/SHA256SUMS
           if-no-files-found: error
+          overwrite: true
           retention-days: 14
       - name: Upload API documentation
         uses: actions/upload-artifact@v6
@@ -121,6 +123,7 @@ jobs:
           name: docs-node-${{ matrix.node }}
           path: dist/docs/
           if-no-files-found: error
+          overwrite: true
           retention-days: 14
       - name: Upload coverage report
         if: ${{ !cancelled() }}
@@ -129,4 +132,5 @@ jobs:
           name: coverage-node-${{ matrix.node }}
           path: dist/coverage/
           if-no-files-found: warn
+          overwrite: true
           retention-days: 14
