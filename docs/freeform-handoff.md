@@ -7,10 +7,10 @@ and CI do not depend on a sibling repository.
 
 ## Use the published release
 
-After `parsegraph@7.0.0` is available on npm, run in Freeform:
+After `parsegraph@7.0.1` is available on npm, run in Freeform:
 
 ```sh
-yarn add --exact parsegraph@7.0.0
+yarn add --exact parsegraph@7.0.1
 ```
 
 Commit the dependency and lockfile together. Verify a clean dependency install,
@@ -31,7 +31,7 @@ cat generated/preview-package.json
 ```
 
 This builds production code and creates
-`generated/parsegraph-7.0.0-v1.local.<content-hash>.tgz`. The receipt records the
+`generated/parsegraph-7.0.1-v1.local.<content-hash>.tgz`. The receipt records the
 exact filename, version, and npm integrity value. The preview is marked private,
 has no install scripts, and is not published. Its version is a local identity
 derived from the source package version and packaged contents. The source
@@ -40,7 +40,7 @@ manifest and lockfile are not changed by packaging.
 In Freeform, install the **exact filename from that receipt**:
 
 ```sh
-yarn add file:../parsegraph/generated/parsegraph-7.0.0-v1.local.<content-hash>.tgz
+yarn add file:../parsegraph/generated/parsegraph-7.0.1-v1.local.<content-hash>.tgz
 ```
 
 Replace `<content-hash>` before running that command; it is not a literal path.

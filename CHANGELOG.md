@@ -1,3 +1,10 @@
+## version 7.0.1
+
+- Use npm's registry transport for the release existence check. The Node fetch
+  lookup timed out in both attempts to publish 7.0.0, before npm publication.
+- Retain the published `v7.0.0` GitHub tag and its verified artifacts; 7.0.0 was
+  not published to npm. This patch release contains the same layout library.
+
 ## version 7.0.0
 
 Enhancements:

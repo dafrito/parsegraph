@@ -15,6 +15,9 @@ The production package is built once by `yarn pack:release`, which verifies the
 actual archive through isolated consumers, public document/presentation APIs,
 and deterministic geometry fixtures. npm 11.16.0 is pinned in CI packaging and
 publication jobs. Release builds do not restore the JavaScript dependency cache.
+Each JavaScript job also checks live npm registry reads for the known 6.2.0
+release and the candidate version, so the publication transport is exercised
+before a release is cut.
 
 The native matrix remains independent: Ubuntu and macOS, Debug with sanitizers
 and optimized Release, C/C++ consumer builds, native tests and TypeScript parity,
@@ -42,13 +45,13 @@ yarn pack:release
 yarn doc
 ```
 
-`yarn pack:release` writes `generated/parsegraph-7.0.0.tgz` and
+`yarn pack:release` writes `generated/parsegraph-7.0.1.tgz` and
 `generated/release-package.json` for the current version. The receipt records
 SHA512 integrity, SHA1, and SHA256 hashes. To verify an existing archive without
 rebuilding it:
 
 ```sh
-yarn verify:package -- generated/parsegraph-7.0.0.tgz
+yarn verify:package -- generated/parsegraph-7.0.1.tgz
 ```
 
 After CI downloads a complete candidate, `node tools/release.cjs verify` checks
@@ -78,8 +81,8 @@ exact tested `.tgz` to `npm publish --ignore-scripts`. Only that job receives
 
 A separate job attaches these files to the GitHub Release:
 
-- `parsegraph-7.0.0.tgz`: the same bytes passed to npm.
-- `parsegraph-docs-7.0.0.tgz`: the TypeDoc `docs/` tree for this version.
+- `parsegraph-7.0.1.tgz`: the same bytes passed to npm.
+- `parsegraph-docs-7.0.1.tgz`: the TypeDoc `docs/` tree for this version.
 - `release-package.json`: package identity and archive hashes.
 - `SHA256SUMS`: checksums for the other three files.
 
@@ -115,19 +118,19 @@ be removed once other workflows are confirmed not to depend on them.
 
 ## Cutting version 7
 
-1. Finish and commit the release implementation and version `7.0.0`, including
+1. Finish and commit the release implementation and version `7.0.1`, including
    `yarn.lock` if dependencies changed. Push that commit to GitHub and wait for
    CI. Configure the npm trusted publisher before publishing a GitHub Release.
 2. Confirm the tested tarball works in Freeform and any other consumer that
    needs the new APIs. The [Freeform handoff](docs/freeform-handoff.md) describes
    the document and geometry compatibility requirements.
-3. Create tag `v7.0.0` on the intended tested commit. Create a GitHub Release for
+3. Create tag `v7.0.1` on the intended tested commit. Create a GitHub Release for
    that exact tag with the [version 7 release notes](CHANGELOG.md), leave
    **pre-release** unchecked, and publish it. Publishing the GitHub Release is
    the action that authorizes registry publication.
 4. Watch **Release** in GitHub Actions. Both npm publication and release-asset
    attachment should succeed. Check npm's version and integrity against
-   `release-package.json`, then install `parsegraph@7.0.0` in consumers and
+   `release-package.json`, then install `parsegraph@7.0.1` in consumers and
    regenerate their lockfiles. A package version in source is not evidence that
    it has been published.
 
@@ -144,8 +147,10 @@ validated candidate for 14 days; after that the original commit must be rebuilt
 and validated. Changed packaging tools can produce different bytes, which the
 integrity check intentionally refuses to treat as the same release.
 
-Before publishing, the job reads the exact version from the public npm registry.
-A 404 permits a first publication. An existing version is accepted only if both
+Before publishing, the job reads the exact version from the public npm registry
+using `npm view`, with bounded network retries and a 60-second process timeout.
+Only a structured npm `E404` response with normal exit status 1 permits a first
+publication. Timeouts and malformed responses fail closed. An existing version is accepted only if both
 its SHA512 integrity and SHA1 hash match the candidate. In that case the job
 skips publication and makes no dist-tag changes. A different archive fails;
 choose a new version rather than attempting to overwrite an immutable npm

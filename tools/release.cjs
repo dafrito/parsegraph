@@ -186,20 +186,60 @@ function validateNpmVersion(version) {
   );
 }
 
-async function lookupPublished(receipt, fetchRegistry = fetch) {
-  const response = await fetchRegistry(
-    `${REGISTRY}/${receipt.name}/${receipt.version}`,
-    {
-      signal: AbortSignal.timeout(30000),
-      headers: { accept: "application/json" },
+async function lookupPublished(receipt, run = execFileSync) {
+  // Use the same registry transport/configuration as publication. Built-in
+  // fetch timed out on hosted runners where npm's registry requests succeeded.
+  let output;
+  try {
+    output = run(
+      "npm",
+      [
+        "view",
+        `${receipt.name}@${receipt.version}`,
+        "name",
+        "version",
+        "dist",
+        "--json",
+        `--registry=${REGISTRY}`,
+        "--prefer-online",
+        "--fetch-retries=2",
+        "--fetch-retry-mintimeout=1000",
+        "--fetch-retry-maxtimeout=3000",
+        "--fetch-timeout=15000",
+      ],
+      {
+        cwd: root,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+        timeout: 60000,
+      }
+    );
+  } catch (error) {
+    let code;
+    try {
+      code = JSON.parse(String(error.stdout)).error?.code;
+    } catch {
+      // A missing/malformed response cannot establish that a version is absent.
     }
+    if (error.status === 1 && !error.signal && code === "E404") return null;
+    throw new Error(
+      `Registry lookup failed (${
+        code || error.code || error.signal || "unknown error"
+      }); refusing to assume the version is absent`
+    );
+  }
+  const published = JSON.parse(output);
+  assert.equal(
+    published?.name,
+    receipt.name,
+    "Registry returned a different package"
   );
-  if (response.status === 404) return null;
-  assert.ok(
-    response.ok,
-    `Registry lookup failed: HTTP ${response.status}; refusing to assume the version is absent`
+  assert.equal(
+    published?.version,
+    receipt.version,
+    "Registry returned a different version"
   );
-  return response.json();
+  return published;
 }
 
 async function publishCandidate(
@@ -303,7 +343,18 @@ async function main(command) {
     fs.readFileSync(path.join(root, "package.json"), "utf8")
   );
   const directory = path.join(root, "generated");
-  if (command === "guard") {
+  if (command === "check-registry") {
+    assert.ok(
+      await lookupPublished({ name: "parsegraph", version: "6.2.0" }),
+      "Known published version is missing"
+    );
+    const published = await lookupPublished(metadata);
+    console.log(
+      `npm registry lookup verified: 6.2.0 exists; ${metadata.version} is ${
+        published ? "published" : "unpublished"
+      }`
+    );
+  } else if (command === "guard") {
     const { tag } = releaseContext(metadata);
     console.log(`Verified ${tag} at ${process.env.GITHUB_SHA}`);
   } else if (command === "seal") {
@@ -331,7 +382,7 @@ async function main(command) {
     }
   } else {
     throw new Error(
-      "Usage: node tools/release.cjs <guard|seal|verify|publish|attach>"
+      "Usage: node tools/release.cjs <check-registry|guard|seal|verify|publish|attach>"
     );
   }
 }

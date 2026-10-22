@@ -216,22 +216,78 @@ test("release refuses a candidate built for another version", (t) => {
 });
 
 test("registry absence is distinct from authentication, rate limit, or server failure", async () => {
-  assert.equal(
-    await lookupPublished(metadata, async () => ({ status: 404 })),
-    null
-  );
-  for (const status of [401, 403, 429, 500, 503]) {
+  const failure =
+    (code, overrides = {}) =>
+    () => {
+      throw Object.assign(new Error("npm view failed"), {
+        status: 1,
+        signal: null,
+        stdout: JSON.stringify({ error: { code } }),
+        ...overrides,
+      });
+    };
+  assert.equal(await lookupPublished(metadata, failure("E404")), null);
+  for (const code of [
+    "E401",
+    "E403",
+    "E429",
+    "E500",
+    "E503",
+    "EAI_AGAIN",
+    "ETIMEDOUT",
+  ]) {
     await assert.rejects(
-      lookupPublished(metadata, async () => ({ status, ok: false })),
+      lookupPublished(metadata, failure(code)),
       /refusing to assume/
     );
   }
-  await assert.rejects(
-    lookupPublished(metadata, async () => {
-      throw new Error("network unavailable");
+  for (const overrides of [
+    { status: null, signal: "SIGTERM" },
+    { status: 2 },
+    { stdout: "not JSON" },
+    { stdout: "" },
+  ]) {
+    await assert.rejects(
+      lookupPublished(metadata, failure("E404", overrides)),
+      /refusing to assume/
+    );
+  }
+});
+
+test("registry lookup uses bounded npm requests and returns exact version metadata", async () => {
+  const published = { ...metadata, dist: { integrity: "sha512-example" } };
+  assert.deepEqual(
+    await lookupPublished(metadata, (program, args, options) => {
+      assert.equal(program, "npm");
+      assert.deepEqual(args.slice(0, 6), [
+        "view",
+        "parsegraph@7.0.0",
+        "name",
+        "version",
+        "dist",
+        "--json",
+      ]);
+      assert.ok(args.includes("--registry=https://registry.npmjs.org"));
+      assert.ok(args.includes("--prefer-online"));
+      assert.ok(args.includes("--fetch-timeout=15000"));
+      assert.equal(options.timeout, 60000);
+      return JSON.stringify(published);
     }),
-    /network unavailable/
+    published
   );
+});
+
+test("successful but malformed or mismatched registry output cannot permit publication", async () => {
+  for (const output of [
+    "",
+    "invalid JSON",
+    "null",
+    "[]",
+    "{}",
+    JSON.stringify({ ...metadata, version: "6.2.0" }),
+  ]) {
+    await assert.rejects(lookupPublished(metadata, () => output));
+  }
 });
 
 test("publication retry skips only byte-identical immutable npm versions", async (t) => {

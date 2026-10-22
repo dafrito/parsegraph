@@ -92,6 +92,8 @@ jobs:
         run: |
           yarn test:package
           yarn test:release
+      - name: Verify npm registry lookups on this runner
+        run: node tools/release.cjs check-registry
       - name: Test with coverage
         run: yarn test:cov --ci --runInBand
       - name: Build development bundle
