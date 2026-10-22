@@ -143,8 +143,10 @@ static pg_status combine_child(pg_node *node, pg_direction direction,
 
 static pg_status position_child(pg_node *node, pg_direction direction,
                                  double alignment, double separation) {
+    if (!node || !cardinal(direction)) return PG_INVALID;
     if (!isfinite(separation) || separation < 0) return PG_RANGE;
     pg_node *c = child(node, direction);
+    if (!c) return PG_INVALID;
     pg_edge *edge = &node->edges[direction];
     double size;
     if (edge->alignment == PG_ALIGN_NONE) {

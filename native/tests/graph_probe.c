@@ -101,7 +101,14 @@ int main(void) {
         } else if(!strcmp(command,"snapshot")) {
             size_t budget;if(scanf("%zu",&budget)!=1 || !budget) return 1;snapshot(nodes,count,budget);
         } else if(!strcmp(command,"end")) {
-            for(i=0;i<count;++i) pg_node_free(nodes[i]);free(nodes);free(values);nodes=NULL;values=NULL;count=0;
+            for(i=0;i<count;++i) {
+                pg_node_free(nodes[i]);
+            }
+            free(nodes);
+            free(values);
+            nodes=NULL;
+            values=NULL;
+            count=0;
         } else return 1;
     }
     return nodes?1:0;
