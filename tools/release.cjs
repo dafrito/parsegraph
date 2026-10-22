@@ -97,6 +97,124 @@ function releaseContext(metadata) {
   return { event, tag };
 }
 
+function validateRecoveryContext(event, env, metadata, facts) {
+  assert.equal(env.GITHUB_ACTIONS, "true", "Recovery requires GitHub Actions");
+  assert.equal(env.GITHUB_EVENT_NAME, "workflow_dispatch");
+  assert.equal(env.GITHUB_REPOSITORY, REPOSITORY, "Unexpected repository");
+  assert.equal(event.repository?.full_name, REPOSITORY);
+  assert.equal(env.GITHUB_REF, "refs/heads/main", "Recovery must run on main");
+  assert.equal(metadata.name, "parsegraph");
+  assert.match(metadata.version, /^7\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
+  const tag = `v${metadata.version}`;
+  assert.equal(
+    event.inputs?.release_tag,
+    tag,
+    "Recovery tag must match package.json"
+  );
+  assert.match(
+    event.inputs?.release_commit || "",
+    /^[a-f0-9]{40}$/,
+    "Expected original release commit"
+  );
+  assert.match(env.GITHUB_SHA, /^[a-f0-9]{40}$/);
+  assert.equal(
+    facts.head,
+    env.GITHUB_SHA,
+    "Checkout must be the workflow source"
+  );
+  assert.equal(
+    facts.tagCommit,
+    event.inputs.release_commit,
+    "Release tag moved from its expected commit"
+  );
+  assert.equal(
+    facts.isAncestor,
+    true,
+    "Original release must be an ancestor of recovery source"
+  );
+  assert.equal(facts.tagMetadata.name, metadata.name);
+  assert.equal(
+    facts.tagMetadata.version,
+    metadata.version,
+    "Original release version differs"
+  );
+  assert.equal(facts.release.tagName, tag);
+  assert.equal(
+    facts.release.isDraft,
+    false,
+    "Recovery requires a published release"
+  );
+  assert.equal(
+    facts.release.isPrerelease,
+    false,
+    "Recovery requires a stable release"
+  );
+  assert.ok(
+    typeof facts.release.publishedAt === "string" &&
+      Number.isFinite(Date.parse(facts.release.publishedAt)),
+    "Recovery requires a publication date"
+  );
+  return tag;
+}
+
+function recoveryContext(metadata) {
+  const event = JSON.parse(
+    fs.readFileSync(process.env.GITHUB_EVENT_PATH, "utf8")
+  );
+  // Validate inputs before using them as revisions or CLI arguments.
+  assert.match(
+    event.inputs?.release_tag || "",
+    /^v7\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+  );
+  assert.match(event.inputs?.release_commit || "", /^[a-f0-9]{40}$/);
+  const git = (args) =>
+    execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
+  const head = git(["rev-parse", "HEAD"]);
+  const tagCommit = git([
+    "rev-parse",
+    `refs/tags/${event.inputs.release_tag}^{commit}`,
+  ]);
+  let isAncestor = false;
+  try {
+    git(["merge-base", "--is-ancestor", tagCommit, head]);
+    isAncestor = true;
+  } catch {
+    // An unknown or unrelated release source cannot authorize publication.
+  }
+  const release = JSON.parse(
+    execFileSync(
+      "gh",
+      [
+        "release",
+        "view",
+        event.inputs.release_tag,
+        "--repo",
+        REPOSITORY,
+        "--json",
+        "tagName,isDraft,isPrerelease,publishedAt",
+      ],
+      { cwd: root, encoding: "utf8", timeout: 30000 }
+    )
+  );
+  const tag = validateRecoveryContext(event, process.env, metadata, {
+    head,
+    tagCommit,
+    isAncestor,
+    release,
+    tagMetadata: JSON.parse(git(["show", `${tagCommit}:package.json`])),
+  });
+  console.log(
+    `Recovery source ${head}; immutable ${tag} source ${tagCommit}. Publication requires byte-identical archives.`
+  );
+  return { event, tag, recovery: true };
+}
+
+function publicationContext(metadata) {
+  return process.env.GITHUB_EVENT_NAME === "workflow_dispatch"
+    ? recoveryContext(metadata)
+    : releaseContext(metadata);
+}
+
 function readCandidate(directory, metadata) {
   const receipt = JSON.parse(
     fs.readFileSync(path.join(directory, "release-package.json"), "utf8")
@@ -150,6 +268,59 @@ function verifyAssets(directory, metadata) {
     "Release asset checksums changed"
   );
   return candidate;
+}
+
+function compareRecoveryAssets(directory, originalDirectory, metadata) {
+  const candidate = verifyAssets(directory, metadata);
+  const original = verifyAssets(originalDirectory, metadata);
+  assert.ok(
+    fs
+      .readFileSync(candidate.archive)
+      .equals(fs.readFileSync(original.archive)),
+    "Recovery archive differs from the original published release"
+  );
+  assert.ok(
+    fs
+      .readFileSync(path.join(directory, "release-package.json"))
+      .equals(
+        fs.readFileSync(path.join(originalDirectory, "release-package.json"))
+      ),
+    "Recovery receipt differs from the original published release"
+  );
+  return candidate;
+}
+
+function verifyRecoveryAssets(directory, metadata, tag, run = execFileSync) {
+  const candidate = verifyAssets(directory, metadata);
+  const temporary = fs.mkdtempSync(
+    path.join(os.tmpdir(), "parsegraph-recovery-")
+  );
+  try {
+    for (const name of [...assetNames(candidate.receipt), "SHA256SUMS"]) {
+      run(
+        "gh",
+        [
+          "release",
+          "download",
+          tag,
+          "--repo",
+          REPOSITORY,
+          "--pattern",
+          name,
+          "--dir",
+          temporary,
+        ],
+        { stdio: "inherit", timeout: 60000 }
+      );
+    }
+    compareRecoveryAssets(directory, temporary, metadata);
+    console.log(
+      `Recovery verified: ${candidate.receipt.filename} and its receipt exactly match ${tag}; original release assets remain unchanged.`
+    );
+    return candidate;
+  } finally {
+    fs.rmSync(temporary, { recursive: true, force: true });
+  }
 }
 
 function publicationAction(receipt, published) {
@@ -257,21 +428,37 @@ async function publishCandidate(
     );
     return action;
   }
-  run(
-    "npm",
-    [
-      "publish",
-      candidate.archive,
-      "--ignore-scripts",
-      "--access=public",
-      "--tag=latest",
-      "--provenance",
-      `--registry=${REGISTRY}`,
-    ],
-    { cwd: root, stdio: "inherit" }
-  );
-  // If the upload succeeds but the response is lost, rerun the job. The same
-  // integrity check above makes that retry safe without retrying npm blindly.
+  try {
+    run(
+      "npm",
+      [
+        "publish",
+        candidate.archive,
+        "--ignore-scripts",
+        "--access=public",
+        "--tag=latest",
+        "--provenance",
+        `--registry=${REGISTRY}`,
+        "--fetch-timeout=60000",
+        "--fetch-retries=0",
+        "--loglevel=http",
+      ],
+      { cwd: root, stdio: "inherit", timeout: 180000, killSignal: "SIGKILL" }
+    );
+  } catch (error) {
+    // A timeout can lose the response after the registry accepted the bytes.
+    // Read once to establish the outcome; never blindly repeat a publication.
+    const afterFailure = await lookup(candidate.receipt);
+    if (
+      publicationAction(candidate.receipt, afterFailure) === "already-published"
+    ) {
+      console.log(
+        `Publication response failed, but registry integrity confirms ${candidate.receipt.filename}.`
+      );
+      return "already-published";
+    }
+    throw error;
+  }
   return action;
 }
 
@@ -355,7 +542,7 @@ async function main(command) {
       }`
     );
   } else if (command === "guard") {
-    const { tag } = releaseContext(metadata);
+    const { tag } = publicationContext(metadata);
     console.log(`Verified ${tag} at ${process.env.GITHUB_SHA}`);
   } else if (command === "seal") {
     const { receipt } = readCandidate(directory, metadata);
@@ -370,8 +557,14 @@ async function main(command) {
       `Verified release assets for ${receipt.name}@${receipt.version}`
     );
   } else if (command === "publish" || command === "attach") {
-    const { tag } = releaseContext(metadata);
-    const candidate = verifyAssets(directory, metadata);
+    const { tag, recovery } = publicationContext(metadata);
+    assert.ok(
+      command !== "attach" || !recovery,
+      "Recovery must not replace release assets"
+    );
+    const candidate = recovery
+      ? verifyRecoveryAssets(directory, metadata, tag)
+      : verifyAssets(directory, metadata);
     if (command === "publish") {
       validateNpmVersion(
         execFileSync("npm", ["--version"], { encoding: "utf8" }).trim()
@@ -390,10 +583,13 @@ async function main(command) {
 module.exports = {
   hash,
   validateReleaseContext,
+  validateRecoveryContext,
   readCandidate,
   assetNames,
   checksums,
   verifyAssets,
+  compareRecoveryAssets,
+  verifyRecoveryAssets,
   publicationAction,
   validateNpmVersion,
   lookupPublished,

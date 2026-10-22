@@ -6,9 +6,12 @@ const path = require("node:path");
 const {
   hash,
   validateReleaseContext,
+  validateRecoveryContext,
   readCandidate,
   checksums,
   verifyAssets,
+  compareRecoveryAssets,
+  verifyRecoveryAssets,
   publicationAction,
   validateNpmVersion,
   lookupPublished,
@@ -41,6 +44,164 @@ function context() {
 test("release identity accepts the stable matching version and resolved tag", () => {
   assert.equal(validateReleaseContext(...context()), "v7.0.0");
 });
+
+function recoveryContext() {
+  return [
+    {
+      repository: { full_name: "dafrito/parsegraph" },
+      inputs: { release_tag: "v7.0.0", release_commit: sha },
+    },
+    {
+      GITHUB_ACTIONS: "true",
+      GITHUB_EVENT_NAME: "workflow_dispatch",
+      GITHUB_REPOSITORY: "dafrito/parsegraph",
+      GITHUB_SHA: "b".repeat(40),
+      GITHUB_REF: "refs/heads/main",
+    },
+    { ...metadata },
+    {
+      head: "b".repeat(40),
+      tagCommit: sha,
+      isAncestor: true,
+      tagMetadata: { ...metadata },
+      release: {
+        tagName: "v7.0.0",
+        isDraft: false,
+        isPrerelease: false,
+        publishedAt: "2026-10-22T02:25:30Z",
+      },
+    },
+  ];
+}
+
+test("recovery accepts a published ancestor release while retaining actual workflow identity", () => {
+  const c = recoveryContext();
+  const before = JSON.stringify(c);
+  assert.equal(validateRecoveryContext(...c), "v7.0.0");
+  assert.equal(
+    JSON.stringify(c),
+    before,
+    "Must not rewrite provenance environment"
+  );
+  assert.notEqual(c[1].GITHUB_SHA, c[3].tagCommit);
+});
+
+for (const [name, mutate] of [
+  [
+    "local invocation",
+    (c) => {
+      delete c[1].GITHUB_ACTIONS;
+    },
+  ],
+  [
+    "push",
+    (c) => {
+      c[1].GITHUB_EVENT_NAME = "push";
+    },
+  ],
+  [
+    "fork",
+    (c) => {
+      c[1].GITHUB_REPOSITORY = "other/parsegraph";
+    },
+  ],
+  [
+    "foreign event",
+    (c) => {
+      c[0].repository.full_name = "other/parsegraph";
+    },
+  ],
+  [
+    "tag dispatch",
+    (c) => {
+      c[1].GITHUB_REF = "refs/tags/v7.0.0";
+    },
+  ],
+  [
+    "another branch",
+    (c) => {
+      c[1].GITHUB_REF = "refs/heads/topic";
+    },
+  ],
+  [
+    "different checkout",
+    (c) => {
+      c[3].head = sha;
+    },
+  ],
+  [
+    "wrong package",
+    (c) => {
+      c[2].name = "other";
+    },
+  ],
+  [
+    "prerelease package",
+    (c) => {
+      c[2].version = "7.0.0-rc.1";
+    },
+  ],
+  [
+    "different version",
+    (c) => {
+      c[0].inputs.release_tag = "v7.0.1";
+    },
+  ],
+  [
+    "missing expected commit",
+    (c) => {
+      delete c[0].inputs.release_commit;
+    },
+  ],
+  [
+    "moved tag",
+    (c) => {
+      c[3].tagCommit = "a".repeat(40);
+    },
+  ],
+  [
+    "unrelated source",
+    (c) => {
+      c[3].isAncestor = false;
+    },
+  ],
+  [
+    "original version mismatch",
+    (c) => {
+      c[3].tagMetadata.version = "6.2.0";
+    },
+  ],
+  [
+    "wrong release",
+    (c) => {
+      c[3].release.tagName = "v7.0.1";
+    },
+  ],
+  [
+    "draft release",
+    (c) => {
+      c[3].release.isDraft = true;
+    },
+  ],
+  [
+    "prerelease",
+    (c) => {
+      c[3].release.isPrerelease = true;
+    },
+  ],
+  [
+    "unpublished release",
+    (c) => {
+      c[3].release.publishedAt = null;
+    },
+  ],
+]) {
+  test(`recovery rejects ${name}`, () => {
+    const c = recoveryContext();
+    mutate(c);
+    assert.throws(() => validateRecoveryContext(...c));
+  });
+}
 
 for (const [name, mutate] of [
   [
@@ -177,6 +338,102 @@ function fixture(t) {
 test("downloaded artifacts retain their validated hashes", (t) => {
   const { directory, receipt } = fixture(t);
   assert.deepEqual(verifyAssets(directory, metadata).receipt, receipt);
+});
+
+test("recovery compares npm bytes and receipt while verifying each independent documentation seal", (t) => {
+  const current = fixture(t);
+  const original = fixture(t);
+  fs.writeFileSync(
+    path.join(current.directory, "parsegraph-docs-7.0.0.tgz"),
+    "newly generated documentation archive"
+  );
+  fs.writeFileSync(
+    path.join(current.directory, "SHA256SUMS"),
+    checksums(current.directory, current.receipt)
+  );
+  assert.equal(
+    compareRecoveryAssets(current.directory, original.directory, metadata)
+      .archive,
+    current.archive
+  );
+});
+
+test("recovery rejects a different but independently valid npm archive", (t) => {
+  const current = fixture(t);
+  const original = fixture(t);
+  const bytes = Buffer.from("a different valid candidate");
+  fs.writeFileSync(current.archive, bytes);
+  Object.assign(current.receipt, {
+    integrity: `sha512-${hash(bytes, "sha512", "base64")}`,
+    shasum: hash(bytes, "sha1"),
+    sha256: hash(bytes),
+  });
+  fs.writeFileSync(
+    path.join(current.directory, "release-package.json"),
+    JSON.stringify(current.receipt)
+  );
+  fs.writeFileSync(
+    path.join(current.directory, "SHA256SUMS"),
+    checksums(current.directory, current.receipt)
+  );
+  assert.throws(
+    () =>
+      compareRecoveryAssets(current.directory, original.directory, metadata),
+    /differs from the original/
+  );
+});
+
+test("recovery rejects corrupt original assets and changed receipt bytes", (t) => {
+  const current = fixture(t);
+  const original = fixture(t);
+  fs.appendFileSync(
+    path.join(original.directory, "release-package.json"),
+    "\n"
+  );
+  assert.throws(
+    () =>
+      compareRecoveryAssets(current.directory, original.directory, metadata),
+    /checksums changed/
+  );
+  fs.writeFileSync(
+    path.join(original.directory, "SHA256SUMS"),
+    checksums(original.directory, original.receipt)
+  );
+  assert.throws(
+    () =>
+      compareRecoveryAssets(current.directory, original.directory, metadata),
+    /Recovery receipt differs/
+  );
+});
+
+test("recovery only downloads and verifies existing release assets", (t) => {
+  const current = fixture(t);
+  const original = fixture(t);
+  const downloaded = [];
+  const candidate = verifyRecoveryAssets(
+    current.directory,
+    metadata,
+    "v7.0.0",
+    (program, args, options) => {
+      assert.equal(program, "gh");
+      assert.deepEqual(args.slice(0, 3), ["release", "download", "v7.0.0"]);
+      assert.equal(options.timeout, 60000);
+      const name = args[args.indexOf("--pattern") + 1];
+      const destination = args[args.indexOf("--dir") + 1];
+      downloaded.push(name);
+      fs.copyFileSync(
+        path.join(original.directory, name),
+        path.join(destination, name)
+      );
+    }
+  );
+  assert.equal(candidate.archive, current.archive);
+  assert.deepEqual(downloaded, [
+    current.receipt.filename,
+    "parsegraph-docs-7.0.0.tgz",
+    "release-package.json",
+    "SHA256SUMS",
+  ]);
 });
 
 test("modified npm archive fails verification even with a matching filename", (t) => {
@@ -342,7 +599,12 @@ test("first publication sends the exact verified archive without rebuilding or s
     "--tag=latest",
     "--provenance",
     "--registry=https://registry.npmjs.org",
+    "--fetch-timeout=60000",
+    "--fetch-retries=0",
+    "--loglevel=http",
   ]);
+  assert.equal(calls[0][2].timeout, 180000);
+  assert.equal(calls[0][2].killSignal, "SIGKILL");
 });
 
 test("failed npm publication is surfaced for a deliberate retry", async (t) => {
@@ -360,6 +622,68 @@ test("failed npm publication is surfaced for a deliberate retry", async (t) => {
     /npm rejected/
   );
   assert.equal(calls, 1);
+});
+
+test("a lost publication response is recovered only by matching registry integrity", async (t) => {
+  const candidate = fixture(t);
+  let lookups = 0;
+  let uploads = 0;
+  assert.equal(
+    await publishCandidate(
+      candidate,
+      async () => {
+        if (++lookups === 1) return null;
+        return {
+          ...metadata,
+          dist: {
+            integrity: candidate.receipt.integrity,
+            shasum: candidate.receipt.shasum,
+          },
+        };
+      },
+      () => {
+        uploads++;
+        throw Object.assign(new Error("publish timed out"), {
+          code: "ETIMEDOUT",
+        });
+      }
+    ),
+    "already-published"
+  );
+  assert.equal(lookups, 2);
+  assert.equal(uploads, 1);
+});
+
+test("ambiguous failure rejects registry conflicts and unreadable outcomes without retransmission", async (t) => {
+  const candidate = fixture(t);
+  for (const after of [
+    async () => ({
+      ...metadata,
+      dist: {
+        integrity: "sha512-conflicting",
+        shasum: candidate.receipt.shasum,
+      },
+    }),
+    async () => {
+      throw new Error("Registry lookup failed");
+    },
+  ]) {
+    let lookups = 0;
+    let uploads = 0;
+    await assert.rejects(
+      publishCandidate(
+        candidate,
+        async () => (++lookups === 1 ? null : after()),
+        () => {
+          uploads++;
+          throw new Error("upload response lost");
+        }
+      ),
+      /different archive integrity|Registry lookup failed/
+    );
+    assert.equal(lookups, 2);
+    assert.equal(uploads, 1);
+  }
 });
 
 test("npm's trusted publisher minimum is checked explicitly", () => {

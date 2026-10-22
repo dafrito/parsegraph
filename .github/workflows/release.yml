@@ -3,12 +3,22 @@ name: Release
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing published release to recover (must match package.json)
+        required: true
+        type: string
+      release_commit:
+        description: Original full commit SHA of the immutable release tag
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.event.release.tag_name }}
+  group: release-${{ github.event.release.tag_name || inputs.release_tag }}
   cancel-in-progress: false
 
 jobs:
@@ -27,6 +37,8 @@ jobs:
           node-version: 24
           package-manager-cache: false
       - run: node tools/release.cjs guard
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   validate:
     name: Validate released source and build candidate
@@ -60,9 +72,12 @@ jobs:
           path: generated
       - name: Publish once, or verify an identical existing version
         run: node tools/release.cjs publish
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   attach:
     name: Attach archives and checksums to the GitHub release
+    if: github.event_name == 'release'
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 10
