@@ -7,29 +7,44 @@ option(PARSEGRAPH_BUILD_EXAMPLES "Build the standalone SVG example" ON)
 option(PARSEGRAPH_BUILD_BENCHMARKS "Build deterministic native benchmarks" ON)
 option(PARSEGRAPH_BUILD_QT_VIEWER "Build the Qt Quick reference viewer (Qt 6.7+)" OFF)
 include(CTest)
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
-add_library(extent_options INTERFACE)
-target_include_directories(extent_options INTERFACE include)
-target_compile_features(extent_options INTERFACE c_std_11)
+# Build policy stays in this directory, never in exported usage requirements.
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
-  target_compile_options(extent_options INTERFACE -Wall -Wextra -Wpedantic -Werror -ffp-contract=off)
+  add_compile_options(-Wall -Wextra -Wpedantic -Werror -ffp-contract=off)
   if(PARSEGRAPH_SANITIZE)
-    target_compile_options(extent_options INTERFACE -fsanitize=address,undefined -fno-omit-frame-pointer)
-    target_link_options(extent_options INTERFACE -fsanitize=address,undefined)
+    add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=address,undefined)
   endif()
 endif()
 
-if(NOT WIN32)
-  target_link_libraries(extent_options INTERFACE m)
-endif()
 add_library(parsegraph_extent STATIC src/extent.c)
-target_link_libraries(parsegraph_extent PUBLIC extent_options)
-set_target_properties(parsegraph_extent PROPERTIES C_EXTENSIONS OFF)
+target_include_directories(parsegraph_extent PUBLIC
+  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+  "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+target_compile_features(parsegraph_extent PUBLIC c_std_11)
+if(NOT WIN32)
+  target_link_libraries(parsegraph_extent PUBLIC m)
+endif()
+set_target_properties(parsegraph_extent PROPERTIES EXPORT_NAME extent
+  POSITION_INDEPENDENT_CODE ON)
+add_library(parsegraph::extent ALIAS parsegraph_extent)
 
 add_library(parsegraph STATIC src/types.c src/node.c src/layout.c src/caret.c src/paint.c)
 target_link_libraries(parsegraph PUBLIC parsegraph_extent)
-set_target_properties(parsegraph PROPERTIES C_EXTENSIONS OFF)
+set_target_properties(parsegraph PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_library(parsegraph::parsegraph ALIAS parsegraph)
+
+# Sanitized archives require matching runtime flags and are not distributable.
+if(PARSEGRAPH_SANITIZE)
+  install(CODE "message(FATAL_ERROR \"Install requires PARSEGRAPH_SANITIZE=OFF; use a separate package build.\")")
+else()
+  include(cmake/Packaging.cmake)
+endif()
 if(PARSEGRAPH_BUILD_EXAMPLES OR PARSEGRAPH_BUILD_BENCHMARKS OR PARSEGRAPH_BUILD_QT_VIEWER OR BUILD_TESTING)
   add_library(parsegraph_primes STATIC examples/primes.c)
   target_include_directories(parsegraph_primes PUBLIC examples)
@@ -68,7 +83,10 @@ if(BUILD_TESTING)
 
   add_executable(layout_failure_test src/extent.c src/types.c src/node.c src/layout.c tests/layout_failure_test.c)
   target_compile_definitions(layout_failure_test PRIVATE malloc=pg_test_malloc calloc=pg_test_calloc realloc=pg_test_realloc free=pg_test_free)
-  target_link_libraries(layout_failure_test PRIVATE extent_options)
+  target_include_directories(layout_failure_test PRIVATE include)
+  if(NOT WIN32)
+    target_link_libraries(layout_failure_test PRIVATE m)
+  endif()
   add_test(NAME layout_allocation_failure COMMAND layout_failure_test)
   add_executable(extent_test tests/extent_test.c)
   target_link_libraries(extent_test PRIVATE parsegraph_extent)
@@ -82,8 +100,28 @@ if(BUILD_TESTING)
   # Replace allocation only in this test build; the public library uses libc.
   add_executable(extent_failure_test src/extent.c tests/failure.c)
   target_compile_definitions(extent_failure_test PRIVATE malloc=pg_test_malloc free=pg_test_free)
-  target_link_libraries(extent_failure_test PRIVATE extent_options)
+  target_include_directories(extent_failure_test PRIVATE include)
+  if(NOT WIN32)
+    target_link_libraries(extent_failure_test PRIVATE m)
+  endif()
   add_test(NAME allocation_failure COMMAND extent_failure_test)
+
+  add_test(NAME installed_package COMMAND "${CMAKE_COMMAND}"
+    "-DPACKAGE_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}"
+    "-DTEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/package-acceptance"
+    "-DC_COMPILER=${CMAKE_C_COMPILER}"
+    "-DCXX_COMPILER=${CMAKE_CXX_COMPILER}"
+    "-DTEST_CONFIG=$<CONFIG>"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/installed_package.cmake")
+  set_tests_properties(installed_package PROPERTIES TIMEOUT 120 LABELS packaging)
+  add_test(NAME installed_package_custom_dirs COMMAND "${CMAKE_COMMAND}"
+    "-DPACKAGE_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}"
+    "-DTEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/package-custom-acceptance"
+    "-DC_COMPILER=${CMAKE_C_COMPILER}"
+    "-DCXX_COMPILER=${CMAKE_CXX_COMPILER}"
+    "-DTEST_CONFIG=$<CONFIG>" -DCUSTOM_DIRS=ON
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/installed_package.cmake")
+  set_tests_properties(installed_package_custom_dirs PROPERTIES TIMEOUT 120 LABELS packaging)
 
   if(PARSEGRAPH_TS_PARITY)
     find_program(NODE_EXECUTABLE node REQUIRED)

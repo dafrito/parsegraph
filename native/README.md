@@ -26,11 +26,99 @@ dependencies. To build and test without JavaScript, set
 requirement and all tests. Examples and benchmarks have separate
 `PARSEGRAPH_BUILD_EXAMPLES` and `PARSEGRAPH_BUILD_BENCHMARKS` switches.
 
-CMake consumers can use `add_subdirectory(path/to/parsegraph/native)` and link
-`parsegraph::parsegraph`. The build creates `libparsegraph.a` and its dependency
-`libparsegraph_extent.a`; manual link commands need both archives, in that order,
-and `-lm` on Unix. A shared-library release and package-manager distribution are
-separate follow-up work. No system installation or publication is performed.
+CMake consumers can use `add_subdirectory(path/to/parsegraph/native)` or the
+installed package below. Both expose `parsegraph::parsegraph` (the complete core)
+and `parsegraph::extent` (Extent only). The build creates `libparsegraph.a` and
+its dependency `libparsegraph_extent.a`; manual link commands need both archives,
+in that order, and `-lm` on Unix. CMake targets carry these dependencies and the
+public include directory automatically. Internal warnings, floating-point flags,
+and sanitizer policy are not imposed on consumers. The archives are built with
+position-independent code so they can also be linked into application plugins.
+
+## Install and consume
+
+Build a clean, unsanitized package from the repository checkout. Only a C compiler
+and CMake are required for this configuration; no JavaScript, C++, Qt, or graphics
+dependencies are needed:
+
+```sh
+cmake -S native -B native/build-package -DCMAKE_BUILD_TYPE=Release \
+  -DBUILD_TESTING=OFF -DPARSEGRAPH_SANITIZE=OFF -DPARSEGRAPH_TS_PARITY=OFF \
+  -DPARSEGRAPH_BUILD_EXAMPLES=OFF -DPARSEGRAPH_BUILD_BENCHMARKS=OFF
+cmake --build native/build-package --parallel 2
+cmake --install native/build-package --prefix "$HOME/.local/parsegraph"
+```
+
+Installation is explicit; building does not write to system directories. Sanitized
+builds reject installation to avoid distributing archives that require an
+undocumented sanitizer runtime. Use a separate build directory as shown above.
+
+A separate application's `CMakeLists.txt` needs:
+
+```cmake
+find_package(parsegraph 0.1 CONFIG REQUIRED)
+target_link_libraries(my_application PRIVATE parsegraph::parsegraph)
+```
+
+Configure that application with `-DCMAKE_PREFIX_PATH="$HOME/.local/parsegraph"`.
+Use `parsegraph::extent` instead for Extent-only clients. There is no separate
+C++ library: the same headers and archives expose a C ABI usable from C++.
+See [examples/installed](examples/installed) for runnable C and C++ consumers:
+
+```sh
+cmake -S native/examples/installed -B native/build-consumer \
+  -DCMAKE_PREFIX_PATH="$HOME/.local/parsegraph"
+cmake --build native/build-consumer --parallel 2
+ctest --test-dir native/build-consumer --output-on-failure
+```
+
+You can move the installed prefix as a unit and configure new consumers against
+its new location. GNUInstallDirs controls `CMAKE_INSTALL_LIBDIR`,
+`CMAKE_INSTALL_INCLUDEDIR`, and `CMAKE_INSTALL_DATADIR`; they must be relative
+paths contained within the prefix. With unusual library directory layouts, pass
+`-Dparsegraph_DIR=<prefix>/<libdir>/cmake/parsegraph` directly.
+
+### Native version and distribution policy
+
+The native package is **0.1.0**, independently versioned from the TypeScript/npm
+package. During the experimental 0.x period, breaking native API or struct-layout
+changes require a new minor version; compatible fixes increment the patch.
+`find_package(parsegraph 0.1 ...)` accepts compatible 0.1.x packages, not 0.2.x
+or npm version 7. An exact version can be requested with `EXACT`. There is no
+stable binary ABI promise: rebuild consumers when upgrading native packages.
+
+Source builds from this repository and platform-specific static archives are the
+initial distribution formats. Linux and macOS are the CI acceptance platforms;
+Windows binary distribution is not yet validated. Shared `.so`/`.dylib`/DLL
+packages, symbol-export policy, package-manager publication, and signed Qt app
+bundles are separate milestones. This packaging work does not publish a release.
+
+Create a relocatable archive of the headers, libraries, CMake configuration,
+license, and README with:
+
+```sh
+SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) ZERO_AR_DATE=1 \
+  cmake --build native/build-package --target package
+```
+
+CPack writes `parsegraph-native-0.1.0-<system>-<architecture>-<compiler>-<version>.tar.gz`
+in the build directory. Extract it and use the extracted top-level directory as
+`CMAKE_PREFIX_PATH`. Archives are tied to their platform, compiler/toolchain and
+build configuration; they are not universal binaries. CI produces Release
+archives and SHA-256 manifests on Linux and macOS. `SOURCE_DATE_EPOCH` normalizes
+archive timestamps; `ZERO_AR_DATE` prevents Apple's archive index timestamps from
+changing during installation. Tests verify repeated packaging of the same build
+produces an identical checksum with these settings. Checksums identify an
+artifact; byte-identical clean builds across different paths, users, SDKs, or
+toolchains are not promised.
+
+The `installed_package` and `installed_package_custom_dirs` CTests build a minimal
+source snapshot without JavaScript or test sources, install and relocate it,
+and also unpack its CPack archive. They remove the producer source and build
+directories before building external C/C++ consumers, check exported requirements,
+exercise layout and Extent, and reject incompatible version requests, absolute
+install directories, and sanitized installation. These tests
+run in the native CI matrix, including alongside sanitized behavior tests.
 
 ## Public API
 

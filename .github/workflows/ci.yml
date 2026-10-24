@@ -20,6 +20,8 @@ jobs:
     name: Native (${{ matrix.os }}, ${{ matrix.build_type }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
+    env:
+      ZERO_AR_DATE: "1"
     strategy:
       fail-fast: false
       matrix:
@@ -50,6 +52,24 @@ jobs:
       - name: Record optimized benchmark observations
         if: matrix.build_type == 'Release'
         run: native/build/parsegraph_benchmark --nodes 2000 > native/build/benchmark.csv
+      - name: Package native static libraries
+        if: matrix.build_type == 'Release'
+        run: |
+          export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
+          cmake --build native/build --target package
+          cd native/build
+          cmake -E sha256sum parsegraph-native-*.tar.gz > native-SHA256SUMS
+      - name: Upload native static package
+        if: matrix.build_type == 'Release'
+        uses: actions/upload-artifact@v6
+        with:
+          name: native-package-${{ matrix.os }}
+          path: |
+            native/build/parsegraph-native-*.tar.gz
+            native/build/native-SHA256SUMS
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 14
       - name: Upload native diagnostics
         uses: actions/upload-artifact@v6
         with:
