@@ -66,7 +66,7 @@
     "render:svg": "yarn svg:build && ts-node --project tools/svg/tsconfig.json tools/svg/cli.ts",
     "examples:check": "tsc --project examples/tsconfig.json",
     "pack:preview": "yarn build:prod && node tools/pack-preview.cjs",
-    "all": "yarn lint && yarn test:cov && yarn build && yarn doc",
+    "all": "yarn lint:ci && yarn test:cov && yarn build && yarn doc",
     "build": "webpack --mode development --config config/webpack.config.js",
     "build:watch": "yarn build --watch",
     "build:prod": "node tools/build-production.cjs",
@@ -77,7 +77,7 @@
     "test:cov": "yarn test --coverage --coverageDirectory=dist/coverage",
     "prettier": "prettier --write src",
     "lint:ci": "prettier --check src && eslint 'src/**' --ignore-pattern '*.spec.js' --ignore-pattern '*.spec.ts'",
-    "lint": "yarn prettier && npx eslint --fix ./src/** --ignore-pattern *.spec.js --ignore-pattern *.spec.ts",
+    "lint": "yarn prettier && eslint 'src/**' --fix --ignore-pattern '*.spec.js' --ignore-pattern '*.spec.ts'",
     "doc": "typedoc --tsconfig config/tsconfig.browser.json src/index.ts --out ./dist/docs",
     "clean": "./scripts/clean",
     "tar": "./scripts/tar-dev parsegraph",
@@ -85,6 +85,7 @@
     "pack:release": "yarn build:prod && node tools/pack-release.cjs",
     "verify:package": "node tools/verify-package.cjs",
     "test:package": "node --test tools/package.test.cjs",
+    "test:maintenance": "node --test tools/maintenance.test.cjs",
     "test:release": "node --test tools/release.test.cjs",
     "prepack": "node tools/prepack.cjs"
   }

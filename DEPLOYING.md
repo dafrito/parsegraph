@@ -9,7 +9,7 @@ CI never publishes. Dependencies come from `yarn.lock` using Yarn Classic
 second npm lockfile. npm is used to produce and publish installable archives.
 
 The JavaScript matrix runs on Ubuntu with Node 22 and 24. Each job checks
-formatting and lint, generator and SVG-tool types, packaging/release safeguards,
+formatting and lint, generator and SVG-tool types, maintenance/packaging/release safeguards,
 Jest coverage, development compilation, the production archive, and TypeDoc.
 The production package is built once by `yarn pack:release`, which verifies the
 actual archive through isolated consumers, public document/presentation APIs,
@@ -37,6 +37,7 @@ yarn install --frozen-lockfile --non-interactive
 yarn lint:ci
 yarn examples:check
 yarn svg:check
+yarn test:maintenance
 yarn test:package
 yarn test:release
 yarn test:cov --ci --runInBand
@@ -171,6 +172,7 @@ trusted publisher configuration and rerun the failed publication job.
 | `lint`, `prettier`               | Local formatting/fixing commands; not used for CI validation.                                                                               |
 | `test`, `test:watch`, `test:cov` | Jest once, interactively, or with coverage.                                                                                                 |
 | `test:package`                   | Packaging contract regression tests.                                                                                                        |
+| `test:maintenance`               | Fast cleanup and command-argument checks using temporary fixtures; does not clean this checkout.                                            |
 | `test:release`                   | Offline tests of release identity, archive integrity, registry retry behavior, and attachment retries; never publishes.                     |
 | `build`, `build:watch`           | Development bundle and declarations in `dist/`.                                                                                             |
 | `build:prod`, `build:prod:watch` | Production bundle and declarations in `dist-prod/`.                                                                                         |
@@ -183,8 +185,34 @@ trusted publisher configuration and rerun the failed publication job.
 | `doc`                            | TypeDoc output in `dist/docs/`.                                                                                                             |
 | `dependencygraph`                | Generate `dependencygraph.svg`; requires external `ts_dependency_graph` and Graphviz.                                                       |
 | `tar`, `tar:prod`                | Compatibility commands; use `pack:preview` / `pack:release` for installable consumer packages.                                              |
-| `all`                            | Legacy convenience sequence; CI uses explicit checks so it does not run fixing lint.                                                        |
-| `clean`                          | Remove build outputs. CI starts from a fresh checkout.                                                                                      |
+| `all`                            | Check-only lint, Jest coverage, development build, and API docs; source formatting is not changed.                                          |
+| `clean`                          | Remove the JavaScript build/staging outputs and generated artifacts listed below. CI starts from a fresh checkout.                          |
+
+### Local maintenance
+
+`yarn lint:ci` checks formatting and lint without changing files. `yarn lint`
+formats source and applies ESLint fixes; `yarn prettier` only formats source.
+Both lint commands pass quoted recursive and exclusion patterns to the installed
+ESLint. `yarn all` uses the check-only command, so validation cannot silently fix
+source files.
+
+`yarn clean` removes `dist/` (including generated API docs and coverage),
+`dist-prod/`, `dist-types/`, `dist-tools/`, and the legacy `parsegraph/` staging
+directory. It also removes the root `parsegraph-dev.tgz`, `parsegraph.tgz`, and
+`dependencygraph.svg` artifacts. Within `generated/`, it removes only direct
+`.parsegraph`, `.svg`, `.png`, and `.tgz` files, the preview/release package
+receipts, and `SHA256SUMS`. Save any generated files you want to retain elsewhere
+before cleaning.
+
+The command resolves its checkout from the script's location, independent of the
+working directory. It preserves `generated/README.md`, other unknown files and
+subdirectories, authored `docs/`, `examples/fixtures/`, installed dependencies,
+editor settings, and native build directories. A symlinked `generated/`
+directory is rejected before cleanup; artifact symlinks are unlinked without
+following their targets. The command accepts no output-path arguments.
+
+Run `yarn test:maintenance` to verify cleanup and lint command behavior using
+temporary directories. It does not remove files from your working checkout.
 
 The `deploy` and broken `deploy:prod` package commands are removed. Registry
 publication is owned by the release workflow, independently of the VPN website

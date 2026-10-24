@@ -90,6 +90,7 @@ jobs:
           yarn svg:check
       - name: Test packaging and release safeguards
         run: |
+          yarn test:maintenance
           yarn test:package
           yarn test:release
       - name: Verify npm registry lookups on this runner
