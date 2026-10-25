@@ -294,3 +294,49 @@ it("reports unknown capabilities and rejects unsupported structured content", as
   ).rejects.toThrow("content adapter");
   await expect(renderSvg(graph, { width: 0 })).rejects.toThrow("positive");
 });
+
+it("frames stored focus after a document round trip without changing node geometry", async () => {
+  const caret = new DirectionCaret("Root");
+  caret.node().setId("root");
+  caret.spawn("d", "Content").setId("content");
+  caret.spawn("f", "Excluded sibling").setId("sibling");
+  caret.focus("d");
+  const graph = serializeParsegraphDocument(caret.root(), {
+    presentation: createPresentation(),
+  });
+  const full = await renderSvg(graph);
+  const outlined = await renderSvg(graph, {
+    focus: { nodeId: "root", outline: true },
+  });
+  const framed = await renderSvg(graph, {
+    focus: { nodeId: "root", frame: true, outline: true },
+    padding: 8,
+  });
+  expect(outlined.geometry).toEqual(full.geometry);
+  expect(framed.geometry).toEqual(full.geometry);
+  expect(outlined.viewBox).toEqual(full.viewBox);
+  const bodies = full.geometry.filter((n) => n.id !== "sibling");
+  const bounds = {
+    left: Math.min(...bodies.map((n) => n.x - n.width / 2)),
+    top: Math.min(...bodies.map((n) => n.y - n.height / 2)),
+    right: Math.max(...bodies.map((n) => n.x + n.width / 2)),
+    bottom: Math.max(...bodies.map((n) => n.y + n.height / 2)),
+  };
+  expect(framed.focusBounds).toEqual(bounds);
+  expect(framed.viewBox).toEqual([
+    bounds.left - 8,
+    bounds.top - 8,
+    bounds.right - bounds.left + 16,
+    bounds.bottom - bounds.top + 16,
+  ]);
+  expect(parse(framed.svg).querySelectorAll("[data-node-id]")).toHaveLength(3);
+  expect(
+    parse(framed.svg).querySelector('[data-focus-node-id="root"]')
+  ).not.toBeNull();
+  await expect(
+    renderSvg(graph, { focus: { nodeId: "missing" } })
+  ).rejects.toThrow(/Unknown focus node/);
+  await expect(renderSvg(graph, { focus: { nodeId: "" } })).rejects.toThrow(
+    /nonempty node ID/
+  );
+});

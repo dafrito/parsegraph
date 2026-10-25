@@ -83,7 +83,7 @@ function main(args: string[]) {
         (arg === "--padding" ? number < 0 : number <= 0)
       )
         throw new Error(`Invalid ${arg}: ${value}`);
-      options[arg.slice(2) as keyof SvgOptions] = number;
+      options[arg.slice(2) as "width" | "height" | "padding"] = number;
     }
   }
   if (!input)

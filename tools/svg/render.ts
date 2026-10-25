@@ -1,5 +1,6 @@
 import {
   Alignment,
+  FocusBounds,
   CommitLayout,
   Direction,
   DirectionNode,
@@ -13,6 +14,8 @@ import {
 } from "../../src";
 
 export interface SvgOptions {
+  /** Optional post-layout framing. No focus option preserves the whole-graph view. */
+  focus?: { nodeId: string; frame?: boolean; outline?: boolean };
   width?: number;
   height?: number;
   padding?: number;
@@ -39,6 +42,11 @@ export async function renderSvg(input: unknown, options: SvgOptions = {}) {
       throw new Error("Image dimensions must be finite positive numbers");
     }
   }
+  if (
+    options.focus &&
+    (typeof options.focus.nodeId !== "string" || !options.focus.nodeId.length)
+  )
+    throw new Error("Focus requires a nonempty node ID");
   const padding = options.padding ?? 16;
   if (!Number.isFinite(padding) || padding < 0)
     throw new Error("Padding must be finite and nonnegative");
@@ -118,6 +126,15 @@ export async function renderSvg(input: unknown, options: SvgOptions = {}) {
     maxX = Math.max(maxX, x + width / 2);
     maxY = Math.max(maxY, y + height / 2);
   };
+  const geometry: {
+    id: string;
+    x: number;
+    y: number;
+    scale: number;
+    width: number;
+    height: number;
+    paintGroup: string;
+  }[] = [];
   for (const node of nodes) {
     const appearance = loaded.appearance
       ? resolveNodeAppearance(loaded.appearance, String(node.id()))
@@ -129,6 +146,15 @@ export async function renderSvg(input: unknown, options: SvgOptions = {}) {
     const size = [0, 0];
     nodeLayout.size(size);
     include(x, y, size[0] * scale, size[1] * scale);
+    geometry.push({
+      id: String(node.id()),
+      x,
+      y,
+      scale,
+      width: size[0] * scale,
+      height: size[1] * scale,
+      paintGroup: String(node.paintGroup().node().id()),
+    });
     const group = node.paintGroup().node().layout();
     paintNodeLines(node, 0.5, (gx, gy, width, height) => {
       const ax = group.absoluteX() + gx * group.absoluteScale();
@@ -222,6 +248,38 @@ export async function renderSvg(input: unknown, options: SvgOptions = {}) {
     }
     scene.appendChild(body);
   }
+  let focusBounds: FocusBounds | undefined;
+  if (options.focus) {
+    const target = nodes.find(
+      (node) => String(node.id()) === options.focus.nodeId
+    );
+    if (!target) throw new Error(`Unknown focus node: ${options.focus.nodeId}`);
+    focusBounds = target.layout().focusBounds();
+    if (options.focus.outline) {
+      const { left, top, right, bottom } = focusBounds;
+      scene.appendChild(
+        element("rect", {
+          "data-focus-node-id": options.focus.nodeId,
+          x: left,
+          y: top,
+          width: right - left,
+          height: bottom - top,
+          fill: "none",
+          stroke: "#b34722",
+          "stroke-width": 2,
+          "stroke-dasharray": "6 4",
+          "vector-effect": "non-scaling-stroke",
+          "pointer-events": "none",
+        })
+      );
+    }
+    if (options.focus.frame) {
+      minX = focusBounds.left;
+      minY = focusBounds.top;
+      maxX = focusBounds.right;
+      maxY = focusBounds.bottom;
+    }
+  }
   const viewWidth = Math.max(1, maxX - minX + 2 * padding);
   const viewHeight = Math.max(1, maxY - minY + 2 * padding);
   const width =
@@ -248,6 +306,9 @@ export async function renderSvg(input: unknown, options: SvgOptions = {}) {
   return {
     svg: new XMLSerializer().serializeToString(svg),
     nodes: nodes.length,
+    geometry,
+    viewBox: [minX - padding, minY - padding, viewWidth, viewHeight],
+    ...(focusBounds ? { focusBounds } : {}),
     ignoredCapabilities: loaded.ignoredCapabilities,
   };
 }
