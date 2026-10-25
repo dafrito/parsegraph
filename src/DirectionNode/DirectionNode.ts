@@ -27,6 +27,7 @@ export class DirectionNode<Value = any> {
   private _scale: number;
   private _value?: Value;
   private _focusDirections?: Direction[];
+  private _looseSeparation = 0;
 
   constructor(value?: Value) {
     this._id = nodeIdPrefix + nodeCount++;
@@ -178,6 +179,46 @@ export class DirectionNode<Value = any> {
   setNodeFit(nodeFit: Fit): void {
     this._nodeFit = nodeFit;
     this.invalidate();
+  }
+
+  /** Read the separation rule for a planar direction; defaults to EXACT.
+   * @param {Direction} direction - Direction owned by this node.
+   * @return {Fit} EXACT or LOOSE.
+   */
+  separationFit(direction: Direction): Fit {
+    this.validateSeparationDirection(direction);
+    return this._looseSeparation & (1 << direction) ? Fit.LOOSE : Fit.EXACT;
+  }
+
+  /** Set spacing without simplifying stored extents or changing layout order.
+   * Parent-facing settings are dormant until that direction becomes child-facing.
+   * @param {Direction} direction - A planar direction (including absent edges).
+   * @param {Fit} fit - EXACT or LOOSE; NAIVE is not a separation rule.
+   */
+  setSeparationFit(direction: Direction, fit: Fit): void {
+    this.validateSeparationDirection(direction);
+    if (fit !== Fit.EXACT && fit !== Fit.LOOSE) {
+      throw new Error("Separation fit must be EXACT or LOOSE");
+    }
+    const mask = 1 << direction;
+    const next =
+      fit === Fit.LOOSE
+        ? this._looseSeparation | mask
+        : this._looseSeparation & ~mask;
+    if (next !== this._looseSeparation) {
+      this._looseSeparation = next;
+      this.invalidate();
+    }
+  }
+
+  private validateSeparationDirection(direction: Direction): void {
+    if (
+      !Number.isInteger(direction) ||
+      direction < Direction.DOWNWARD ||
+      direction > Direction.BACKWARD
+    ) {
+      throw new Error("Separation fit requires a planar direction");
+    }
   }
 
   scale(): number {

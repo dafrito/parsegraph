@@ -212,6 +212,18 @@ pg_status pg_node_set_preferred_axis(pg_node *n, pg_preferred_axis pref) {
     pg_node_invalidate(n);
     return PG_OK;
 }
+pg_fit pg_node_separation_fit(const pg_node *n, pg_direction d) {
+    if (!n || d < PG_DOWNWARD || d > PG_BACKWARD) return PG_FIT_NULL;
+    return (n->loose_separation & (1u << d)) ? PG_FIT_LOOSE : PG_FIT_EXACT;
+}
+pg_status pg_node_set_separation_fit(pg_node *n, pg_direction d, pg_fit fit) {
+    if (!n || d < PG_DOWNWARD || d > PG_BACKWARD ||
+        (fit != PG_FIT_EXACT && fit != PG_FIT_LOOSE)) return PG_INVALID;
+    unsigned mask = 1u << d;
+    unsigned next = fit == PG_FIT_LOOSE ? n->loose_separation | mask : n->loose_separation & ~mask;
+    if (next != n->loose_separation) { n->loose_separation = next; pg_node_invalidate(n); }
+    return PG_OK;
+}
 pg_status pg_node_pull(pg_node *n, pg_direction d) {
     if (!n || !direction_valid(d)) return PG_INVALID;
     if (pg_node_is_rootlike(n)) return pg_node_set_preferred_axis(n, pg_direction_axis(d) == PG_VERTICAL ? PG_PREFERRED_VERTICAL : PG_PREFERRED_HORIZONTAL);

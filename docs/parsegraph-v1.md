@@ -33,7 +33,7 @@ There is no required-capability list or negotiation gate in this draft.
 A known capability must be validated before use. A malformed supported payload
 is an error, rather than an instruction to silently use defaults. An unknown
 capability's contents are opaque JSON and must not be partially interpreted.
-Unknown fields inside the defined core, `presentation/1`, `appearance/1`, or `focus/1` are rejected: new
+Unknown fields inside the defined core, `presentation/1`, `appearance/1`, `focus/1`, or `separation/1` are rejected: new
 behavior belongs in a new capability payload, not an unannounced field that
 looks supported. Unknown names in the capability map itself are accepted.
 
@@ -332,7 +332,7 @@ with no options, the writer emits an empty capability map. The writer validates
 and snapshots JSON data. The reader validates before graph mutation and copies
 payloads. It reports unsupported capability names but does not reject them.
 
-The reference library currently validates/interprets `presentation/1`, `appearance/1`, and `focus/1`; it only
+The reference library currently validates/interprets `presentation/1`, `appearance/1`, `focus/1`, and `separation/1`; it only
 preserves `generation/1` and other unknown capabilities as opaque JSON.
 `ignoredCapabilities` therefore reports what the library does not interpret,
 not necessarily what the host viewer implements. If Freeform initially uses
@@ -474,3 +474,10 @@ The optional [focus/1 capability](focus-v1.md) stores per-node sets of child
 branches to frame. It supplies post-layout framing intent without changing
 packing. Supporting readers restore it on nodes; older readers may preserve it
 opaquely. TypeScript and C expose matching graph-space body-bounds queries.
+
+### Directional separation (`separation/1`)
+
+The optional [separation/1 capability](separation-v1.md) stores per-node planar
+directions that use boxed separation comparisons. Defaults remain exact.
+Caret `loosen()` and `tighten()` configure the perpendicular axis selected by the
+current layout preference, without changing node fit or simplifying extents.

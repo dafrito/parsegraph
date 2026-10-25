@@ -1,4 +1,10 @@
-import { Direction, readDirection, reverseDirection } from "./Direction";
+import {
+  Axis,
+  getDirectionAxis,
+  Direction,
+  readDirection,
+  reverseDirection,
+} from "./Direction";
 import { DirectionNode } from "./DirectionNode";
 
 import { PreferredAxis, Fit, Alignment, readAlignment } from "./DirectionNode";
@@ -277,6 +283,30 @@ export class DirectionCaret<Value> {
    *
    * @see {@link readDirection}
    */
+  /** Set loose separation on the axis perpendicular to the current preference. */
+  loosen(): void {
+    this.setCrossAxisSeparation(Fit.LOOSE);
+  }
+
+  /** Restore exact separation on the current perpendicular axis (not undo). */
+  tighten(): void {
+    this.setCrossAxisSeparation(Fit.EXACT);
+  }
+
+  private setCrossAxisSeparation(fit: Fit): void {
+    const node = this.node();
+    const preference = node.siblings().getLayoutPreference();
+    const horizontal = node.neighbors().isRootlike()
+      ? preference === PreferredAxis.HORIZONTAL ||
+        preference === PreferredAxis.PERPENDICULAR
+      : getDirectionAxis(node.siblings().layoutOrder()[1]) === Axis.HORIZONTAL;
+    for (const direction of horizontal
+      ? [Direction.DOWNWARD, Direction.UPWARD]
+      : [Direction.FORWARD, Direction.BACKWARD]) {
+      node.setSeparationFit(direction, fit);
+    }
+  }
+
   pull(given: Direction | string): void {
     this.node().siblings().pull(readDirection(given));
   }

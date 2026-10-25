@@ -1,6 +1,7 @@
+import { separateExtents } from "./separateExtents";
 import { Direction, Axis, getDirectionAxis } from "../../../Direction";
 
-import { DirectionNode, AxisOverlap } from "../..";
+import { DirectionNode, AxisOverlap, Fit } from "../..";
 
 import { LayoutPhase } from "..";
 
@@ -13,6 +14,23 @@ import { getSeparation } from "./getSeparation";
 
 const firstSize: number[] = [NaN, NaN];
 const secondSize: number[] = [NaN, NaN];
+
+/** Resolve the conservative policy for an opposing-child comparison.
+ * @param {DirectionNode} node - Owning parent.
+ * @param {Direction} first - First outgoing edge.
+ * @param {Direction} second - Opposite outgoing edge.
+ * @return {Fit} LOOSE if either direction requests it.
+ */
+function opposingSeparationFit(
+  node: DirectionNode,
+  first: Direction,
+  second: Direction
+): Fit {
+  return node.separationFit(first) === Fit.LOOSE ||
+    node.separationFit(second) === Fit.LOOSE
+    ? Fit.LOOSE
+    : Fit.EXACT;
+}
 
 /**
  * Layout a pair of nodes in the given directions.
@@ -108,21 +126,20 @@ export const layoutAxis = (
   // console.log("First alignment: " + firstNodeAlignment);
   // console.log("Second alignment: " + secondNodeAlignment);
 
-  let separationBetweenChildren: number = firstNode
-    .layout()
-    .extentsAt(secondDirection)
-    .separation(
-      secondNode.layout().extentsAt(firstDirection),
-      // Alignments are in the parent's space; extent offsets are in each
-      // child's space. Express the displacement in the first child's space.
-      (secondNodeAlignment - firstNodeAlignment) / firstNode.scale() +
-        firstNode.layout().extentOffsetAt(secondDirection) -
-        (secondNode.scale() / firstNode.scale()) *
-          secondNode.layout().extentOffsetAt(firstDirection),
-      true,
-      node.neighbors().nodeAt(secondDirection).scale() /
-        node.neighbors().nodeAt(firstDirection).scale()
-    );
+  let separationBetweenChildren: number = separateExtents(
+    firstNode.layout().extentsAt(secondDirection),
+    secondNode.layout().extentsAt(firstDirection),
+    // Alignments are in the parent's space; extent offsets are in each
+    // child's space. Express the displacement in the first child's space.
+    (secondNodeAlignment - firstNodeAlignment) / firstNode.scale() +
+      firstNode.layout().extentOffsetAt(secondDirection) -
+      (secondNode.scale() / firstNode.scale()) *
+        secondNode.layout().extentOffsetAt(firstDirection),
+    true,
+    node.neighbors().nodeAt(secondDirection).scale() /
+      node.neighbors().nodeAt(firstDirection).scale(),
+    opposingSeparationFit(node, firstDirection, secondDirection)
+  );
   separationBetweenChildren *= node.neighbors().nodeAt(firstDirection).scale();
 
   // console.log("Separation between children="
@@ -190,31 +207,29 @@ export const layoutAxis = (
 
   // Allow some overlap if we have both first-axis sides, but
   // nothing ahead on the second axis.
-  let separationFromFirst: number = node
-    .layout()
-    .extentsAt(firstDirection)
-    .separation(
-      firstNode.layout().extentsAt(secondDirection),
-      node.layout().extentOffsetAt(firstDirection) +
-        firstNodeAlignment -
-        node.neighbors().nodeAt(firstDirection).scale() *
-          firstNode.layout().extentOffsetAt(secondDirection),
-      firstAxisOverlap,
-      node.neighbors().nodeAt(firstDirection).scale()
-    );
+  let separationFromFirst: number = separateExtents(
+    node.layout().extentsAt(firstDirection),
+    firstNode.layout().extentsAt(secondDirection),
+    node.layout().extentOffsetAt(firstDirection) +
+      firstNodeAlignment -
+      node.neighbors().nodeAt(firstDirection).scale() *
+        firstNode.layout().extentOffsetAt(secondDirection),
+    firstAxisOverlap,
+    node.neighbors().nodeAt(firstDirection).scale(),
+    node.separationFit(firstDirection)
+  );
 
-  let separationFromSecond: number = node
-    .layout()
-    .extentsAt(secondDirection)
-    .separation(
-      secondNode.layout().extentsAt(firstDirection),
-      node.layout().extentOffsetAt(secondDirection) +
-        secondNodeAlignment -
-        node.neighbors().nodeAt(secondDirection).scale() *
-          secondNode.layout().extentOffsetAt(firstDirection),
-      secondAxisOverlap,
-      node.neighbors().nodeAt(secondDirection).scale()
-    );
+  let separationFromSecond: number = separateExtents(
+    node.layout().extentsAt(secondDirection),
+    secondNode.layout().extentsAt(firstDirection),
+    node.layout().extentOffsetAt(secondDirection) +
+      secondNodeAlignment -
+      node.neighbors().nodeAt(secondDirection).scale() *
+        secondNode.layout().extentOffsetAt(firstDirection),
+    secondAxisOverlap,
+    node.neighbors().nodeAt(secondDirection).scale(),
+    node.separationFit(secondDirection)
+  );
 
   /* console.log(
             "Separation from this " + nameType(this.type()) + " to " +

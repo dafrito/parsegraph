@@ -66,6 +66,11 @@ bool pg_node_is_rootlike(const pg_node *node);
 
 pg_fit pg_node_fit(const pg_node *node);
 pg_status pg_node_set_fit(pg_node *node, pg_fit fit);
+/* Planar directions only; defaults EXACT. LOOSE boxes only the separation
+ * comparison, not stored extents. Parent-facing settings remain dormant.
+ * Invalid reads return PG_FIT_NULL; invalid writes leave state unchanged. */
+pg_fit pg_node_separation_fit(const pg_node *node, pg_direction direction);
+pg_status pg_node_set_separation_fit(pg_node *node, pg_direction direction, pg_fit fit);
 double pg_node_scale(const pg_node *node);
 pg_status pg_node_set_scale(pg_node *node, double scale);
 bool pg_node_right_to_left(const pg_node *node);

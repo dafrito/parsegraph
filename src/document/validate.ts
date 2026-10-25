@@ -364,6 +364,28 @@ export function validateParsegraphDocument(
     (children.get(id) || []).forEach((child) => pending.push(child));
   }
   check(visited.size === nodes.size, "disconnected nodes or cycle");
+  if (
+    Object.prototype.hasOwnProperty.call(document.capabilities, "separation/1")
+  ) {
+    const separation = document.capabilities["separation/1"];
+    object(separation);
+    fields(separation, ["nodeDirections"]);
+    object(separation.nodeDirections);
+    Object.entries(separation.nodeDirections).forEach(([id, directions]) => {
+      check(nodes.has(id), `separation references unknown node ${id}`);
+      check(
+        Array.isArray(directions),
+        "separation directions must be an array"
+      );
+      check(
+        new Set(directions).size === directions.length,
+        "duplicate separation direction"
+      );
+      directions.forEach((d) =>
+        choice(d, ["downward", "upward", "forward", "backward"])
+      );
+    });
+  }
   if (Object.prototype.hasOwnProperty.call(document.capabilities, "focus/1")) {
     const focus = document.capabilities["focus/1"];
     object(focus);

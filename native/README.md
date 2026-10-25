@@ -276,3 +276,8 @@ post-layout graph-space bounds queries. See [focus/1](../docs/focus-v1.md) for t
 C/TypeScript API and serialization contract. The native core does not parse JSON.
 `pg_bounds` is an edge-based rectangle (`left`, `top`, `right`, `bottom`), distinct
 from painting's center-based `pg_rect`. Focus does not invalidate or alter layout.
+
+## Separation fit
+
+Caret `loosen()` / `tighten()` set cross-axis separation independently of node fit.
+See [separation and multislot spacing](../docs/separation-v1.md).

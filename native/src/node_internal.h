@@ -17,6 +17,7 @@ struct pg_node {
     void *value;
     uint64_t id;
     pg_fit fit;
+    unsigned loose_separation;
     pg_preferred_axis preferred_axis;
     double scale;
     bool right_to_left, creased;

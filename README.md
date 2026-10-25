@@ -196,3 +196,8 @@ using their group position. Then, at render time, you pass a world matrix to
 your render call that is the absolute position of that paint group. Both the
 group and the absolute position are computed using the CommitLayout
 algorithm.
+
+## Separation fit
+
+Caret `loosen()` / `tighten()` set cross-axis separation independently of node fit.
+See [separation and multislot spacing](docs/separation-v1.md).

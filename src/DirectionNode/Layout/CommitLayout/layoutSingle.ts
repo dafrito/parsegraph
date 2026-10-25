@@ -1,3 +1,4 @@
+import { separateExtents } from "./separateExtents";
 import { Extent } from "../Extent";
 
 import {
@@ -69,18 +70,17 @@ export const layoutSingle = (
 
   // Separate the child from this node.
 
-  let separationFromChild: number = node
-    .layout()
-    .extentsAt(direction)
-    .separation(
-      childExtent,
-      node.layout().extentOffsetAt(direction) +
-        alignment -
-        node.neighbors().nodeAt(direction).scale() *
-          child.layout().extentOffsetAt(reversed),
-      allowAxisOverlap,
-      node.neighbors().nodeAt(direction).scale()
-    );
+  let separationFromChild: number = separateExtents(
+    node.layout().extentsAt(direction),
+    childExtent,
+    node.layout().extentOffsetAt(direction) +
+      alignment -
+      node.neighbors().nodeAt(direction).scale() *
+        child.layout().extentOffsetAt(reversed),
+    allowAxisOverlap,
+    node.neighbors().nodeAt(direction).scale(),
+    node.separationFit(direction)
+  );
   // console.log("Calculated unpadded separation of " +
   //   separationFromChild + ".");
 

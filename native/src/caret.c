@@ -218,6 +218,19 @@ void *pg_caret_replace(pg_caret *c, void *value) {
     if (c) pg_node_set_value(pg_caret_node(c), value);
     return old;
 }
+static pg_status cross_axis_separation(pg_caret *c, pg_fit fit) {
+    if (!c) return PG_INVALID;
+    pg_node *n = pg_caret_node(c);
+    pg_preferred_axis pref = pg_node_preferred_axis(n);
+    bool horizontal = pg_node_is_rootlike(n)
+        ? pref == PG_PREFERRED_HORIZONTAL || pref == PG_PREFERRED_PERPENDICULAR
+        : pg_direction_axis(pg_node_layout_order(n)[1]) == PG_HORIZONTAL;
+    pg_direction d = horizontal ? PG_DOWNWARD : PG_FORWARD;
+    pg_status status = pg_node_set_separation_fit(n, d, fit);
+    return status == PG_OK ? pg_node_set_separation_fit(n, pg_direction_reverse(d), fit) : status;
+}
+pg_status pg_caret_loosen(pg_caret *c) { return cross_axis_separation(c, PG_FIT_LOOSE); }
+pg_status pg_caret_tighten(pg_caret *c) { return cross_axis_separation(c, PG_FIT_EXACT); }
 pg_status pg_caret_pull(pg_caret *c, pg_direction d) { return c ? pg_node_pull(pg_caret_node(c), d) : PG_INVALID; }
 pg_status pg_caret_align(pg_caret *c, pg_direction d, pg_alignment a) {
     if (!c) return PG_INVALID;

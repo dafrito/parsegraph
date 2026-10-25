@@ -174,6 +174,21 @@ static pg_status padded_separation(pg_layout *layout, pg_node *node,
     return isfinite(*separation) && *separation >= 0 ? PG_OK : PG_RANGE;
 }
 
+static pg_status separate_extents(const pg_extent *a, const pg_extent *b,
+        double offset, bool overlap, double scale, bool loose, double *out) {
+    if (!loose) return pg_extent_separation(a, b, offset, overlap, scale, out);
+    double av[3], bv[3];
+    pg_extent_bounding_values((pg_extent *)a, av);
+    pg_extent_bounding_values((pg_extent *)b, bv);
+    double as = av[2], bs = bv[2] * scale;
+    double result = overlap ? 0 : fmax(0, fmax(isnan(as) ? 0 : as, isnan(bs) ? 0 : bs));
+    if (av[0] > 0 && bv[0] > 0 && fmax(0, offset) < fmin(av[0], offset + bv[0]*scale)
+        && !isnan(as) && !isnan(bs)) result = fmax(result, as + bs);
+    if (!isfinite(result)) return PG_RANGE;
+    *out = result;
+    return PG_OK;
+}
+
 static pg_status layout_single(pg_layout *layout, pg_node *node,
                                pg_direction d, bool allow_axis_overlap) {
     pg_node *c = child(node, d);
@@ -182,8 +197,8 @@ static pg_status layout_single(pg_layout *layout, pg_node *node,
     double alignment, separation;
     TRY(pg_layout_alignment(node, d, &alignment));
     const pg_extent *e = const_extent(node, d), *ce = const_extent(c, reverse(d));
-    TRY(pg_extent_separation(e, ce, e->offset + alignment - c->scale*ce->offset,
-                              overlap(node, d, allow_axis_overlap), c->scale, &separation));
+    TRY(separate_extents(e, ce, e->offset + alignment - c->scale*ce->offset,
+                              overlap(node, d, allow_axis_overlap), c->scale, pg_node_separation_fit(node, d) == PG_FIT_LOOSE, &separation));
     TRY(padded_separation(layout, node, d, &separation));
     TRY(position_child(node, d, alignment, separation));
     return combine_child(node, d, alignment, separation);
@@ -201,18 +216,18 @@ static pg_status layout_axis(pg_layout *layout, pg_node *node,
     TRY(pg_layout_alignment(node, second, &b_alignment));
     const pg_extent *ae = const_extent(a, second), *be = const_extent(b, first);
     double ratio = b->scale/a->scale;
-    TRY(pg_extent_separation(ae, be,
+    TRY(separate_extents(ae, be,
         (b_alignment-a_alignment)/a->scale + ae->offset-ratio*be->offset,
-        true, ratio, &between));
+        true, ratio, pg_node_separation_fit(node, first) == PG_FIT_LOOSE || pg_node_separation_fit(node, second) == PG_FIT_LOOSE, &between));
     between *= a->scale;
     const pg_extent *first_extent = const_extent(node, first);
     const pg_extent *second_extent = const_extent(node, second);
-    TRY(pg_extent_separation(first_extent, ae,
+    TRY(separate_extents(first_extent, ae,
         first_extent->offset+a_alignment-a->scale*ae->offset,
-        overlap(node, first, allow_axis_overlap), a->scale, &a_sep));
-    TRY(pg_extent_separation(second_extent, be,
+        overlap(node, first, allow_axis_overlap), a->scale, pg_node_separation_fit(node, first) == PG_FIT_LOOSE, &a_sep));
+    TRY(separate_extents(second_extent, be,
         second_extent->offset+b_alignment-b->scale*be->offset,
-        overlap(node, second, allow_axis_overlap), b->scale, &b_sep));
+        overlap(node, second, allow_axis_overlap), b->scale, pg_node_separation_fit(node, second) == PG_FIT_LOOSE, &b_sep));
     if (between >= a_sep+b_sep) {
         a_sep = fmax(a_sep, between/2);
         b_sep = fmax(b_sep, between/2);

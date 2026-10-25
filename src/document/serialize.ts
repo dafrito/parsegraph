@@ -18,6 +18,7 @@ import {
   Capabilities,
   Focus,
   FocusDirection,
+  Separation,
 } from "./types";
 import {
   DIRECTIONS,
@@ -43,7 +44,18 @@ export function serializeParsegraphDocument(
     throw new Error("Serialize from the actual graph root");
   const nodes: DocumentNode[] = [];
   const focus: Focus = { nodeDirections: Object.create(null) };
+  const separation: Separation = { nodeDirections: Object.create(null) };
   forEachSerializedNode(root, (node) => {
+    const loose = [
+      Direction.DOWNWARD,
+      Direction.UPWARD,
+      Direction.FORWARD,
+      Direction.BACKWARD,
+    ].filter((d) => node.separationFit(d) === Fit.LOOSE);
+    if (loose.length)
+      separation.nodeDirections[node.id() as string] = loose.map(
+        (d) => DIRECTIONS[d] as Exclude<FocusDirection, "inward">
+      );
     const directions = node.focusDirections();
     if (directions !== undefined) {
       node.validateFocusDirections(directions);
@@ -106,6 +118,13 @@ export function serializeParsegraphDocument(
     options.capabilities?.["focus/1"] !== undefined
   ) {
     document.capabilities["focus/1"] = focus;
+  }
+  delete document.capabilities["separation/1"];
+  if (
+    Object.keys(separation.nodeDirections).length ||
+    options.capabilities?.["separation/1"] !== undefined
+  ) {
+    document.capabilities["separation/1"] = separation;
   }
   validateParsegraphDocument(document);
   return JSON.parse(JSON.stringify(document));
@@ -170,6 +189,17 @@ export function deserializeParsegraphDocument(
         PreferredAxis.PARENT + PREFERENCES.indexOf(record.layoutPreference)
       );
   });
+  const separation = document.capabilities["separation/1"] as
+    | Separation
+    | undefined;
+  if (separation)
+    Object.entries(separation.nodeDirections).forEach(([id, directions]) => {
+      directions.forEach((d) =>
+        nodes
+          .get(id)
+          .setSeparationFit(DIRECTIONS.indexOf(d) as Direction, Fit.LOOSE)
+      );
+    });
   const focus = document.capabilities["focus/1"] as Focus | undefined;
   if (focus) {
     Object.entries(focus.nodeDirections).forEach(([id, directions]) => {
@@ -186,7 +216,8 @@ export function deserializeParsegraphDocument(
       (name) =>
         name !== "presentation/1" &&
         name !== "appearance/1" &&
-        name !== "focus/1"
+        name !== "focus/1" &&
+        name !== "separation/1"
     ),
     ...(Object.prototype.hasOwnProperty.call(
       document.capabilities,

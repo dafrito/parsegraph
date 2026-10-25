@@ -61,6 +61,11 @@ export interface Focus {
   nodeDirections: { [id: string]: FocusDirection[] };
 }
 
+/** Directions whose separation comparison uses bounding rectangles. */
+export interface Separation {
+  nodeDirections: { [id: string]: Exclude<FocusDirection, "inward">[] };
+}
+
 export interface DocumentNode {
   id: string;
   value?: JsonValue;
@@ -102,7 +107,7 @@ export interface ParsegraphDocument {
 
 /** Capability names identify independently interpretable JSON payloads. */
 export interface Capabilities {
-  [name: string]: JsonValue | Presentation | Appearance | Focus;
+  [name: string]: JsonValue | Presentation | Appearance | Focus | Separation;
 }
 
 export interface DocumentOptions {
