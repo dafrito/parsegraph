@@ -6,6 +6,8 @@ generated/*.png
 generated/preview-package.json
 generated/release-package.json
 generated/SHA256SUMS
+generated/benchmarks/
+tools/bench/__pycache__/
 dist-tools/
 /parsegraph/
 .DS_Store

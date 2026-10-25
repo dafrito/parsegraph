@@ -1,5 +1,10 @@
 # Native layout benchmarks
 
+For matched TypeScript/C workloads, reusable HTML/Matplotlib reports and JSONL
+events, use the [cross-runtime harness](../../tools/bench/README.md). The CSV
+benchmarks below remain useful for native-only microbenchmarks and group-cache
+diagnostics.
+
 `benchmark.c` exercises construction, navigation, Extent unions, full and incremental layout, flattening, and movement across paint-group boundaries. It emits CSV to stdout and a small checksum/structure-size diagnostic to stderr. It has no renderer, GPU, file parsing, or TypeScript runtime in the measured code.
 
 Run an optimized build. Sanitizers are useful for correctness checks but change timing substantially. From the repository root:

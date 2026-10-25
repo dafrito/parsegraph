@@ -51,6 +51,9 @@
     "webpack-cli": "^5.0.1"
   },
   "scripts": {
+    "bench": "python3 tools/bench/bench.py run",
+    "bench:report": "python3 tools/bench/bench.py report",
+    "bench:check": "tsc -p tools/bench/tsconfig.json --noEmit && python3 -m unittest discover -s tools/bench -p 'test_*.py'",
     "generate:proportion": "ts-node --project examples/tsconfig.json examples/generators/proportion.ts --output generated/proportion.parsegraph",
     "generate:proportion:v1": "ts-node --project examples/tsconfig.json examples/generators/proportion.ts --format v1 --output generated/proportion-v1.parsegraph",
     "generate:ulam": "ts-node --project examples/tsconfig.json examples/generators/ulam.ts --output generated/ulam.parsegraph",
