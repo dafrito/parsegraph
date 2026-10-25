@@ -201,3 +201,17 @@ algorithm.
 
 Caret `loosen()` / `tighten()` set cross-axis separation independently of node fit.
 See [separation and multislot spacing](docs/separation-v1.md).
+
+## Website and visual manual
+
+The website and Caret manual recipes live in the separate `parsegraph-site`
+repository. Its normal `npm run build` regenerates the manual automatically using
+this sibling checkout, or a pinned library revision when no sibling is present.
+The renderer and layout APIs remain here; chapter text and demonstrations belong
+to the website repository.
+
+For the VPN installation, pushing `main` to the `fritolaptop` remote in either
+repository queues a website rebuild. The controller checks out an immutable pair
+of library and website commits, generates and tests the manual, then deploys it
+at https://parsegraph.fritonet.home.arpa/docs/caret/. A failed build leaves the
+previous site live. This does not publish an npm package or deploy Freeform.
