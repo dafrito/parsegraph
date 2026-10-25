@@ -57,6 +57,8 @@ pg_status pg_caret_spawn_move(pg_caret *caret, pg_direction direction, void *val
                               pg_alignment alignment, pg_node **out);
 void *pg_caret_value(const pg_caret *caret);
 void *pg_caret_replace(pg_caret *caret, void *value);
+pg_status pg_caret_set_focus(pg_caret *caret, pg_focus_mask directions);
+void pg_caret_clear_focus(pg_caret *caret);
 pg_status pg_caret_pull(pg_caret *caret, pg_direction direction);
 /* Alignment belongs to an edge's parent. PG_DIRECTION_NONE or the current
  * node's parent direction selects that parent edge. Alignment other than

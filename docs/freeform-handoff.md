@@ -103,3 +103,13 @@ The standalone rainbow port is an end-to-end appearance PoC:
 `yarn generate:rainbow --count 8` writes `generated/rainbow.parsegraph`, and
 `yarn render:svg generated/rainbow.parsegraph` produces a reference image.
 It uses Freeform's existing color calculations and resolved default colors.
+
+## Optional focus capability
+
+[focus/1](focus-v1.md) adds node framing intent without changing layout. The new
+library restores it on nodes and derives it from current nodes on v1 export.
+A viewer can call `node.layout().focusBounds(...fallbackDirections)` after
+layout to frame selected child branches without sibling continuations. Until
+camera integration is implemented, preserve the capability and retain existing
+framing behavior. This checkout's implementation is not yet an npm release;
+consumers on 7.0.1 should continue treating it as opaque data.

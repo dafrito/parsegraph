@@ -24,6 +24,30 @@ void pg_node_set_value(pg_node *node, void *value);
 uint64_t pg_node_id(const pg_node *node);
 void pg_node_set_id(pg_node *node, uint64_t id);
 
+/* Framing intent is optional, non-layout metadata. A zero mask explicitly
+ * selects the body only; unset uses the consumer's fallback. OUTWARD and the
+ * current parent direction are invalid. Missing child branches are permitted.
+ * Reparenting retains intent; a now-parent-facing selection must be corrected
+ * before querying it. Setters validate before replacing the old selection. */
+typedef uint32_t pg_focus_mask;
+#define PG_FOCUS_INWARD (UINT32_C(1) << PG_INWARD)
+#define PG_FOCUS_DOWNWARD (UINT32_C(1) << PG_DOWNWARD)
+#define PG_FOCUS_UPWARD (UINT32_C(1) << PG_UPWARD)
+#define PG_FOCUS_FORWARD (UINT32_C(1) << PG_FORWARD)
+#define PG_FOCUS_BACKWARD (UINT32_C(1) << PG_BACKWARD)
+pg_status pg_node_set_focus(pg_node *node, pg_focus_mask directions);
+bool pg_node_get_focus(const pg_node *node, pg_focus_mask *out);
+void pg_node_clear_focus(pg_node *node);
+
+/* Tight union of bodies in graph coordinates. Includes the current body and
+ * all descendants of each selected child; ignores descendants' own focus.
+ * Includes INWARD and nested paint groups, but no connector stroke or padding.
+ * Requires completed layout. Walks selected subtrees iteratively, with lazy
+ * transform resolution. Outputs remain unchanged on any failure. */
+typedef struct pg_bounds { double left, top, right, bottom; } pg_bounds;
+pg_status pg_node_bounds_for_directions(pg_node *node, pg_focus_mask directions, pg_bounds *out);
+pg_status pg_node_focus_bounds(pg_node *node, pg_focus_mask fallback, pg_bounds *out);
+
 /* Replacement and reparenting detach displaced nodes without destroying them.
  * NONE detaches this node from its parent; a parent-facing direction does too.
  * OUTWARD connections, occupied parent directions, and cycles are rejected

@@ -14,5 +14,8 @@ int main(){
     std::unique_ptr<pg_layout,decltype(&pg_layout_free)> layout(pg_layout_new(graph.get(),nullptr),pg_layout_free);check(bool(layout));check(pg_layout_run(layout.get())==PG_OK);
     pg_transform t;check(pg_node_absolute_transform(child,&t)==PG_OK);check(t.x==15&&t.y==0&&t.scale==1);
     int calls=0;check(pg_paint_node_bounds(graph.get(),rectangle,&calls)==PG_OK);check(pg_paint_node_lines(graph.get(),.5,rectangle,&calls)==PG_OK);check(calls==2);
+    check(pg_caret_set_focus(caret.get(),PG_FOCUS_FORWARD)==PG_OK);
+    pg_bounds focused;check(pg_node_focus_bounds(graph.get(),0,&focused)==PG_OK);
+    check(focused.left==-10&&focused.right==20&&focused.top==-6&&focused.bottom==6);
     pg_rect bounds;check(pg_paint_group_bounds(graph.get(),.5,&bounds)==PG_OK);check(bounds.width>=20&&bounds.height>=12);
 }

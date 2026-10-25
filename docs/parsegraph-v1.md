@@ -11,6 +11,8 @@ proportion, Ulam, primes, Memory Piers, and rainbow generators. The related
 Freeform can preserve that payload without implementing regeneration.
 The optional [`appearance/1` specification](appearance-v1.md) defines portable
 colors and alpha, including Freeform's existing builder styling.
+The optional [`focus/1` specification](focus-v1.md) defines directional framing
+intent and post-layout bounds queries.
 
 The existing unversioned format is called **v0**, including its current quirks.
 [Its description](../SERIALIZATION.md) remains the compatibility reference.
@@ -31,7 +33,7 @@ There is no required-capability list or negotiation gate in this draft.
 A known capability must be validated before use. A malformed supported payload
 is an error, rather than an instruction to silently use defaults. An unknown
 capability's contents are opaque JSON and must not be partially interpreted.
-Unknown fields inside the defined core, `presentation/1`, or `appearance/1` are rejected: new
+Unknown fields inside the defined core, `presentation/1`, `appearance/1`, or `focus/1` are rejected: new
 behavior belongs in a new capability payload, not an unannounced field that
 looks supported. Unknown names in the capability map itself are accepted.
 
@@ -330,7 +332,7 @@ with no options, the writer emits an empty capability map. The writer validates
 and snapshots JSON data. The reader validates before graph mutation and copies
 payloads. It reports unsupported capability names but does not reject them.
 
-The reference library currently validates/interprets `presentation/1` and `appearance/1`; it only
+The reference library currently validates/interprets `presentation/1`, `appearance/1`, and `focus/1`; it only
 preserves `generation/1` and other unknown capabilities as opaque JSON.
 `ignoredCapabilities` therefore reports what the library does not interpret,
 not necessarily what the host viewer implements. If Freeform initially uses
@@ -465,3 +467,10 @@ rich-content rendering, a theme/selector language, or a computed-geometry snapsh
 Optional concrete colors and alpha are defined separately by `appearance/1`.
 Those can be separate capabilities. Presentation can improve across viewers
 without making all viewers mandatory implementations of every feature.
+
+### Directional framing (`focus/1`)
+
+The optional [focus/1 capability](focus-v1.md) stores per-node sets of child
+branches to frame. It supplies post-layout framing intent without changing
+packing. Supporting readers restore it on nodes; older readers may preserve it
+opaquely. TypeScript and C expose matching graph-space body-bounds queries.

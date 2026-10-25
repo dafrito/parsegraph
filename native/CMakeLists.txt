@@ -73,7 +73,7 @@ if(BUILD_TESTING)
   target_compile_features(graph_cpp_test PRIVATE cxx_std_11)
   target_link_libraries(graph_cpp_test PRIVATE parsegraph)
   add_test(NAME graph_cpp_consumer COMMAND graph_cpp_test)
-  foreach(component types node caret layout paint)
+  foreach(component types node caret layout paint focus)
     add_executable(${component}_test tests/${component}_test.c)
     target_link_libraries(${component}_test PRIVATE parsegraph)
     add_test(NAME ${component} COMMAND ${component}_test)
@@ -127,6 +127,9 @@ if(BUILD_TESTING)
 
   if(PARSEGRAPH_TS_PARITY)
     find_program(NODE_EXECUTABLE node REQUIRED)
+    add_test(NAME focus_typescript_parity COMMAND "${NODE_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/tests/focus_parity.cjs" "$<TARGET_FILE:focus_test>")
+    set_tests_properties(focus_typescript_parity PROPERTIES TIMEOUT 60)
     add_executable(extent_probe tests/probe.c)
     target_link_libraries(extent_probe PRIVATE parsegraph_extent)
     add_test(NAME typescript_parity COMMAND "${NODE_EXECUTABLE}"
@@ -144,7 +147,7 @@ if(BUILD_TESTING)
     set_tests_properties(primes_typescript_parity PROPERTIES TIMEOUT 120)
   endif()
   # Keep assertions (including their exercised API calls) active in Release.
-  foreach(test_target types_test node_test caret_test layout_test paint_test
+  foreach(test_target types_test node_test caret_test layout_test paint_test focus_test
       caret_allocation_test layout_failure_test extent_test extent_cpp_test
       extent_failure_test graph_cpp_test primes_test)
     if(MSVC)

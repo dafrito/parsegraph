@@ -592,3 +592,58 @@ pg_node *pg_node_under_coords(pg_node *root, double x, double y, double user_sca
     if (stack != local) free(stack);
     return result;
 }
+
+static bool valid_focus(const pg_node *n, pg_focus_mask mask) {
+    const pg_focus_mask allowed = PG_FOCUS_INWARD | PG_FOCUS_DOWNWARD |
+        PG_FOCUS_UPWARD | PG_FOCUS_FORWARD | PG_FOCUS_BACKWARD;
+    return n && !(mask & ~allowed) &&
+        (!n->parent || !(mask & (UINT32_C(1) << n->parent_direction)));
+}
+pg_status pg_node_set_focus(pg_node *n, pg_focus_mask directions) {
+    if (!valid_focus(n, directions)) return PG_INVALID;
+    n->focus = directions;
+    n->has_focus = true;
+    return PG_OK;
+}
+bool pg_node_get_focus(const pg_node *n, pg_focus_mask *out) {
+    if (!n || !out || !n->has_focus) return false;
+    *out = n->focus;
+    return true;
+}
+void pg_node_clear_focus(pg_node *n) { if (n) n->has_focus = false; }
+
+static pg_status include_body(pg_node *n, pg_bounds *bounds) {
+    if (n->phase != PG_LAYOUT_COMMITTED || !isfinite(n->width) || !isfinite(n->height)) return PG_INVALID;
+    pg_transform t;
+    pg_status status = pg_node_absolute_transform(n, &t);
+    if (status != PG_OK) return status;
+    double w = n->width * t.scale, h = n->height * t.scale;
+    pg_bounds body = {t.x - w / 2, t.y - h / 2, t.x + w / 2, t.y + h / 2};
+    if (w < 0 || h < 0 || !isfinite(body.left) || !isfinite(body.top) ||
+        !isfinite(body.right) || !isfinite(body.bottom)) return PG_RANGE;
+    bounds->left = fmin(bounds->left, body.left);
+    bounds->top = fmin(bounds->top, body.top);
+    bounds->right = fmax(bounds->right, body.right);
+    bounds->bottom = fmax(bounds->bottom, body.bottom);
+    return PG_OK;
+}
+pg_status pg_node_bounds_for_directions(pg_node *n, pg_focus_mask directions, pg_bounds *out) {
+    if (!out || !valid_focus(n, directions) || pg_node_root(n)->phase != PG_LAYOUT_COMMITTED) return PG_INVALID;
+    pg_bounds bounds = {INFINITY, INFINITY, -INFINITY, -INFINITY};
+    pg_status status = include_body(n, &bounds);
+    if (status != PG_OK) return status;
+    for (int d = PG_INWARD; d <= PG_BACKWARD; ++d) {
+        if (!(directions & (UINT32_C(1) << d))) continue;
+        pg_node *child = pg_node_child(n, (pg_direction)d);
+        for (pg_node *node = child; node; node = pg_node_next_preorder(node, child)) {
+            status = include_body(node, &bounds);
+            if (status != PG_OK) return status;
+        }
+    }
+    *out = bounds;
+    return PG_OK;
+}
+pg_status pg_node_focus_bounds(pg_node *n, pg_focus_mask fallback, pg_bounds *out) {
+    if (!n) return PG_INVALID;
+    return pg_node_bounds_for_directions(n, n->has_focus ? n->focus : fallback, out);
+}

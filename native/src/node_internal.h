@@ -20,6 +20,8 @@ struct pg_node {
     pg_preferred_axis preferred_axis;
     double scale;
     bool right_to_left, creased;
+    bool has_focus;
+    pg_focus_mask focus;
     pg_layout_phase phase;
     double width, height;
     pg_extent extents[4];

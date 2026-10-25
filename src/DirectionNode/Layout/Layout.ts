@@ -5,6 +5,14 @@ import { findPaintGroup } from "../../DirectionNode/PaintGroups/findPaintGroup";
 import { DirectionNode } from "../../DirectionNode/DirectionNode";
 import { LayoutPhase } from "./LayoutPhase";
 
+/** Tight union of node bodies in graph coordinates, without camera padding. */
+export interface FocusBounds {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 export class Layout {
   private _extents: Extent[];
   private _absoluteVersion: number;
@@ -39,6 +47,82 @@ export class Layout {
     this._groupScale = NaN;
 
     this._size = [NaN, NaN];
+  }
+
+  /**
+   * Resolve explicit branches after layout. Descendant focus preferences are ignored.
+   * @param {Direction[]} directions - Child branches; no directions means body only.
+   * @return {FocusBounds} Graph-space body bounds, including nested paint groups.
+   */
+  boundsForDirections(...directions: Direction[]): FocusBounds {
+    const root = this._node;
+    root.validateFocusDirections(directions);
+    if (root.neighbors().root().layout().phase() !== LayoutPhase.COMMITTED) {
+      throw new Error("Focus bounds require completed layout");
+    }
+    const bounds = {
+      left: Infinity,
+      top: Infinity,
+      right: -Infinity,
+      bottom: -Infinity,
+    };
+    const pending = [root];
+    const selected = new Set(directions);
+    const size = [0, 0];
+    while (pending.length) {
+      const node = pending.pop() as DirectionNode;
+      const layout = node.layout();
+      layout.size(size);
+      const x = layout.absoluteX();
+      const y = layout.absoluteY();
+      const scale = layout.absoluteScale();
+      const width = size[0] * scale;
+      const height = size[1] * scale;
+      const edges = [
+        x - width / 2,
+        y - height / 2,
+        x + width / 2,
+        y + height / 2,
+      ];
+      if (
+        layout.phase() !== LayoutPhase.COMMITTED ||
+        !Number.isFinite(scale) ||
+        scale <= 0 ||
+        width < 0 ||
+        height < 0 ||
+        !edges.every(Number.isFinite)
+      ) {
+        throw new Error("Focus bounds require finite, committed geometry");
+      }
+      bounds.left = Math.min(bounds.left, edges[0]);
+      bounds.top = Math.min(bounds.top, edges[1]);
+      bounds.right = Math.max(bounds.right, edges[2]);
+      bounds.bottom = Math.max(bounds.bottom, edges[3]);
+      for (
+        let direction = Direction.INWARD;
+        direction <= Direction.BACKWARD;
+        ++direction
+      ) {
+        if (
+          (node !== root || selected.has(direction)) &&
+          node.neighbors().hasChildAt(direction)
+        ) {
+          pending.push(node.neighbors().nodeAt(direction));
+        }
+      }
+    }
+    return bounds;
+  }
+
+  /**
+   * Resolve node framing intent, or the caller's fallback when unset.
+   * @param {Direction[]} fallback - Default child directions; body only if omitted.
+   * @return {FocusBounds} Graph-space body bounds.
+   */
+  focusBounds(...fallback: Direction[]): FocusBounds {
+    return this.boundsForDirections(
+      ...(this._node.focusDirections() ?? fallback)
+    );
   }
 
   setPhase(state: LayoutPhase) {

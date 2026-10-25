@@ -26,6 +26,7 @@ export class DirectionNode<Value = any> {
   private _rightToLeft: boolean;
   private _scale: number;
   private _value?: Value;
+  private _focusDirections?: Direction[];
 
   constructor(value?: Value) {
     this._id = nodeIdPrefix + nodeCount++;
@@ -94,6 +95,48 @@ export class DirectionNode<Value = any> {
   setId(id: string | number | undefined) {
     this._id = id;
     return this;
+  }
+
+  /**
+   * Replace framing intent without invalidating layout. No directions means body only.
+   * @param {Direction[]} directions - Selected child branches.
+   * @return {DirectionNode} This node.
+   */
+  setFocus(...directions: Direction[]): this {
+    this.validateFocusDirections(directions);
+    this._focusDirections = Array.from(new Set(directions)).sort(
+      (a, b) => a - b
+    );
+    return this;
+  }
+
+  /**
+   * A defensive copy; undefined means the viewer chooses its default.
+   * @return {Direction[] | undefined} Stored selection.
+   */
+  focusDirections(): Direction[] | undefined {
+    return this._focusDirections?.slice();
+  }
+
+  clearFocus(): this {
+    this._focusDirections = undefined;
+    return this;
+  }
+
+  /** @param {Direction[]} directions - Initial child branches to include. */
+  validateFocusDirections(directions: readonly Direction[]): void {
+    for (const direction of directions) {
+      if (
+        !Number.isInteger(direction) ||
+        direction < Direction.INWARD ||
+        direction > Direction.BACKWARD ||
+        direction === Direction.OUTWARD ||
+        (!this.neighbors().isRoot() &&
+          direction === this.neighbors().parentDirection())
+      ) {
+        throw new Error("Focus requires child-facing directions (not OUTWARD)");
+      }
+    }
   }
 
   value(): Value | undefined {

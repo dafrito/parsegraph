@@ -270,3 +270,10 @@ pg_status pg_caret_set_fit(pg_caret *c, pg_direction d, pg_fit fit) {
 pg_status pg_caret_fit_exact(pg_caret *c, pg_direction d) { return pg_caret_set_fit(c, d, PG_FIT_EXACT); }
 pg_status pg_caret_fit_loose(pg_caret *c, pg_direction d) { return pg_caret_set_fit(c, d, PG_FIT_LOOSE); }
 pg_status pg_caret_fit_naive(pg_caret *c, pg_direction d) { return pg_caret_set_fit(c, d, PG_FIT_NAIVE); }
+
+pg_status pg_caret_set_focus(pg_caret *caret, pg_focus_mask directions) {
+    return pg_node_set_focus(pg_caret_node(caret), directions);
+}
+void pg_caret_clear_focus(pg_caret *caret) {
+    pg_node_clear_focus(pg_caret_node(caret));
+}

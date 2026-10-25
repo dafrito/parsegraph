@@ -49,6 +49,18 @@ export interface Appearance {
   pageBackgroundAlpha: number;
 }
 
+export type FocusDirection =
+  | "inward"
+  | "downward"
+  | "upward"
+  | "forward"
+  | "backward";
+
+/** Optional framing intent. An absent entry is unset; [] means body only. */
+export interface Focus {
+  nodeDirections: { [id: string]: FocusDirection[] };
+}
+
 export interface DocumentNode {
   id: string;
   value?: JsonValue;
@@ -90,7 +102,7 @@ export interface ParsegraphDocument {
 
 /** Capability names identify independently interpretable JSON payloads. */
 export interface Capabilities {
-  [name: string]: JsonValue | Presentation | Appearance;
+  [name: string]: JsonValue | Presentation | Appearance | Focus;
 }
 
 export interface DocumentOptions {

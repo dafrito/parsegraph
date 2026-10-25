@@ -70,6 +70,23 @@ export class DirectionCaret<Value> {
     return this._nodes[this._nodes.length - 1];
   }
 
+  /**
+   * Replace the current node's focus selection; an empty list means body only.
+   * @param {Array} directions - Child directions or their string aliases.
+   * @return {DirectionCaret} This caret.
+   */
+  focus(...directions: (Direction | string)[]): this {
+    this.node().setFocus(
+      ...directions.map((direction) => readDirection(direction))
+    );
+    return this;
+  }
+
+  clearFocus(): this {
+    this.node().clearFocus();
+    return this;
+  }
+
   has(inDirection: Direction | string): boolean {
     return this.node().neighbors().hasNode(readDirection(inDirection));
   }

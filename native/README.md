@@ -268,3 +268,11 @@ shapes; loose fitting deliberately retains only a box. The API is not a promise
 of linear layout for every topology. Benchmarks separate full layout, dirty-path
 updates, group movement, and full-graph flattening. There is currently no matched
 TypeScript timing baseline, so no native speedup factor is claimed.
+
+## Directional focus
+
+Nodes can store optional child-direction masks, with Caret setters and
+post-layout graph-space bounds queries. See [focus/1](../docs/focus-v1.md) for the
+C/TypeScript API and serialization contract. The native core does not parse JSON.
+`pg_bounds` is an edge-based rectangle (`left`, `top`, `right`, `bottom`), distinct
+from painting's center-based `pg_rect`. Focus does not invalidate or alter layout.

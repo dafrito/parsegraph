@@ -16,6 +16,8 @@ import {
   JsonValue,
   DocumentOptions,
   Capabilities,
+  Focus,
+  FocusDirection,
 } from "./types";
 import {
   DIRECTIONS,
@@ -40,7 +42,15 @@ export function serializeParsegraphDocument(
   if (!root.neighbors().isRoot())
     throw new Error("Serialize from the actual graph root");
   const nodes: DocumentNode[] = [];
+  const focus: Focus = { nodeDirections: Object.create(null) };
   forEachSerializedNode(root, (node) => {
+    const directions = node.focusDirections();
+    if (directions !== undefined) {
+      node.validateFocusDirections(directions);
+      focus.nodeDirections[node.id() as string] = directions.map(
+        (d) => DIRECTIONS[d] as FocusDirection
+      );
+    }
     const isRoot = node.neighbors().isRoot();
     const parent = isRoot ? null : node.neighbors().parentNode();
     const parentDir = isRoot ? null : node.neighbors().parentDirection();
@@ -89,6 +99,14 @@ export function serializeParsegraphDocument(
     },
     ...(options.metadata !== undefined ? { metadata: options.metadata } : {}),
   };
+  // Nodes own this capability: do not resurrect stale entries from loaded options.
+  delete document.capabilities["focus/1"];
+  if (
+    Object.keys(focus.nodeDirections).length ||
+    options.capabilities?.["focus/1"] !== undefined
+  ) {
+    document.capabilities["focus/1"] = focus;
+  }
   validateParsegraphDocument(document);
   return JSON.parse(JSON.stringify(document));
 }
@@ -152,12 +170,23 @@ export function deserializeParsegraphDocument(
         PreferredAxis.PARENT + PREFERENCES.indexOf(record.layoutPreference)
       );
   });
+  const focus = document.capabilities["focus/1"] as Focus | undefined;
+  if (focus) {
+    Object.entries(focus.nodeDirections).forEach(([id, directions]) => {
+      nodes
+        .get(id)
+        .setFocus(...directions.map((d) => DIRECTIONS.indexOf(d) as Direction));
+    });
+  }
   return {
     version: 1,
     root: nodes.get(document.root),
     capabilities: document.capabilities,
     ignoredCapabilities: Object.keys(document.capabilities).filter(
-      (name) => name !== "presentation/1" && name !== "appearance/1"
+      (name) =>
+        name !== "presentation/1" &&
+        name !== "appearance/1" &&
+        name !== "focus/1"
     ),
     ...(Object.prototype.hasOwnProperty.call(
       document.capabilities,
