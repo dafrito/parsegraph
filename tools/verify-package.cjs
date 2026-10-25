@@ -56,6 +56,7 @@ import {
   createPresentation, createTextMeasurer, createPresentationPainter,
   serializeParsegraph, serializeParsegraphDocument, deserializeParsegraphDocument,
   validateParsegraphDocument, resolveNodeAppearance, ParsegraphDocument,
+  Fit, Focus, Separation,
 } from "parsegraph";
 const root = new DirectionNode<string>("typed consumer");
 const caret = new DirectionCaret<string>(root);
@@ -72,6 +73,25 @@ if (loaded.appearance) {
   const alpha: number = appearance.backgroundAlpha;
 }
 const direction: Direction = Direction.FORWARD;
+caret.focus("d", Direction.UPWARD);
+const focus: Direction[] | undefined = root.focusDirections();
+const bounds: {left:number;top:number;right:number;bottom:number} = loaded.root.layout().focusBounds();
+loaded.root.layout().boundsForDirections(Direction.DOWNWARD);
+root.setSeparationFit(Direction.FORWARD, Fit.LOOSE);
+const fit: Fit = root.separationFit(Direction.FORWARD);
+caret.pull(Direction.DOWNWARD);
+caret.loosen(); caret.tighten(); caret.clearFocus();
+const focusCapability: Focus = {nodeDirections:{root:["downward","upward"]}};
+const separationCapability: Separation = {nodeDirections:{root:["forward"]}};
+if (false) {
+  // @ts-expect-error focus accepts directions, not arbitrary objects
+  caret.focus({direction:"downward"});
+  // @ts-expect-error focus does not allow outward capability selections
+  const invalidFocus: Focus = {nodeDirections:{root:["outward"]}};
+  // @ts-expect-error separation is planar only
+  const invalidSeparation: Separation = {nodeDirections:{root:["inward"]}};
+}
+
 // @ts-expect-error public values remain typed
 const invalid: number = root.value();
 // @ts-expect-error invalid preset must not silently become any

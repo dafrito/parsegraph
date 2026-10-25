@@ -75,7 +75,9 @@ for (const preset of ["standard", "proportional", "math"]) {
       );
   }
   if (preset === "proportional") {
-    const endpoints = nodes.filter((node) => /^\d+$/.test(String(node.value())));
+    const endpoints = nodes.filter((node) =>
+      /^\d+$/.test(String(node.value()))
+    );
     assert.ok(
       endpoints.length > 1,
       "Proportional fixture must have numbered endpoints"
@@ -114,6 +116,143 @@ assert.deepEqual(
   api.serializeParsegraphDocument(coloredState.root, coloredState).capabilities,
   colored.capabilities
 );
+// Run the same public-API contract against the installed CommonJS bundle and
+// the browser UMD global. No source imports or repository helpers are available.
+function verifyFocusAndSeparation(lib) {
+  const {
+    DirectionNode,
+    DirectionCaret,
+    Direction: D,
+    Fit,
+    PreferredAxis,
+    CommitLayout,
+  } = lib;
+  const plain = (value) => JSON.parse(JSON.stringify(value));
+  const nodes = [
+    [10, 10],
+    [10, 100],
+    [100, 10],
+    [10, 10],
+    [10, 20],
+    [100, 10],
+  ].map((size, i) => {
+    const node = new DirectionNode(size);
+    node.setId(String(i));
+    node.setNodeFit(Fit.EXACT);
+    return node;
+  });
+  const [root, down, arm, next, short, other] = nodes;
+  root.connect(D.DOWNWARD, down);
+  down.connect(D.FORWARD, arm);
+  root.connect(D.FORWARD, next);
+  next.connect(D.DOWNWARD, short);
+  short.connect(D.FORWARD, other);
+  down.paintGroups().crease();
+  const caret = new DirectionCaret(root);
+  caret.pull(D.DOWNWARD);
+  const commit = (node) => {
+    const job = new CommitLayout(node, {
+      size: (n, out) => {
+        out[0] = n.value()[0];
+        out[1] = n.value()[1];
+      },
+    });
+    let steps = 0;
+    while (job.crank()) assert.ok(++steps < 10000, "Installed layout stalled");
+  };
+  const positions = () =>
+    nodes.map((n) => [n.layout().absoluteX(), n.layout().absoluteY()]);
+  commit(root);
+  const exact = positions();
+  caret.focus("d", "f");
+  down.setFocus(); // Explicit body-only intent must survive serialization.
+  assert.deepEqual(plain(root.focusDirections()), [D.DOWNWARD, D.FORWARD]);
+  const rects = nodes.map((n) => {
+    const l = n.layout(),
+      size = [0, 0];
+    l.size(size);
+    return [
+      l.absoluteX() - (size[0] * l.absoluteScale()) / 2,
+      l.absoluteY() - (size[1] * l.absoluteScale()) / 2,
+      l.absoluteX() + (size[0] * l.absoluteScale()) / 2,
+      l.absoluteY() + (size[1] * l.absoluteScale()) / 2,
+    ];
+  });
+  assert.deepEqual(plain(root.layout().focusBounds()), {
+    left: Math.min(...rects.map((r) => r[0])),
+    top: Math.min(...rects.map((r) => r[1])),
+    right: Math.max(...rects.map((r) => r[2])),
+    bottom: Math.max(...rects.map((r) => r[3])),
+  });
+  assert.deepEqual(
+    plain(root.layout().boundsForDirections(D.DOWNWARD, D.FORWARD)),
+    plain(root.layout().focusBounds())
+  );
+  assert.deepEqual(positions(), exact, "Focus must not change geometry");
+  caret.loosen();
+  assert.equal(root.nodeFit(), Fit.EXACT);
+  assert.equal(root.separationFit(D.FORWARD), Fit.LOOSE);
+  assert.equal(root.separationFit(D.BACKWARD), Fit.LOOSE);
+  assert.equal(root.separationFit(D.DOWNWARD), Fit.EXACT);
+  assert.throws(() => root.layout().focusBounds(), /completed layout/);
+  commit(root);
+  assert.ok(
+    next.layout().absoluteX() > exact[3][0],
+    "Loose separation must reserve the content envelope"
+  );
+  const document = lib.serializeParsegraphDocument(root);
+  assert.deepEqual(plain(document.capabilities["focus/1"]), {
+    nodeDirections: { 0: ["downward", "forward"], 1: [] },
+  });
+  assert.deepEqual(plain(document.capabilities["separation/1"]), {
+    nodeDirections: { 0: ["forward", "backward"] },
+  });
+  lib.validateParsegraphDocument(document);
+  document.nodes.reverse();
+  const loaded = lib.deserializeParsegraphDocument(document);
+  assert.deepEqual(plain(loaded.ignoredCapabilities), []);
+  commit(loaded.root);
+  assert.deepEqual(
+    plain(loaded.root.layout().focusBounds()),
+    plain(root.layout().focusBounds())
+  );
+  assert.deepEqual(
+    plain(lib.serializeParsegraphDocument(loaded.root, loaded).capabilities),
+    plain(document.capabilities)
+  );
+  const restoredCaret = new DirectionCaret(loaded.root);
+  restoredCaret.tighten();
+  restoredCaret.clearFocus();
+  assert.equal(loaded.root.focusDirections(), undefined);
+  assert.equal(loaded.root.separationFit(D.FORWARD), Fit.EXACT);
+  const cleared = lib.serializeParsegraphDocument(loaded.root, loaded);
+  assert.deepEqual(plain(cleared.capabilities["focus/1"]), {
+    nodeDirections: { 1: [] },
+  });
+  assert.deepEqual(plain(cleared.capabilities["separation/1"]), {
+    nodeDirections: {},
+  });
+  root.setSeparationFit(D.FORWARD, Fit.EXACT);
+  caret.tighten();
+  commit(root);
+  assert.deepEqual(positions(), exact, "Tighten must restore exact geometry");
+  for (const capability of ["focus/1", "separation/1"]) {
+    const invalid = plain(document);
+    invalid.capabilities[capability] = { nodeDirections: { 0: ["outward"] } };
+    assert.throws(() => lib.validateParsegraphDocument(invalid));
+  }
+  // The released bundle must contain the inward-root pull correction too.
+  const host = new DirectionNode([400, 400]);
+  host.connect(D.INWARD, root);
+  caret.pull(D.DOWNWARD);
+  caret.loosen();
+  assert.equal(root.siblings().getLayoutPreference(), PreferredAxis.VERTICAL);
+  assert.equal(root.siblings().layoutOrder()[1], D.DOWNWARD);
+  assert.equal(root.separationFit(D.FORWARD), Fit.LOOSE);
+  commit(host);
+}
+verifyFocusAndSeparation(api);
+verifyFocusAndSeparation(browser.parsegraph);
 console.log(
-  `Package ${metadata.version}: CommonJS/UMD, v1 APIs, v0 import, capability/metadata round trips, appearance, and all three geometry fixtures pass.`
+  `Package ${metadata.version}: CommonJS/UMD, v1 APIs, v0 import, capability/metadata round trips, appearance, focus/separation behavior and round trips, and all three geometry fixtures pass.`
 );

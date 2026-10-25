@@ -38,7 +38,7 @@ describe("DirectionNode native port regressions", () => {
     expect(size).toEqual([20, 30]);
     expect(formerRoot.layout().absoluteX()).toBe(60);
   });
-  it("invalidates rootlike geometry when preference normalization preserves sibling order", () => {
+  it("preserves inward vertical geometry on repeated preference and recomputes on axis change", () => {
     const parent = new DirectionNode([100, 100]);
     const inner = new DirectionNode([10, 10]);
     const up = inner.connect(Direction.UPWARD, new DirectionNode([100, 10]));
@@ -64,10 +64,13 @@ describe("DirectionNode native port regressions", () => {
     expect(inner.neighbors().at(Direction.FORWARD).xPos()).toBe(55);
     const order = inner.siblings().layoutOrder();
     inner.siblings().setLayoutPreference(PreferredAxis.VERTICAL);
-    expect(inner.siblings().getLayoutPreference()).toBe(
-      PreferredAxis.PERPENDICULAR
-    );
+    expect(inner.siblings().getLayoutPreference()).toBe(PreferredAxis.VERTICAL);
     expect(inner.siblings().layoutOrder()).toBe(order);
+    commit();
+    expect(inner.neighbors().at(Direction.UPWARD).yPos()).toBe(-10);
+    expect(inner.neighbors().at(Direction.FORWARD).xPos()).toBe(55);
+    inner.siblings().setLayoutPreference(PreferredAxis.HORIZONTAL);
+    expect(inner.siblings().layoutOrder()).not.toBe(order);
     commit();
     expect(inner.neighbors().at(Direction.UPWARD).yPos()).toBe(-55);
     expect(inner.neighbors().at(Direction.FORWARD).xPos()).toBe(10);
@@ -247,26 +250,24 @@ describe("DirectionNode native port regressions", () => {
         .siblings()
         .dump()
         .map((node) => node.value())
-    ).toEqual(["forward", "downward", "inner", "root"]);
+    ).toEqual(["downward", "forward", "inner", "root"]);
     expect(downward.neighbors().parentNode()).toBe(inner);
   });
 
-  it("reorders an inward subtree when detaching changes its effective preferred axis", () => {
+  it("preserves an inward subtree ordering when detaching its relative preference", () => {
     const root = new DirectionNode("root");
     const inner = root.connect(Direction.INWARD, new DirectionNode("inner"));
     inner.siblings().setLayoutPreference(PreferredAxis.PARENT);
     inner.connect(Direction.FORWARD, new DirectionNode("forward"));
     inner.connect(Direction.DOWNWARD, new DirectionNode("downward"));
     root.disconnect(Direction.INWARD);
-    expect(inner.siblings().getLayoutPreference()).toBe(
-      PreferredAxis.HORIZONTAL
-    );
+    expect(inner.siblings().getLayoutPreference()).toBe(PreferredAxis.VERTICAL);
     expect(
       inner
         .siblings()
         .dump()
         .map((node) => node.value())
-    ).toEqual(["forward", "downward", "inner"]);
+    ).toEqual(["downward", "forward", "inner"]);
     expect(root.siblings().dump()).toEqual([root]);
   });
 

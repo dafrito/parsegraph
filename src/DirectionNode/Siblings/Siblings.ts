@@ -410,6 +410,9 @@ export class Siblings {
       throw new Error("Cannot sanitize root layout preference");
     }
     const paxis = getDirectionAxis(parentDir);
+    // Inward children lay out both planar axes like roots. The Z parent
+    // cannot define a horizontal/vertical relative preference.
+    if (paxis === Axis.Z) return given;
     if (given === PreferredAxis.VERTICAL) {
       given =
         paxis === Axis.VERTICAL
@@ -430,10 +433,11 @@ export class Siblings {
 
   convertLayoutPreference(inDirection: Direction): void {
     const disconnected = this.node();
+    // A Z parent uses root-like order: PARENT means vertical-first.
     if (
       disconnected.siblings().getLayoutPreference() === PreferredAxis.PARENT
     ) {
-      if (Axis.VERTICAL === getDirectionAxis(inDirection)) {
+      if (Axis.HORIZONTAL !== getDirectionAxis(inDirection)) {
         disconnected.siblings()._layoutPreference = PreferredAxis.VERTICAL;
       } else {
         disconnected.siblings()._layoutPreference = PreferredAxis.HORIZONTAL;
@@ -442,7 +446,7 @@ export class Siblings {
       disconnected.siblings().getLayoutPreference() ===
       PreferredAxis.PERPENDICULAR
     ) {
-      if (Axis.VERTICAL === getDirectionAxis(inDirection)) {
+      if (Axis.HORIZONTAL !== getDirectionAxis(inDirection)) {
         disconnected.siblings()._layoutPreference = PreferredAxis.HORIZONTAL;
       } else {
         disconnected.siblings()._layoutPreference = PreferredAxis.VERTICAL;
@@ -515,9 +519,8 @@ export class Siblings {
     const previousPreference = this._layoutPreference;
     this._layoutPreference = given;
     if (previousOrder === this.layoutOrder()) {
-      // Rootlike layout uses the stored preference directly. Normalizing an
-      // inward node's absolute preference can change its axis layout even when
-      // the sibling traversal order remains identical.
+      // A stored preference can change without changing effective order.
+      // Keep geometry caches consistent with the new metadata.
       if (previousPreference !== given) {
         this.node().invalidate();
       }
@@ -555,7 +558,7 @@ export class Siblings {
   }
 
   layoutOrder(): Direction[] {
-    if (this.node().neighbors().isRoot()) {
+    if (this.node().neighbors().isRootlike()) {
       if (
         this.getLayoutPreference() === PreferredAxis.HORIZONTAL ||
         this.getLayoutPreference() === PreferredAxis.PERPENDICULAR

@@ -82,15 +82,15 @@ static void inward_reordering(void) {
     assert(pg_node_connect(inner, PG_DOWNWARD, downward) == PG_OK);
     assert(pg_node_sibling_next(inner) == downward);
     assert(pg_node_connect(r, PG_INWARD, inner) == PG_OK);
-    assert(pg_node_sibling_next(r) == forward);
-    assert(pg_node_sibling_next(forward) == downward);
-    assert(pg_node_sibling_next(downward) == inner);
+    assert(pg_node_sibling_next(r) == downward);
+    assert(pg_node_sibling_next(forward) == inner);
+    assert(pg_node_sibling_next(downward) == forward);
     assert(pg_node_sibling_next(inner) == r);
     assert(pg_node_set_preferred_axis(inner, PG_PREFERRED_PARENT) == PG_OK);
     assert(pg_node_disconnect(r, PG_INWARD) == inner);
-    assert(pg_node_sibling_next(inner) == forward);
-    assert(pg_node_sibling_next(forward) == downward);
-    assert(pg_node_sibling_next(downward) == inner);
+    assert(pg_node_sibling_next(inner) == downward);
+    assert(pg_node_sibling_next(forward) == inner);
+    assert(pg_node_sibling_next(downward) == forward);
     pg_node_free_tree(inner); pg_node_free(r);
 }
 
@@ -100,7 +100,7 @@ static const pg_direction h_order[] = {PG_INWARD,PG_BACKWARD,PG_FORWARD,PG_DOWNW
 static const pg_direction v_order[] = {PG_INWARD,PG_DOWNWARD,PG_UPWARD,PG_BACKWARD,PG_FORWARD,PG_OUTWARD};
 static const pg_direction *model_order(pg_node *n) {
     pg_preferred_axis p = pg_node_preferred_axis(n);
-    if (!pg_node_parent(n)) return p == PG_PREFERRED_HORIZONTAL || p == PG_PREFERRED_PERPENDICULAR ? h_order : v_order;
+    if (!pg_node_parent(n) || pg_node_parent_direction(n) == PG_OUTWARD) return p == PG_PREFERRED_HORIZONTAL || p == PG_PREFERRED_PERPENDICULAR ? h_order : v_order;
     bool parent_horizontal = pg_direction_axis(pg_node_parent_direction(n)) == PG_HORIZONTAL;
     bool parent_vertical = pg_direction_axis(pg_node_parent_direction(n)) == PG_VERTICAL;
     if (p == PG_PREFERRED_HORIZONTAL) p = parent_horizontal ? PG_PREFERRED_PARENT : PG_PREFERRED_PERPENDICULAR;

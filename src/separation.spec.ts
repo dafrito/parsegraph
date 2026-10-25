@@ -122,14 +122,10 @@ test("relative preferences, root defaults, and inward roots choose the actual se
   const inward = new DirectionNode();
   root.connect(D.INWARD, inward);
   c.moveTo(inward);
-  // Existing pull normalization turns inward-root VERTICAL into PERPENDICULAR,
-  // which the root-like layout interprets as horizontal. Follow actual order.
   c.pull(D.DOWNWARD);
   c.loosen();
-  expect(inward.separationFit(D.DOWNWARD)).toBe(Fit.LOOSE);
-  expect(inward.siblings().getLayoutPreference()).toBe(
-    PreferredAxis.PERPENDICULAR
-  );
+  expect(inward.separationFit(D.FORWARD)).toBe(Fit.LOOSE);
+  expect(inward.siblings().getLayoutPreference()).toBe(PreferredAxis.VERTICAL);
 });
 
 test.each([false, true])(
@@ -215,3 +211,89 @@ test("separation/1 round trips concrete directions and discards stale options; v
     ).toThrow();
   }
 });
+
+test.each([false, true])(
+  "inward pull preserves absolute preference, traversal, and geometry (creased=%s)",
+  (creased) => {
+    const { root, caret, nodes } = fixture();
+    const host = new DirectionNode([400, 400]);
+    host.setId("host");
+    if (creased) root.paintGroups().crease();
+    host.connect(D.INWARD, root);
+    const checkOrder = (vertical: boolean) => {
+      expect(root.siblings().getLayoutPreference()).toBe(
+        vertical ? PreferredAxis.VERTICAL : PreferredAxis.HORIZONTAL
+      );
+      expect(root.siblings().layoutOrder()[1]).toBe(
+        vertical ? D.DOWNWARD : D.BACKWARD
+      );
+      const ring: DirectionNode[] = [];
+      let n = root;
+      do {
+        ring.push(n);
+        n = n.siblings().next();
+        if (ring.length > 7) throw new Error("broken sibling ring");
+      } while (n !== root);
+      expect(new Set(ring).size).toBe(ring.length);
+    };
+    for (const direction of [D.FORWARD, D.DOWNWARD, D.FORWARD, D.DOWNWARD]) {
+      caret.pull(direction);
+      checkOrder(direction === D.DOWNWARD);
+      layout(host);
+    }
+    const exact = positions(nodes);
+    caret.loosen();
+    layout(host);
+    expect(root.separationFit(D.FORWARD)).toBe(Fit.LOOSE);
+    expect(nodes[3].neighbors().parentX()).toBeGreaterThan(
+      exact[3][0] - exact[0][0]
+    );
+    const document = serializeParsegraphDocument(host);
+    const loaded = deserializeParsegraphDocument(document);
+    const restored = loaded.root.neighbors().nodeAt(D.INWARD);
+    expect(restored.siblings().getLayoutPreference()).toBe(
+      PreferredAxis.VERTICAL
+    );
+    layout(loaded.root);
+    expect(
+      restored.neighbors().nodeAt(D.FORWARD).neighbors().parentX()
+    ).toBeCloseTo(nodes[3].neighbors().parentX(), 8);
+    const saved = serializeParsegraphDocument(loaded.root, loaded);
+    expect(saved.nodes.find((n) => n.id === "0")).toEqual(
+      document.nodes.find((n) => n.id === "0")
+    );
+    expect(saved.capabilities).toEqual(document.capabilities);
+    caret.tighten();
+    layout(host);
+    expect(positions(nodes)).toEqual(exact);
+    host.disconnect(D.INWARD);
+    checkOrder(true);
+    host.connect(D.DOWNWARD, root);
+    caret.pull(D.DOWNWARD);
+    expect(root.siblings().getLayoutPreference()).toBe(PreferredAxis.PARENT);
+    host.connect(D.INWARD, root);
+    checkOrder(true);
+    layout(host);
+    expect(positions(nodes)).toEqual(exact);
+  }
+);
+
+test.each([PreferredAxis.PARENT, PreferredAxis.PERPENDICULAR])(
+  "legacy inward relative preference %s keeps its order on detach",
+  (preference) => {
+    const { root, nodes } = fixture();
+    const host = new DirectionNode([400, 400]);
+    host.connect(D.INWARD, root);
+    root.siblings().setLayoutPreference(preference);
+    layout(host);
+    const order = root.siblings().layoutOrder();
+    const relative = nodes.map((n) => [
+      n.layout().absoluteX() - root.layout().absoluteX(),
+      n.layout().absoluteY() - root.layout().absoluteY(),
+    ]);
+    host.disconnect(D.INWARD);
+    expect(root.siblings().layoutOrder()).toBe(order);
+    layout(root);
+    expect(positions(nodes)).toEqual(relative);
+  }
+);

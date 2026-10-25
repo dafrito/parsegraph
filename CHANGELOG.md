@@ -1,3 +1,14 @@
+## Unreleased
+
+- Preserve absolute horizontal/vertical preferences for inward-contained roots
+  in TypeScript and C. `pull(DOWNWARD)` now uses vertical-first layout and
+  `loosen()` selects horizontal separation. Sibling traversal and detached
+  relative preferences retain the same effective axis order. Geometry can change
+  for inward graphs affected by the previous normalization bug.
+- Verify focus bounds, focus/separation capability round trips, and reversible
+  loose separation through the actual npm archive, including CommonJS, browser
+  UMD, and isolated TypeScript consumers.
+
 ## version 7.0.1
 
 - Use npm's registry transport for the release existence check. The Node fetch

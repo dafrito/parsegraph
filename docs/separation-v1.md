@@ -65,10 +65,13 @@ extents even after loose separation; LOOSE nodes continue simplifying them. NAIV
 node fit can preserve existing positions instead of rerunning separation, so use
 EXACT or LOOSE node fit for predictable responsive spacing.
 
-Known existing limitation: pulling an inward-contained root vertically is
-currently normalized to PERPENDICULAR, interpreted by root-like layout as
-horizontal-first. The new actions follow actual order. This is tracked separately
-on the Parsegraph board as “Inward-root pull loses vertical layout preference.”
+Inward-contained roots preserve absolute HORIZONTAL/VERTICAL preferences, just
+like graph roots. `pull(DOWNWARD)` therefore lays out vertical content first,
+and `loosen()` selects FORWARD/BACKWARD separation there too. Older builds
+normalized an inward root's vertical preference to PERPENDICULAR and incorrectly
+used horizontal-first layout. Legacy relative preferences retain their root-like
+interpretation (PARENT is vertical-first; PERPENDICULAR is horizontal-first),
+including when detached.
 
 ## C API
 

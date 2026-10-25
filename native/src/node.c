@@ -126,7 +126,7 @@ pg_preferred_axis pg_node_canonical_preferred_axis(const pg_node *n) {
     return pref;
 }
 const pg_direction *pg_node_layout_order(const pg_node *n) {
-    if (!n || !n->parent) return !n || n->preferred_axis == PG_PREFERRED_HORIZONTAL || n->preferred_axis == PG_PREFERRED_PERPENDICULAR ? horizontal_order : vertical_order;
+    if (!n || pg_node_is_rootlike(n)) return !n || n->preferred_axis == PG_PREFERRED_HORIZONTAL || n->preferred_axis == PG_PREFERRED_PERPENDICULAR ? horizontal_order : vertical_order;
     bool horizontal = pg_direction_axis(n->parent_direction) == PG_HORIZONTAL;
     if (pg_node_canonical_preferred_axis(n) == PG_PREFERRED_PERPENDICULAR) horizontal = !horizontal;
     return horizontal ? horizontal_order : vertical_order;
@@ -200,7 +200,7 @@ static void reorder_children(pg_node *n) {
 pg_status pg_node_set_preferred_axis(pg_node *n, pg_preferred_axis pref) {
     if (!n || pref < PG_PREFERRED_PARENT || pref > PG_PREFERRED_VERTICAL) return PG_INVALID;
     if (!n->parent && pref != PG_PREFERRED_HORIZONTAL && pref != PG_PREFERRED_VERTICAL) return PG_INVALID;
-    if (n->parent) {
+    if (!pg_node_is_rootlike(n)) {
         pg_axis axis = pg_direction_axis(n->parent_direction);
         if (pref == PG_PREFERRED_HORIZONTAL) pref = axis == PG_HORIZONTAL ? PG_PREFERRED_PARENT : PG_PREFERRED_PERPENDICULAR;
         else if (pref == PG_PREFERRED_VERTICAL) pref = axis == PG_VERTICAL ? PG_PREFERRED_PARENT : PG_PREFERRED_PERPENDICULAR;
@@ -248,7 +248,8 @@ pg_node *pg_node_disconnect(pg_node *n, pg_direction d) {
     child->parent_direction = PG_DIRECTION_NONE;
     n->edges[d].node = NULL;
     /* Relative preferences must become absolute when the parent disappears. */
-    bool vertical = pg_direction_axis(d) == PG_VERTICAL;
+    /* For an inward root, legacy PARENT means vertical-first. */
+    bool vertical = pg_direction_axis(d) != PG_HORIZONTAL;
     if (child->preferred_axis == PG_PREFERRED_PARENT) child->preferred_axis = vertical ? PG_PREFERRED_VERTICAL : PG_PREFERRED_HORIZONTAL;
     else if (child->preferred_axis == PG_PREFERRED_PERPENDICULAR) child->preferred_axis = vertical ? PG_PREFERRED_HORIZONTAL : PG_PREFERRED_VERTICAL;
     if (old_order != pg_node_layout_order(child)) reorder_children(child);
