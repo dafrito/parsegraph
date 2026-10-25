@@ -22,7 +22,8 @@ before a release is cut.
 The native matrix remains independent: Ubuntu and macOS, Debug with sanitizers
 and optimized Release, C/C++ consumer builds, native tests and TypeScript parity,
 a generated SVG, and diagnostic benchmark results. These checks gate the npm
-release too; this workflow does not distribute native binaries.
+release too. Release configurations upload native static-library packages as CI
+artifacts; the npm package and GitHub release attachment job do not include them.
 
 Successful JavaScript jobs upload `parsegraph-node-22` and `parsegraph-node-24`
 artifacts containing the production npm archive, its receipt, versioned API
@@ -46,13 +47,13 @@ yarn pack:release
 yarn doc
 ```
 
-`yarn pack:release` writes `generated/parsegraph-7.0.1.tgz` and
+`yarn pack:release` writes `generated/parsegraph-7.1.0.tgz` and
 `generated/release-package.json` for the current version. The receipt records
 SHA512 integrity, SHA1, and SHA256 hashes. To verify an existing archive without
 rebuilding it:
 
 ```sh
-yarn verify:package -- generated/parsegraph-7.0.1.tgz
+yarn verify:package -- generated/parsegraph-7.1.0.tgz
 ```
 
 After CI downloads a complete candidate, `node tools/release.cjs verify` checks
@@ -82,8 +83,8 @@ exact tested `.tgz` to `npm publish --ignore-scripts`. Only that job receives
 
 A separate job attaches these files to the GitHub Release:
 
-- `parsegraph-7.0.1.tgz`: the same bytes passed to npm.
-- `parsegraph-docs-7.0.1.tgz`: the TypeDoc `docs/` tree for this version.
+- `parsegraph-7.1.0.tgz`: the same bytes passed to npm.
+- `parsegraph-docs-7.1.0.tgz`: the TypeDoc `docs/` tree for this version.
 - `release-package.json`: package identity and archive hashes.
 - `SHA256SUMS`: checksums for the other three files.
 
@@ -119,19 +120,19 @@ be removed once other workflows are confirmed not to depend on them.
 
 ## Cutting version 7
 
-1. Finish and commit the release implementation and version `7.0.1`, including
+1. Finish and commit the release implementation and version `7.1.0`, including
    `yarn.lock` if dependencies changed. Push that commit to GitHub and wait for
    CI. Configure the npm trusted publisher before publishing a GitHub Release.
 2. Confirm the tested tarball works in Freeform and any other consumer that
    needs the new APIs. The [Freeform handoff](docs/freeform-handoff.md) describes
    the document and geometry compatibility requirements.
-3. Create tag `v7.0.1` on the intended tested commit. Create a GitHub Release for
+3. Create tag `v7.1.0` on the intended tested commit. Create a GitHub Release for
    that exact tag with the [version 7 release notes](CHANGELOG.md), leave
    **pre-release** unchecked, and publish it. Publishing the GitHub Release is
    the action that authorizes registry publication.
 4. Watch **Release** in GitHub Actions. Both npm publication and release-asset
    attachment should succeed. Check npm's version and integrity against
-   `release-package.json`, then install `parsegraph@7.0.1` in consumers and
+   `release-package.json`, then install `parsegraph@7.1.0` in consumers and
    regenerate their lockfiles. A package version in source is not evidence that
    it has been published.
 

@@ -1,4 +1,18 @@
-## Unreleased
+## version 7.1.0
+
+- Add directional focus metadata, Caret focus actions, and graph-space bounds
+  queries in TypeScript and C, with optional `focus/1` document serialization.
+- Add per-direction separation fit and Caret `loosen()` / `tighten()` actions
+  in TypeScript and C, with optional `separation/1` serialization. Separation
+  can use bounding boxes while exact combined extents remain intact.
+- Expose measured SVG geometry and focus framing for reference tools and the
+  visual Caret manual. Add matched TypeScript/C benchmarks with HTML reports,
+  JSONL events, and representative SVG scenes.
+- Add installable native CMake targets, relocatable static-library packages,
+  and external C/C++ consumer checks. Native packaging remains separate from npm.
+- Improve maintenance commands and bounded, integrity-checked release recovery.
+
+Fixes and verification:
 
 - Preserve absolute horizontal/vertical preferences for inward-contained roots
   in TypeScript and C. `pull(DOWNWARD)` now uses vertical-first layout and
@@ -8,6 +22,15 @@
 - Verify focus bounds, focus/separation capability round trips, and reversible
   loose separation through the actual npm archive, including CommonJS, browser
   UMD, and isolated TypeScript consumers.
+
+Compatibility:
+
+- Additive JavaScript APIs retain the existing CommonJS/UMD package entry point.
+- The `.parsegraph` envelope remains v1; focus and separation are optional,
+  independently versioned capabilities. Readers must honor separation to
+  reproduce its spacing; focus metadata does not itself change layout.
+- Native consumers should rebuild; the experimental C library does not promise
+  a stable binary ABI.
 
 ## version 7.0.1
 

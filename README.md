@@ -1,7 +1,7 @@
 # Installation
 
-Install the published JavaScript layout library with `yarn add parsegraph@7.0.1`
-or `npm install parsegraph@7.0.1`. Import the public API from `parsegraph` as shown
+Install the published JavaScript layout library with `yarn add parsegraph@7.1.0`
+or `npm install parsegraph@7.1.0`. Import the public API from `parsegraph` as shown
 below. The package includes TypeScript declarations and a UMD/CommonJS runtime;
 it supports browser bundlers and Node CommonJS consumers. It does not provide a
 native ESM entry point. The C library and Qt viewer have separate native builds.
