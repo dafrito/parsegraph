@@ -49,6 +49,9 @@ these caps as evidence that every maximum-sized graph is cheap.
 - `report.summary.json`: per-operation medians, quartiles, extrema and memory
   observations derived from accepted samples.
 - `report-charts/*.svg` and `*.png`: standalone plots for documents and sharing.
+- `report-graphs/*.svg`: one small measured graph per shape, in exact and loose
+  fit. The report embeds these previews and links to the standalone SVGs.
+- `illustrations/`: drawing primitives and a manifest tied to the event stream.
 - `fixtures/*/fixture.txt` and `fixture.json`: exact shared inputs and hashes.
 - `logs/`: build configuration, verification geometry, raw worker JSONL, stderr.
 
@@ -66,6 +69,28 @@ directory for reproducible investigation. Reports preserve failed/interrupted
 status, and exclude unverified or incomplete cases from charts/statistics.
 After a build failure or interruption, the partial JSONL can also be rendered
 using this command. Timing assertions are deliberately absent from tests.
+
+New runs automatically generate graph illustrations. To add them to an existing
+run, retain its `fixtures/` and verification `logs/`, then run:
+
+```sh
+/tmp/parsegraph-bench-env/bin/python tools/bench/bench.py illustrate \
+  generated/benchmarks/my-first-run/events.jsonl
+/tmp/parsegraph-bench-env/bin/python tools/bench/bench.py report \
+  generated/benchmarks/my-first-run/events.jsonl \
+  --output generated/benchmarks/my-first-run/report.html
+```
+
+Illustration compiles the TypeScript worker and lays out only the smallest
+accepted size for each shape/fit. No timings are rerun or changed. It verifies
+the resulting node geometry against the saved native full-layout snapshot, then
+uses the public body/connector painting helpers to produce SVG. If library
+changes alter that geometry, illustration fails rather than showing a different
+graph as historical evidence. Thumbnails fit independently for legibility, show
+their actual bounds, and offer a same-scale toggle to compare packing. Colors
+identify paint groups; sizes are the actual
+synthetic benchmark sizes. Report regeneration subsequently needs only the saved
+illustrations and events, and does not invoke Node or the layout algorithm.
 
 ## Workload contract
 

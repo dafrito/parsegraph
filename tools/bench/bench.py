@@ -201,6 +201,8 @@ def run(args):
         raise
     finally:
         events.file.close()
+    import preview
+    preview.generate(out / "events.jsonl")
     report.render(out / "events.jsonl", out / "report.html")
     return bool(failed)
 
@@ -220,7 +222,13 @@ def main():
     p = sub.add_parser("report", help="Regenerate HTML/plots from existing JSONL without rerunning benchmarks")
     p.add_argument("events", type=Path)
     p.add_argument("--output", type=Path, required=True)
+    p = sub.add_parser("illustrate", help="Generate representative SVGs from saved fixtures; checks geometry without rerunning timings")
+    p.add_argument("events", type=Path)
     args = parser.parse_args()
+    if args.command == "illustrate":
+        import preview
+        preview.generate(args.events)
+        return 0
     if args.command == "report":
         import report
         report.render(args.events, args.output)

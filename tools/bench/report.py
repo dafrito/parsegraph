@@ -74,10 +74,12 @@ def summarize(rows):
 
 
 def render(events_path, output):
+    import preview
     rows = load_events(events_path)
     summary = summarize(rows)
     output = Path(output).resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
+    gallery = preview.gallery(events_path, rows, output)
     charts = output.parent / (output.stem + "-charts")
     charts.mkdir(exist_ok=True)
     os.environ.setdefault("MPLCONFIGDIR", str(output.parent / ".matplotlib"))
@@ -186,6 +188,11 @@ img{{display:block;width:100%;height:auto}}.notice{{padding:16px 20px;background
 th,td{{padding:8px 12px;text-align:left;border-bottom:1px solid #ddd;white-space:nowrap}}th{{position:sticky;top:0;background:#eaf0eb}}
 pre{{white-space:pre-wrap;overflow-wrap:anywhere;background:#eef0ed;padding:18px;font-size:12px}}input{{padding:10px;font:inherit;width:min(90%,450px);margin:16px 0}}
 footer{{margin-top:48px;color:#5f6b74;font-size:13px}}
+.graph-pair{{display:grid;grid-template-columns:1fr 1fr;gap:16px}}figure{{margin:0;min-width:0}}figcaption{{font-weight:600;margin-bottom:8px}}
+.graph-preview{{height:260px;object-fit:contain;background:#faf9f6;border:1px solid #d6ddd9;border-radius:6px}}
+input.graph-scale{{width:auto;margin:8px 5px 14px 0}}
+#workload-graphs article{{padding:20px 0;border-bottom:1px solid #d6ddd9}}#workload-graphs h3{{margin-bottom:0}}
+@media(max-width:650px){{.graph-pair{{grid-template-columns:1fr}}}}
 </style><main><div class="eyebrow">Parsegraph · headless performance</div>
 <h1>Same graphs. Two implementations.</h1>
 <p class="lead">Controlled TypeScript and C workloads, checked for geometry agreement before timing comparisons. This report is a reusable artifact generated from the accompanying JSONL event stream.</p>
@@ -195,6 +202,7 @@ footer{{margin-top:48px;color:#5f6b74;font-size:13px}}
 <p><a href="{e(source_link, quote=True)}">JSONL events</a> · <a href="{e(summary_path.name, quote=True)}">Summary JSON</a> · <a href="{e(charts.name, quote=True)}/full-layout.svg">Reusable SVG chart</a></p>
 <div class="notice"><strong>Read the endpoint, not just the number.</strong> TypeScript eagerly computes positions; C can defer them. <code>/api</code> timings therefore measure different internal work. Compare <code>/ready</code> for the shared end-to-end contract. No timing thresholds or universal speedup claims.</div>
 {'<div class="errors"><strong>Incomplete/failed cases are excluded.</strong><ul>' + error_text + '</ul></div>' if errors or status != 'passed' else ''}
+{gallery}
 {''.join(sections)}
 <details><summary>All accepted measurements</summary><label>Filter rows <input id="filter" placeholder="e.g. comb, full_layout/api, typescript"></label><div class="scroll"><table id="samples">
 <thead><tr>{''.join('<th>'+h+'</th>' for h in ['Shape','Nodes','Fit','Runtime','Stage','Trials','Median ms/op','P25–P75','Measured nodes/op','Live bounds'])}</tr></thead><tbody>{''.join(table)}</tbody></table></div></details>
@@ -202,7 +210,8 @@ footer{{margin-top:48px;color:#5f6b74;font-size:13px}}
 <p>Demo fixtures reuse the actual generator topology with synthetic precomputed body sizes and a four-unit gap. Exact/loose fits intentionally produce different spacing. GC, allocator and JIT effects remain part of their runtimes. Extent accounting is not peak RSS; Node arrayBuffers is a subset of external memory, not an additional allocation.</p>
 <pre>{e(json.dumps(start, indent=2))}</pre></details>
 <footer>Generated with Matplotlib {e(matplotlib.__version__)}. Plots use log axes; zero-duration samples remain in JSON/table. Median and interquartile ranges describe these observations only. Graphics snapshots, font rendering, GPU/VRAM, and browser costs are outside this run.</footer></main>
-<script>document.getElementById('filter').addEventListener('input',function(){{const q=this.value.toLowerCase();document.querySelectorAll('#samples tbody tr').forEach(r=>r.hidden=!r.textContent.toLowerCase().includes(q));}});</script></html>'''
+<script>document.getElementById('filter').addEventListener('input',function(){{const q=this.value.toLowerCase();document.querySelectorAll('#samples tbody tr').forEach(r=>r.hidden=!r.textContent.toLowerCase().includes(q));}});
+document.querySelectorAll('.graph-scale').forEach(c=>c.addEventListener('change',function(){{this.closest('article').querySelectorAll('.graph-preview').forEach(img=>img.src=this.checked?img.dataset.shared:img.dataset.fitted);}}));</script></html>'''
     output.write_text(document)
     print(f"Report: {output}")
     return summary

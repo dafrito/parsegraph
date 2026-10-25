@@ -3,9 +3,11 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 
 import bench
 import report
+import preview
 
 
 def events():
@@ -23,6 +25,40 @@ def events():
 
 
 class AcceptanceTests(unittest.TestCase):
+    def test_svg_preserves_world_geometry_and_shared_viewport(self):
+        rectangles = [dict(kind="body", node=0, group=0, x=-10, y=15, width=20, height=8),
+                      dict(kind="line", node=0, group=0, x=5, y=15, width=10, height=1)]
+        viewport = (-50, -40, 100, 80)
+        xml = ET.fromstring(preview.svg(rectangles, viewport, '<demo & "fit">'))
+        self.assertEqual(xml.attrib["viewBox"], "-62 -52 174 144")
+        self.assertEqual(xml.find('{http://www.w3.org/2000/svg}title').text, '<demo & "fit">')
+        bodies = [r for r in xml if r.attrib.get("data-kind") == "body"]
+        self.assertEqual(bodies[0].attrib["x"], "-20")
+        self.assertEqual(bodies[0].attrib["y"], "11")
+        self.assertEqual(bodies[0].attrib["width"], "20")
+        rectangles[0]["x"] = float("nan")
+        with self.assertRaises(ValueError):
+            preview.svg(rectangles, viewport, "bad")
+
+    def test_painted_bodies_apply_world_scale_exactly_once(self):
+        drawing = dict(geometry=[[10, 20, .5, 0, 0, 1, 24, 16]],
+                       rectangles=[dict(kind="body", node=0, group=0, x=10, y=20, width=12, height=8)])
+        preview.validate_bodies(drawing, 1)
+        drawing["rectangles"][0]["width"] = 24
+        with self.assertRaisesRegex(ValueError, "world geometry"):
+            preview.validate_bodies(drawing, 1)
+
+    def test_gallery_binds_illustrations_to_event_stream(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            events_path = root / "events.jsonl"
+            events_path.write_text("test")
+            (root / "illustrations").mkdir()
+            (root / "illustrations/manifest.json").write_text(json.dumps(dict(
+                schema="parsegraph.bench.illustrations/1", run_id="different", events_sha256="wrong")))
+            with self.assertRaisesRegex(ValueError, "match this benchmark run"):
+                preview.gallery(events_path, events(), root / "report.html")
+
     def test_geometry_checks_every_node_and_stage(self):
         a = [{"type": "geometry", "stage": "full_layout", "nodes": [[0.] * 16, [1.] * 16]}]
         b = copy.deepcopy(a)

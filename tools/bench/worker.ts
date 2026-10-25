@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { CommitLayout, DirectionNode, Fit } from "../../src";
+import { drawing } from "./drawing";
 
 const [file, fitName, warmupText, mode] = process.argv.slice(2);
 const raw = readFileSync(file, "utf8").trim().split(/\s+/).map(Number);
@@ -53,6 +54,13 @@ function trial(emit: boolean) {
     getSeparation: () => 4,
   });
   const construct = elapsed(start);
+  if (mode === "drawing") {
+    while (layout.crank()) {
+      /* Illustration only; no benchmark samples. */
+    }
+    if (emit) console.log(JSON.stringify(drawing(nodes)));
+    return;
+  }
   function memory() {
     let bounds = 0,
       capacity = 0;
